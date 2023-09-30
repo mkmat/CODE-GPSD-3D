@@ -65,7 +65,7 @@ If called without any argument, GPSD-3D shows the documentation.
 
 **-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, rc=0 is used)
 
-**-q= *q***:    positive quality integer *q* (if not specified, quality=1 is used)
+**-q= *q***:    positive quality integer *q* (if not specified, quality=1 is used. The number of random shots is 10000 times *q*)
 
 ## Output
 
