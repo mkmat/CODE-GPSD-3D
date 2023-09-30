@@ -157,7 +157,7 @@ and the following file (a list of roughly 13000 *r* values) should have been gen
 
         .benchmark-7-config-radii-GPSD-3D.txt
 
-With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can visualize a graph. 
+With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. 
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
