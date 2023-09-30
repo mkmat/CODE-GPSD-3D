@@ -145,9 +145,11 @@ As we did not specify -quiet, it should produce the following stdout:
         [GPSD-3D]                             start MC .. 
         [GPSD-3D]                  created: list of radii
         [GPSD-3D]               effective volume fraction     0.690
-        [GPSD-3D]                       mean pore radius      1.542
+        [GPSD-3D]                         min pore radius     0.019   
+        [GPSD-3D]                        mean pore radius     1.542 +/- 0.003
+        [GPSD-3D]                         max pore radius     2.847
         [GPSD-3D]               cpu per 1000 shots [secs]     2.510
-        [GPSD-3D]         shots (use -quality to enlarge)     20000
+        [GPSD-3D]               shots (use -q to enlarge)     20000
         [GPSD-3D]   time spent in read_voro_output [secs]     0.244
         [GPSD-3D]    time spent in setup_triangles [secs]     0.002
         [GPSD-3D]         time spent in MonteCarlo [secs]    50.198
