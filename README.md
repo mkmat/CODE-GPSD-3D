@@ -56,8 +56,9 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-rc=<value>] 
           [-q=<integer>] 
           [-o=<filename>]
+          [-more]
           [-quiet]
-          [-clean] 
+          [-clean]
 
 **-in=configfilename**:    name of the file containing the configuration (as described above)
 
@@ -69,13 +70,15 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, *r<sub>c</sub>=0* is used)
 
-**-q= *q***:    positive quality integer *q* (if not specified, *q=1* is used. The number of random shots is 10000 times *q*)
+**-q= *q***:    (optionally) positive quality integer *q* (if not specified, *q=1* is used. The number of random shots is 10000 times *q*)
 
 **-o=outputfilename**:     (optionally) name of the resulting file containing a list of pore radii (if not specified, the list is saved in configfilename.gpsd)
 
-**-quiet**:                do not produce any stdout.
+**-more**:                 (optionally) add, besides pore radius (column 1), the corresponding pore center (columns 2,3,4) to the outputfile (for visualization purposes)
 
-**-clean**:                remove all temporary directories that may have been generated during a crash. 
+**-quiet**:                (optionally) do not produce any stdout.
+
+**-clean**:                GPSD-3D -clean removes all temporary directories that may have been generated during previous crashes. 
 
 ### Comments: 
 
