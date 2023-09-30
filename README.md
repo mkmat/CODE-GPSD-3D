@@ -1,6 +1,8 @@
 # CODE-GPSD-3D
 Generalized pore size distribution for periodic systems of monodisperse spheres
 
+<img src="images/schematic-GPSD3D-github.png" width="40%">
+
 ## Installation
 
 Download GPSD-3D.tar and unpack it in a new directory named GPSD-3D: 
@@ -66,6 +68,8 @@ If called without any argument, GPSD-3D shows the documentation.
 **-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, rc=0 is used)
 
 **-q= *q***:    positive quality integer *q* (if not specified, quality=1 is used. The number of random shots is 10000 times *q*)
+
+
 
 ## Output
 
