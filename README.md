@@ -103,7 +103,7 @@ A number of configurations and corresponding box-files are available from the cu
 
         perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=1
 
-As we did not specify -quiet, it should produce the following stdout:
+As we did not suppress stdout via -quiet, it should produce the following:
 
        _______________________________________________________________________________________________________________________________
 
@@ -159,7 +159,7 @@ and the following file (a list of roughly 13000 *r* values) should have been gen
 
         .benchmark-7-config-radii-GPSD-3D.txt
 
-With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. 
+With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. 
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
