@@ -158,9 +158,9 @@ As we did not suppress stdout via -quiet, it should produce the following:
 
 and the following file (a list of roughly 13000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
-        .benchmark-7-config-radii-GPSD-3D.txt
+        .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
-With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. 
+With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. 
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
