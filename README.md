@@ -57,9 +57,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-q=<integer>] 
           [-o=<filename>]
           [-quiet]
-The leading 'perl' is only needed, if your system does not automatically recognize GPSD-3D to be a perl file. If GPSD-3D is not found, call it via: perl ./GPSD-3D.
-
-If called without any argument, GPSD-3D displays the documentation.
+          [-clean] 
 
 **-in=configfilename**:    name of the file containing the configuration (as described above)
 
@@ -75,8 +73,16 @@ If called without any argument, GPSD-3D displays the documentation.
 
 **-o=outputfilename**:     (optionally) name of the resulting file containing a list of pore radii (if not specified, the list is saved in configfilename.gpsd)
 
-**-quiet**:                do not produce any stdout
+**-quiet**:                do not produce any stdout.
 
+**-clean**:                remove all temporary directories that may have been generated during a crash. 
+
+### Comments: 
+
+1. The leading 'perl' is only needed, if your system does not automatically recognize GPSD-3D to be a perl file. If GPSD-3D is not found, call it via: perl ./GPSD-3D.
+2. If called without any argument, GPSD-3D displays the documentation.
+3. GPSD-3D can be called in parallel. 
+4. Each GPSD-3D call runs in a unique temporary directory, upon successful completion the temporary directory is removed. 
 
 
 ## Output
