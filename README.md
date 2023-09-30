@@ -97,6 +97,68 @@ GPSD-3D returns a list of pore radii *r* in a file, either in configfilename.gps
 
 This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>* can be used to effectively modify the stored particle radii, without changing the configuration file. 
 
+## Test configurations and test runs
+
+A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call is: 
+
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=1
+
+As we did not specify -quiet, it should produce the following stdout:
+
+       _______________________________________________________________________________________________________________________________
+
+        This is GPSD-3D version 1.0 written by Martin Kroger 2023, ETH Zurich, https://www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
+
+        Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
+        Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
+
+        GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
+        GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
+        _______________________________________________________________________________________________________________________________
+
+
+        [INFO] using configuration file .benchmark-7-config
+        [INFO] using box file .benchmark-7-box
+        [PREPARING] scanning .benchmark-7-box
+        [PREPARING] recognized format (B)
+        [INFO] monodisperse: 1
+        [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
+        [INFO] created files in .tmp-GPSD-3D-33491 including .parameters.
+        [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
+        [GPSD-3D] calling cd .tmp-GPSD-3D-33491; voro++ -p -o -c "%i %x %y %z %s %l %w %p %t" 0 24 0 24 0 24 config.txt
+        [GPSD-3D] creating voro++ triangles data ..
+        [GPSD-3D] Using 20000 shots
+        [GPSD-3D] Please stand by ..
+        [GPSD-3D]                          reading box ..
+        [GPSD-3D]                                     box    24.000     24.000     24.000
+        [GPSD-3D]                  reading _triangles.txt
+        [GPSD-3D]     reading and processing triangles ..
+        [GPSD-3D]                                       N      2000
+        [GPSD-3D]                               triangles    119244
+        [GPSD-3D]                         UpperPoreRadius     2.847
+        [GPSD-3D]                                   ro+rc     1.000
+        [GPSD-3D]                                      rp     0.000
+        [GPSD-3D]              max_triangle_max_extension     3.461
+        [GPSD-3D]               creating neighbor list ..
+        [GPSD-3D]                          neighborlist_M         3          3          3
+        [GPSD-3D]                       neighborlist_size     8.000      8.000      8.000
+        [GPSD-3D]                             start MC .. 
+        [GPSD-3D]                  created: list of radii
+        [GPSD-3D]               effective volume fraction     0.690
+        [GPSD-3D]                       mean pore radius      1.542
+        [GPSD-3D]               cpu per 1000 shots [secs]     2.510
+        [GPSD-3D]         shots (use -quality to enlarge)     20000
+        [GPSD-3D]   time spent in read_voro_output [secs]     0.244
+        [GPSD-3D]    time spent in setup_triangles [secs]     0.002
+        [GPSD-3D]         time spent in MonteCarlo [secs]    50.198
+        [GPSD-3D] completed
+
+and the following file (a list of roughly 13000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
+
+        .benchmark-7-config-radii-GPSD-3D.txt
+
+With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can visualize a graph. 
+
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
 For the case of polydisperse systems, the GPSD-3D script contains two lines that may be edited by users to increase or reduce the resolution further. The default setting is:  
