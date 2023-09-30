@@ -1,7 +1,7 @@
 # CODE-GPSD-3D
 Generalized pore size distribution for periodic systems of monodisperse spheres
 
-<img src="images/schematic-GPSD3D-github.png" width="40%">
+<img src="images/schematic-GPSD3D-github.png" width="100%">
 
 ## Installation
 
