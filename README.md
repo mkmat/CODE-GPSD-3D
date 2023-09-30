@@ -3,6 +3,8 @@ Generalized pore size distribution for periodic systems of monodisperse spheres
 
 <img src="images/schematic-GPSD3D-github.png" width="100%">
 
+For monodisperse systems GPSD-3D uses the advanced (grid-free) voronoi-based algorithm. For polydisperse systems, it uses a basic grid-based algorithm, whose resolution is limited by the amount of available memory. The settings of the grid-based algorithm are hard-coded in the file GPSD-3D, and can be modified there (see [below](#hardcoded) for details). 
+
 ## Installation
 
 Download GPSD-3D.tar and unpack it in a new directory named GPSD-3D: 
@@ -36,17 +38,17 @@ But, if you have voro++ not yet installed, or no fortran compiler, you will end 
 
 The input required by GPSD-3D are (i) coordinates: the center positions of *N* monodisperse or polydisperse spheres, that are located inside a rectangular, periodic box, whose corners are specified by (ii) box geometry: 6 values: xlo,xhi,ylo,yhi,zlo,zhi. We offer various file formats, where each of the *N* lines contains the coordinates, and eventually also the radius of a single sphere
 
-1. x y z (monodisperse system)
-2. id x y z (monodisperse system)        
+1. x y z (monodisperse system, requires specifying -ro on the command line)
+2. id x y z (monodisperse system, requires specifying -ro on the command line)        
 3. id x y z radius  (polydisperse system, monodisperse if all radii are equal)
-4. samarth-type configuration file (do not specify box dimensions in that case)
+4. samarth-type configuration file (do not specify box dimensions in that case, requires specifying -ro on the command line)
 
 The six values for the box can be either saved in a txt-file (single line, six values xlo xhi ylo yhi zlo zhi separated by blank or commata), or passed over on the command line.  
 
 
 ## How to run the code. Parameters. Command-line options
 
-      perl GPSD-3D 
+      perl GPSD-3D
           -in=<filename>
           -box=<filename> OR -xlo=.. -xhi=.. ylo=.. -yhi=.. -zlo=.. -zhi=..
           [-ro=<value>] 
@@ -55,8 +57,9 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-q=<integer>] 
           [-o=<filename>]
           [-quiet]
+The leading 'perl' is only needed, if your system does not automatically recognize GPSD-3D to be a perl file. If GPSD-3D is not found, call it via: perl ./GPSD-3D.
 
-If called without any argument, GPSD-3D shows the documentation.
+If called without any argument, GPSD-3D displays the documentation.
 
 **-in=configfilename**:    name of the file containing the configuration (as described above)
 
@@ -78,9 +81,19 @@ If called without any argument, GPSD-3D shows the documentation.
 
 ## Output
 
-GPSD-3D returns a list of pore radii in a file, either in configfilename.gpsd or outputfilename, if the latter had explicitly been defined on the command line. 
+GPSD-3D returns a list of pore radii *r* in a file, either in configfilename.gpsd or outputfilename, if the latter had explicitly been defined on the command line. 
 
-## How to run GPSD-3D
+        0.65831239517769990
+        0.27475487839819612
+        1.0705469842835491E-003
+        0.68528964734647357
+        ...
 
+This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>" can be used to effectively modify the stored radii, without changing the configuration file. 
 
+## Polydisperse systems: Grid-based <a name="hardcoded">
 
+For the case of polydisperse systems, the GPSD-3D script contains two lines that may be edited by users to increase or reduce the resolution further. The default setting is:  
+
+        $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
+        $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
