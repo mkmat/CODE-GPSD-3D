@@ -63,11 +63,11 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-box=< boxfile >**:      name of the file containing the box geometry (as described above, alternatively, the box size can be passed over on the command line)
 
-**-ro= *r<sub>o</sub>***:   particle radius *r<sub>o</sub>* (required, if the particle radii are not contained in the input file. If ro is specified, existing radii in the input file are ignored)
+**-ro= *r<sub>o</sub>***:   particle radius *r<sub>o</sub>* (required, if the particle radii are not contained in the input file. If *r<sub>o</sub>* is specified, existing radii in the input file are ignored)
 
-**-rp= *r<sub>p</sub>***:   (optionally) probe particle radius *r<sub>p</sub>*  (if not specified, rp=0 is used)
+**-rp= *r<sub>p</sub>***:   (optionally) probe particle radius *r<sub>p</sub>*  (if not specified, *r<sub>p</sub>=0* is used)
 
-**-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, rc=0 is used)
+**-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, *r<sub>c</sub=0* is used)
 
 **-q= *q***:    positive quality integer *q* (if not specified, quality=1 is used. The number of random shots is 10000 times *q*)
 
