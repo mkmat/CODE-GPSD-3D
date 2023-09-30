@@ -1,5 +1,5 @@
 # CODE-GPSD-3D
-Generalized pore size distribution for periodic systems of monodisperse spheres
+Generalized pore size distribution for periodic systems composed of spheres. The spheres constitute the 'material', which is surrounded by 'pore space'. This codes allows to calculate the distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*  of pore radii *r* for such system as function of the radius *r<sub>p</sub>* of a thought probe particle and a thought coating thickness *r<sub>c</sub>* of the material spheres. 
 
 <img src="images/schematic-GPSD3D-github.png" width="100%">
 
@@ -89,7 +89,7 @@ GPSD-3D returns a list of pore radii *r* in a file, either in configfilename.gps
         0.68528964734647357
         ...
 
-This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>" can be used to effectively modify the stored radii, without changing the configuration file. 
+This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>* can be used to effectively modify the stored particle radii, without changing the configuration file. 
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
@@ -97,3 +97,14 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
 
         $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
         $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
+
+## About
+
+Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
+
+Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
+
+GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
+
+GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
+
