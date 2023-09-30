@@ -39,7 +39,7 @@ The input required by GPSD-3D are (i) coordinates: the center positions of *N* m
 1. x y z (monodisperse system)
 2. id x y z (monodisperse system)        
 3. id x y z radius  (polydisperse system, monodisperse if all radii are equal)
-4. samarth-type configuration file (do not specify -boxfile in this case)
+4. samarth-type configuration file (do not specify box dimensions in that case)
 
 The six values for the box can be either saved in a txt-file (single line, six values xlo xhi ylo yhi zlo zhi separated by blank or commata), or passed over on the command line.  
 
@@ -48,16 +48,17 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
       perl GPSD-3D 
           -in=<filename>
-          [-box=<filename>] OR [-xlo=.. -xhi=.. ylo=.. -yhi=.. -zlo=.. -zhi=..]
-          [-rp=<value>] 
+          -box=<filename> OR -xlo=.. -xhi=.. ylo=.. -yhi=.. -zlo=.. -zhi=..
           [-ro=<value>] 
+          [-rp=<value>] 
           [-rc=<value>] 
           [-q=<integer>] 
+          [-o=<filename>]
           [-quiet]
 
 If called without any argument, GPSD-3D shows the documentation.
 
-**-in=filename**:    name of the file containing the configuration (as described above)
+**-in=configfilename**:    name of the file containing the configuration (as described above)
 
 **-box=< boxfile >**:      name of the file containing the box geometry (as described above, alternatively, the box size can be passed over on the command line)
 
@@ -69,11 +70,15 @@ If called without any argument, GPSD-3D shows the documentation.
 
 **-q= *q***:    positive quality integer *q* (if not specified, quality=1 is used. The number of random shots is 10000 times *q*)
 
+**-o=outputfilename**:     (optionally) name of the resulting file containing a list of pore radii (if not specified, the list is saved in configfilename.gpsd)
+
+**-quiet**:                do not produce any stdout
+
 
 
 ## Output
 
-GPSD-3D reads the configuration and 
+GPSD-3D returns a list of pore radii in a file, either in configfilename.gpsd or outputfilename, if the latter had explicitly been defined on the command line. 
 
 ## How to run GPSD-3D
 
