@@ -69,7 +69,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, *r<sub>c</sub>=0* is used)
 
-**-q= *q***:    positive quality integer *q* (if not specified, quality=1 is used. The number of random shots is 10000 times *q*)
+**-q= *q***:    positive quality integer *q* (if not specified, *q=1* is used. The number of random shots is 10000 times *q*)
 
 **-o=outputfilename**:     (optionally) name of the resulting file containing a list of pore radii (if not specified, the list is saved in configfilename.gpsd)
 
