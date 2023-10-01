@@ -141,25 +141,27 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [GPSD-3D]                         UpperPoreRadius     2.847
         [GPSD-3D]                                   ro+rc     1.000
         [GPSD-3D]                                      rp     0.000
+        [GPSD-3D]                            reff = rc+rp     0.000
         [GPSD-3D]              max_triangle_max_extension     3.461
         [GPSD-3D]               creating neighbor list ..
         [GPSD-3D]                          neighborlist_M         3          3          3
         [GPSD-3D]                       neighborlist_size     8.000      8.000      8.000
         [GPSD-3D]                             start MC .. 
-        [GPSD-3D]                  created: list of radii
-        [GPSD-3D]               effective volume fraction     0.690
-        [GPSD-3D]                         min pore radius     0.019   
+        [GPSD-3D]               cpu per 1000 shots [secs]     2.516
+        [GPSD-3D]               volume fraction phi(reff)     0.310
+        [GPSD-3D]                                 V(0|rc)  9541.325
+        [GPSD-3D]                         min pore radius     0.019
         [GPSD-3D]                        mean pore radius     1.542 +/- 0.003
         [GPSD-3D]                         max pore radius     2.847
-        [GPSD-3D]               cpu per 1000 shots [secs]     2.510
+        [GPSD-3D]        created a list {r} of pore radii
         [GPSD-3D]               shots (use -q to enlarge)     20000
-        [GPSD-3D]   time spent in read_voro_output [secs]     0.244
+        [GPSD-3D]   time spent in read_voro_output [secs]     0.241
         [GPSD-3D]    time spent in setup_triangles [secs]     0.002
-        [GPSD-3D]         time spent in MonteCarlo [secs]    50.198
+        [GPSD-3D]         time spent in MonteCarlo [secs]    50.320
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
-and the following file (a list of roughly 13000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
+and the following file (a list of roughly 14000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
         .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
