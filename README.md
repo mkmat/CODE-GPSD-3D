@@ -92,13 +92,22 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 GPSD-3D returns a list of pore radii *r* in a file, either in configfilename.gpsd or outputfilename, if the latter had explicitly been defined on the command line. 
 
-        0.65831239517769990
-        0.27475487839819612
-        1.0705469842835491E-003
-        0.68528964734647357
+        0.658312
+        0.274754
+        1.070546
+        0.685289
         ...
 
-This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>* can be used to effectively modify the stored particle radii, without changing the configuration file. 
+This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>* can be used to effectively modify the stored particle radii, without changing the configuration file. If you call GPSD-3D with the -more option, the same file will contain four columns (no header)
+
+        r        x    y    z
+        0.658312 1.31 2.13 1.99
+        0.274754 2.30 1.01 4.02
+        1.070546 ...
+        0.685289 ...
+        ...
+
+where *x*,*y*,*z* are the center coordinates of the pore with radius *r*.
 
 ## Test configurations and test runs
 
