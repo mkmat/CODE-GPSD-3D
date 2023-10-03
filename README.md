@@ -56,6 +56,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-rc=<value>] 
           [-q=<integer>] 
           [-o=<filename>]
+          [-np=<integer>]
           [-more]
           [-quiet]
           [-clean]
@@ -74,6 +75,8 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-o=outputfilename**:     (optionally) name of the resulting file containing a list of pore radii (if not specified, the list is saved in configfilename.gpsd)
 
+**-np= *n<sub>p</sub>***:  (optionally) number of threads to be used (default: maximum number of threads)
+
 **-more**:                 (optionally) add, besides pore radius (column 1), the corresponding pore center (columns 2,3,4) to the outputfile (for visualization purposes)
 
 **-quiet**:                (optionally) do not produce any stdout.
@@ -85,7 +88,8 @@ The six values for the box can be either saved in a txt-file (single line, six v
 1. The leading 'perl' is only needed, if your system does not automatically recognize GPSD-3D to be a perl file. If GPSD-3D is not found, call it via: perl ./GPSD-3D.
 2. If called without any argument, GPSD-3D displays the documentation.
 3. GPSD-3D can be called in parallel. 
-4. Each GPSD-3D call runs in a unique temporary directory, upon successful completion the temporary directory is removed. 
+4. Each GPSD-3D call runs in a unique temporary directory, upon successful completion the temporary directory is removed.
+5. The maximum number of threads used by OpenMP is reported during the installation an if GPSD-3D is called without arguments.
 
 
 ## Output
