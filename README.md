@@ -89,7 +89,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 2. If called without any argument, GPSD-3D displays the documentation.
 3. GPSD-3D can be called in parallel. 
 4. Each GPSD-3D call runs in a unique temporary directory, upon successful completion the temporary directory is removed.
-5. The maximum number of threads used by OpenMP is reported during the installation and also if GPSD-3D is called without arguments.
+5. The maximum number of threads used by OpenMP is reported during the installation and also if GPSD-3D is called without arguments. For very large systems with, say, more than 1000000 spheres, running at the maximum number of threats must not be an advantage and you should check the speed also using a single processor, using -np=1
 
 
 ## Output
