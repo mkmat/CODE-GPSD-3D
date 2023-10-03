@@ -7,7 +7,7 @@ For monodisperse systems GPSD-3D uses the advanced (grid-free) voronoi-based alg
 
 ## Installation
 
-Download GPSD-3D.tar and unpack it in a new directory named GPSD-3D: 
+Download GPSD-3D.tar and unpack it in a new directory named GPSD-3D:
 
     gunzip GPSD-3D.tar.gz; tar -x GPSD-3D.tar; 
 
