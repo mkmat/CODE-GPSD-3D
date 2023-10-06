@@ -190,7 +190,7 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
         $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
         $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
 
-## -info file
+## -info file <a name="info">
 
     N (number of material spheres)
     ro (material sphere radius)
