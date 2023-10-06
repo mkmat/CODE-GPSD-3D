@@ -58,6 +58,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-o=<filename>]
           [-np=<integer>]
           [-more]
+          [-info]
           [-quiet]
           [-clean]
 
@@ -78,6 +79,8 @@ The six values for the box can be either saved in a txt-file (single line, six v
 **-np= *n<sub>p</sub>***:  (optionally) number of threads *n<sub>p</sub>* to be used (default: maximum number of threads)
 
 **-more**:                 (optionally) add, besides pore radius (column 1), the corresponding pore center (columns 2,3,4) to the outputfile (for visualization purposes)
+
+**-info**:                 (optionally) runtime information (cpu times etc) is collected in a file whose name ends with -info (see <a href="#info">below</a> for detailed information)
 
 **-quiet**:                (optionally) do not produce any stdout.
 
@@ -186,6 +189,31 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
 
         $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
         $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
+
+## -info file
+
+    N (number of material spheres)
+    ro (material sphere radius)
+    rp (probe sphere radius)
+    rc (shell thickness)
+    box volume
+    total number of triangles
+    total number of shots
+    total number of pore radius values
+    maximum pore radius
+    minimum pore radius
+    mean pore radius
+    maximum pore radius detected
+    standard error of the mean pore radius
+    volume fraction phi(reff)
+    cpu time used to process the voro++ output
+    cpu time used to setup triangles
+    cpu time spent during Monte Carlo (affected by the number of processors -np)
+    real time spent during Monte Carlo
+    number of neighbor cells
+    np number of processors used
+    
+    
 
 ## About <a name="about">
 
