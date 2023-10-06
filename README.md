@@ -118,9 +118,9 @@ where *x*,*y*,*z* are the center coordinates of the pore with radius *r*.
 
 ## Test configurations and test runs
 
-A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call is: 
+A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call, using 10 of the available threads, 50000 Monte Carlo trials (*q=5*), for a probe sphere with zero radius, and materials spheres of radius 1.0 is 
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=3 -np=10
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=5 -np=10
 
 As we did not suppress stdout via -quiet, it should produce the following:
 
@@ -142,46 +142,80 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [PREPARING] recognized format (B)
         [INFO] monodisperse: 1
         [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-33491 including .parameters.
+        [INFO] created files in .tmp-GPSD-3D-70888 including .parameters.
         [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
-        [GPSD-3D] calling cd .tmp-GPSD-3D-33491; voro++ -p -o -c "%i %x %y %z %s %l %w %p %t" 0 24 0 24 0 24 config.txt
-        [GPSD-3D] creating voro++ triangles data ..
-        [GPSD-3D] Using 60000 shots on 10 threads
+        [GPSD-3D] Using 49996 shots on 10 threads
         [GPSD-3D] Please stand by ..
-        [GPSD-3D]                          reading box ..
-        [GPSD-3D]                                     box    24.000     24.000     24.000
-        [GPSD-3D]                  reading _triangles.txt
-        [GPSD-3D]     reading and processing triangles ..
-        [GPSD-3D]                                       N      2000
-        [GPSD-3D]                               triangles    119244
-        [GPSD-3D]                         UpperPoreRadius     2.847
-        [GPSD-3D]                                   ro+rc     1.000
-        [GPSD-3D]                                      rp     0.000
-        [GPSD-3D]                            reff = rc+rp     0.000
-        [GPSD-3D]              max_triangle_max_extension     3.461
-        [GPSD-3D]               creating neighbor list ..
-        [GPSD-3D]                          neighborlist_M         3          3          3
-        [GPSD-3D]                       neighborlist_size     8.000      8.000      8.000
-        [GPSD-3D]                             start MC .. 
-        [GPSD-3D]               cpu per 1000 shots [secs]     2.516
-        [GPSD-3D]               volume fraction phi(reff)     0.310
-        [GPSD-3D]                                 V(0|rc)  9541.325
-        [GPSD-3D]                         min pore radius     0.019
-        [GPSD-3D]                        mean pore radius     1.542 +/- 0.003
-        [GPSD-3D]                         max pore radius     2.847
-        [GPSD-3D]        created a list {r} of pore radii
-        [GPSD-3D]               shots (use -q to enlarge)     20000
-        [GPSD-3D]   time spent in read_voro_output [secs]     0.241
-        [GPSD-3D]    time spent in setup_triangles [secs]     0.002
-        [GPSD-3D]         time spent in MonteCarlo [secs]    50.320
-        [GPSD-3D] completed
-        [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
+        [GPSD-3D]                               reading box ..
+        [GPSD-3D]                                          box      24.000       24.000       24.000
+        [VORO++]                                  max_vertices          53
+        [VORO++]                                voro_max_faces          31
+        [VORO++]                    voro_max_vertices_for_face          12
+        [GPSD-3D]                                    triangles      119244
+        [GPSD-3D]                      parallel processes (np)          10
+        [GPSD-3D]                                            N        2000
+        [GPSD-3D]                                    triangles      119244
+        [GPSD-3D]                              UpperPoreRadius       2.847
+        [GPSD-3D]                                           ro       1.000
+        [GPSD-3D]                                           rc       0.000
+        [GPSD-3D]                                           rp       0.000
+        [GPSD-3D]                                 reff = rc+rp       0.000
+        [GPSD-3D]                    creating neighbor list ..
+        [GPSD-3D]                               neighborlist_M           4            4            4
+        [GPSD-3D]                            neighborlist_size       6.000        6.000        6.000
+        [GPSD-3D]                                  start MC ..
+        [GPSD-3D]                    cpu per 1000 shots [secs]       1.416
+        [GPSD-3D]                    volume fraction phi(reff)       0.474
+        [GPSD-3D]                                      V(0|rc)    7266.752
+        [GPSD-3D]                              min pore radius       0.075
+        [GPSD-3D]                             mean pore radius       1.793 +/-        0.002
+        [GPSD-3D]                              max pore radius       3.418
+        [GPSD-3D]             created a list {r} of pore radii
+        [GPSD-3D]                    shots (use -q to enlarge)       49996
+        [GPSD-3D]    cpu time spent in read_voro_output [secs]       0.159
+        [GPSD-3D]     cpu time spent in setup_triangles [secs]       0.002
+        [GPSD-3D]          cpu time spent in MonteCarlo [secs]      70.788
+        [GPSD-3D]         real time spent in MonteCarlo [secs]       7.320
+        [GPSD-3D] completed after 8.35455751419067 secs
+
+
 
 and the following file (a list of roughly 14000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
         .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
 With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. 
+
+## DEBUGGING - REFERENCE CODE
+
+    [GPSD-3D]                          reading box ..
+    [GPSD-3D]                                     box    24.000     24.000     24.000
+    [GPSD-3D]                  reading _triangles.txt
+    [GPSD-3D]     reading and processing triangles ..
+    [GPSD-3D]                                       N      2000
+    [GPSD-3D]                               triangles    119244
+    [GPSD-3D]                         UpperPoreRadius     2.847
+    [GPSD-3D]                                   ro+rc     1.000
+    [GPSD-3D]                                      rp     0.000
+    [GPSD-3D]                            reff = rc+rp     0.000
+    [GPSD-3D]              max_triangle_max_extension     3.461
+    [GPSD-3D]               creating neighbor list ..
+    [GPSD-3D]                          neighborlist_M         3          3          3
+    [GPSD-3D]                       neighborlist_size     8.000      8.000      8.000
+    [GPSD-3D]                             start MC .. 
+    [GPSD-3D]               cpu per 1000 shots [secs]     2.516
+    [GPSD-3D]               volume fraction phi(reff)     0.310
+    [GPSD-3D]                                 V(0|rc)  9541.325
+    [GPSD-3D]                         min pore radius     0.019
+    [GPSD-3D]                        mean pore radius     1.542 +/- 0.003
+    [GPSD-3D]                         max pore radius     2.847
+    [GPSD-3D]        created a list {r} of pore radii
+    [GPSD-3D]               shots (use -q to enlarge)     20000
+    [GPSD-3D]   time spent in read_voro_output [secs]     0.241
+    [GPSD-3D]    time spent in setup_triangles [secs]     0.002
+    [GPSD-3D]         time spent in MonteCarlo [secs]    50.320
+    [GPSD-3D] completed
+    [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
