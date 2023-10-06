@@ -72,7 +72,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, *r<sub>c</sub>=0* is used)
 
-**-q= *q***:    (optionally) positive quality integer *q* (if not specified, *q=1* is used. The number of random shots is 10000 times *q*)
+**-q= *q***:    (optionally) positive quality value *q* (if not specified, *q=1* is used. The number of random shots is 10000 times *q*)
 
 **-o=outputfilename**:     (optionally) name of the resulting file containing a list of pore radii (if not specified, the list is saved in configfilename.gpsd)
 
@@ -120,7 +120,7 @@ where *x*,*y*,*z* are the center coordinates of the pore with radius *r*.
 
 A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call is: 
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=1
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=3 -np=10
 
 As we did not suppress stdout via -quiet, it should produce the following:
 
@@ -146,7 +146,7 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
         [GPSD-3D] calling cd .tmp-GPSD-3D-33491; voro++ -p -o -c "%i %x %y %z %s %l %w %p %t" 0 24 0 24 0 24 config.txt
         [GPSD-3D] creating voro++ triangles data ..
-        [GPSD-3D] Using 20000 shots
+        [GPSD-3D] Using 60000 shots on 10 threads
         [GPSD-3D] Please stand by ..
         [GPSD-3D]                          reading box ..
         [GPSD-3D]                                     box    24.000     24.000     24.000
@@ -211,7 +211,7 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
     cpu time spent during Monte Carlo (affected by the number of processors -np)
     real time spent during Monte Carlo
     number of neighbor cells
-    np number of processors used
+    np number of threads used in parallel
     
     
 
