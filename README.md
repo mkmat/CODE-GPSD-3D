@@ -142,7 +142,7 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [PREPARING] recognized format (B)
         [INFO] monodisperse: 1
         [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-120837 including .parameters.
+        [INFO] created files in .tmp-GPSD-3D-150852 including .parameters.
         [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
         [GPSD-3D] Using 49996 shots on 10 threads
         [GPSD-3D] Please stand by ..
@@ -165,7 +165,6 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [GPSD-3D]                               neighborlist_M           3            3            3
         [GPSD-3D]                            neighborlist_size       8.000        8.000        8.000
         [GPSD-3D]                                  start MC ..
-        [GPSD-3D]                    cpu per 1000 shots [secs]       2.640
         [GPSD-3D]                    volume fraction phi(reff)       0.310
         [GPSD-3D]                                      V(0|rc)    9536.835
         [GPSD-3D]                              min pore radius       0.013
@@ -173,12 +172,14 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [GPSD-3D]                              max pore radius       2.847
         [GPSD-3D]             created a list {r} of pore radii
         [GPSD-3D]                    shots (use -q to enlarge)       49996
-        [GPSD-3D]    cpu time spent in read_voro_output [secs]       0.136
-        [GPSD-3D]     cpu time spent in setup_triangles [secs]       0.002
-        [GPSD-3D]          cpu time spent in MonteCarlo [secs]     131.968
-        [GPSD-3D]         real time spent in MonteCarlo [secs]      13.523
+        [GPSD-3D]       cpu+real time spent in overhead [secs]       0.000        0.000
+        [GPSD-3D]cpu+real time spent in read_voro_output [secs       0.138        0.312
+        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.002        0.000
+        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]     131.935       13.312
+        [GPSD-3D]         cpu+real time per 10000 shots [secs]      26.389        2.663
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
+
 
 and the following file (a list of roughly 40000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
@@ -190,7 +191,7 @@ With such list of values at hand, creating the normalized histogram (the pore ra
 
 a second file will have been generated (all entries in this file are described <a href="#info">below</a>
 
-        .benchmark-7-config-ro=1-rp=0-rc=0.gpsd-info
+         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd-info
 
         2000
         1.0000000000000000
@@ -202,17 +203,20 @@ a second file will have been generated (all entries in this file are described <
         34491
         2.8465466781177895
         1.3079602754612063E-002
-        1.5456996167600574
+        1.5456996167600578
         2.8465466781177895
-        1.8930148098899810E-003
+        1.8930148098899714E-003
         0.31012480998479874
-        0.138192996
-        2.42200494E-03
-        131.378937
-        13.3360004
         27
         10
-        13.6403434276581
+        2.12999992E-04
+        0.00000000
+        0.137589008
+        0.312500000
+        2.41599977E-03
+        0.00000000
+        13.6250936985016
+
 
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
@@ -238,13 +242,14 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
     maximum pore radius detected
     standard error of the mean pore radius
     volume fraction phi(reff)
-    cpu time used to process the voro++ output
-    cpu time used to setup triangles
-    cpu time spent during Monte Carlo (affected by the number of processors -np)
-    real time spent during Monte Carlo
     number of neighbor cells
     np number of threads used in parallel
-    total walltime
+    cpu time used to process the voro++ output
+    real time used to process the voro++ output
+    cpu time used to setup triangles
+    real time used to setup triangles
+    cpu time spent during Monte Carlo 
+    real time spent during Monte Carlo 
     
     
 ## About <a name="about">
