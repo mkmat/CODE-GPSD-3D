@@ -72,7 +72,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, *r<sub>c</sub>=0* is used)
 
-**-q= *q***:    (optionally) positive quality value *q* (if not specified, *q=1* is used. The number of random shots is 10000 times *q*)
+**-q= *q***:    (optionally) positive quality value *q* (if not specified, *q=10* is used. The number of random shots is *q* times the number of material spheres)
 
 **-o=outputfilename**:     (optionally) name of the resulting file containing a list of pore radii (if not specified, the list is saved in configfilename.gpsd)
 
@@ -120,7 +120,7 @@ where *x*,*y*,*z* are the center coordinates of the pore with radius *r*.
 
 A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call, using 10 of the available threads, 50000 Monte Carlo trials (*q=5*), for a probe sphere with zero radius, and materials spheres of radius 1.0 is 
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=5 -np=10
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10
 
 As we did not suppress stdout via -quiet, it should produce the following:
 
@@ -187,7 +187,7 @@ and the following file (a list of roughly 40000 *r* values) should have been gen
 
 With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. If you repeat the above command, now using the -info option
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=5 -np=10 -info
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info
 
 a second file will have been generated (all entries in this file are described <a href="#info">below</a>
 
