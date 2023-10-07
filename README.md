@@ -142,7 +142,7 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [PREPARING] recognized format (B)
         [INFO] monodisperse: 1
         [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-70888 including .parameters.
+        [INFO] created files in .tmp-GPSD-3D-120837 including .parameters.
         [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
         [GPSD-3D] Using 49996 shots on 10 threads
         [GPSD-3D] Please stand by ..
@@ -160,137 +160,59 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [GPSD-3D]                                           rc       0.000
         [GPSD-3D]                                           rp       0.000
         [GPSD-3D]                                 reff = rc+rp       0.000
+        [GPSD-3D]                   max_triangle_max_extension       3.461
         [GPSD-3D]                    creating neighbor list ..
-        [GPSD-3D]                               neighborlist_M           4            4            4
-        [GPSD-3D]                            neighborlist_size       6.000        6.000        6.000
+        [GPSD-3D]                               neighborlist_M           3            3            3
+        [GPSD-3D]                            neighborlist_size       8.000        8.000        8.000
         [GPSD-3D]                                  start MC ..
-        [GPSD-3D]                    cpu per 1000 shots [secs]       1.416
-        [GPSD-3D]                    volume fraction phi(reff)       0.474
-        [GPSD-3D]                                      V(0|rc)    7266.752
-        [GPSD-3D]                              min pore radius       0.075
-        [GPSD-3D]                             mean pore radius       1.793 +/-        0.002
-        [GPSD-3D]                              max pore radius       3.418
+        [GPSD-3D]                    cpu per 1000 shots [secs]       2.640
+        [GPSD-3D]                    volume fraction phi(reff)       0.310
+        [GPSD-3D]                                      V(0|rc)    9536.835
+        [GPSD-3D]                              min pore radius       0.013
+        [GPSD-3D]                             mean pore radius       1.546 +/-        0.002
+        [GPSD-3D]                              max pore radius       2.847
         [GPSD-3D]             created a list {r} of pore radii
         [GPSD-3D]                    shots (use -q to enlarge)       49996
-        [GPSD-3D]    cpu time spent in read_voro_output [secs]       0.159
+        [GPSD-3D]    cpu time spent in read_voro_output [secs]       0.136
         [GPSD-3D]     cpu time spent in setup_triangles [secs]       0.002
-        [GPSD-3D]          cpu time spent in MonteCarlo [secs]      70.788
-        [GPSD-3D]         real time spent in MonteCarlo [secs]       7.320
-        [GPSD-3D] completed after 8.35455751419067 secs
+        [GPSD-3D]          cpu time spent in MonteCarlo [secs]     131.968
+        [GPSD-3D]         real time spent in MonteCarlo [secs]      13.523
+        [GPSD-3D] completed
+        [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
-
-
-and the following file (a list of roughly 14000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
+and the following file (a list of roughly 40000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
         .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
-With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. 
+With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. If you repeat the above command, now using the -info option
 
-## DEBUGGING - REFERENCE CODE
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=5 -np=10 -info
 
-    [GPSD-3D]                          reading box ..
-    [GPSD-3D]                                     box    24.000     24.000     24.000
-    [GPSD-3D]                  reading _triangles.txt
-    [GPSD-3D]     reading and processing triangles ..
-    [GPSD-3D]                                       N      2000
-    [GPSD-3D]                               triangles    119244
-    [GPSD-3D]                         UpperPoreRadius     2.847
-    [GPSD-3D]                                   ro+rc     1.000
-    [GPSD-3D]                                      rp     0.000
-    [GPSD-3D]                            reff = rc+rp     0.000
-    [GPSD-3D]              max_triangle_max_extension     3.461
-    [GPSD-3D]               creating neighbor list ..
-    [GPSD-3D]                          neighborlist_M         3          3          3
-    [GPSD-3D]                       neighborlist_size     8.000      8.000      8.000
-    [GPSD-3D]                             start MC .. 
-    [GPSD-3D]               cpu per 1000 shots [secs]     2.516
-    [GPSD-3D]               volume fraction phi(reff)     0.310
-    [GPSD-3D]                                 V(0|rc)  9541.325
-    [GPSD-3D]                         min pore radius     0.019
-    [GPSD-3D]                        mean pore radius     1.542 +/- 0.003
-    [GPSD-3D]                         max pore radius     2.847
-    [GPSD-3D]        created a list {r} of pore radii
-    [GPSD-3D]               shots (use -q to enlarge)     20000
-    [GPSD-3D]   time spent in read_voro_output [secs]     0.241
-    [GPSD-3D]    time spent in setup_triangles [secs]     0.002
-    [GPSD-3D]         time spent in MonteCarlo [secs]    50.320
-    [GPSD-3D] completed
-    [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
+a second file will have been generated (all entries in this file are described <a href="#info">below</a>
 
-This is the voro++ output
+        .benchmark-7-config-ro=1-rp=0-rc=0.gpsd-info
 
-1 10.5 17.5 0.5 11 (-1,-0,0) (-0.447214,0,-0.894427) (-0.5547,-0.83205,2.51468e-16) (0,-0.948683,0.316228) (0.447214,-0.894427,0) (0.707107,-0.707107,0) (5.12411e-17,2.13504e-17,1) (9.5162e-17,1,1.23711e-16) (1,0,0) (0,0,-1) (-0.801784,0.534522,0.267261) 16 (-0.785714,-1.64286,0.0714286) (-2.5,-0.5,-1.38778e-16) (-0.5,-1.5,0.5) (0.5,0.5,-0.5) (-0.5,-1.5,-0.5) (0.5,0.5,0.5) (-1.5,0.5,-0.5) (-1.5,-1.16667,-0.5) (0.5,-0.5,0.5) (0.5,-0.5,-0.5) (-1.83333,0.5,0.5) (-2.07143,0.5,-0.214286) (-0.785714,-1.64286,-0.5) (-2.5,-0.25,-1.59595e-16) (-1,-1.5,0.5) (-2.5,-0.5,0.5) (1,13,15) (1,7,6,11,13) (1,15,14,0,12,7) (2,0,14) (2,4,12,0) (2,8,9,4) (2,14,15,10,5,8) (3,5,10,11,6) (3,9,8,5) (3,6,7,12,4,9) (10,15,13,11)
-
-2 12.5 23.5 10.5 15 (-0.57735,-0.57735,-0.57735) (-1.11022e-16,-6.16298e-33,-1) (0.57735,-0.57735,-0.57735) (0.707107,1.10397e-16,-0.707107) (0.894427,-0.447214,6.4714e-16) (-1,1.11022e-16,-3.33067e-16) (-0.408248,-0.816497,-0.408248) (-0.707107,9.15887e-17,0.707107) (0.816497,0.408248,0.408248) (0.57735,0.57735,-0.57735) (-7.06542e-16,0.707107,-0.707107) (-9.93014e-17,0.894427,-0.447214) (-0.534522,-0.801784,0.267261) (-0.57735,-0.57735,0.57735) (0.707107,-1.96262e-17,0.707107) 21 (0.5,-0.5,-0.5) (5.55112e-17,-1,-0.5) (1,-0.5,1.22125e-15) (-0.5,-1.5,0.5) (-0.5,-0.5,-0.5) (0.5,1.5,0.5) (0.25,-2,0.75) (0.2,-2.1,1.1) (-0.5,0.5,-0.5) (0.0714286,1.78571,1.07143) (0.5,0.5,-0.5) (-0.5,1.5,0.5) (3.70074e-17,-1.5,2.77556e-16) (1.3,0.1,0.3) (1.16667,-0.166667,0.833333) (1.16667,0.5,0.166667) (0.5,0.5,1.5) (0.5,-1.5,1.5) (0.192308,-2.11538,1.03846) (0.25,-2,1.25) (-2.06779e-15,-2,1) (1,4,3,12) (1,0,10,8,4) (1,12,6,2,0) (2,13,15,10,0) (2,6,18,7,19,17,14,13) (3,4,8,11) (3,20,18,6,12) (3,11,9,16,17,19,20) (5,15,13,14,16,9) (5,10,15) (5,11,8,10) (5,9,11) (7,18,20) (7,20,19) (14,17,16)
-
-This is the voro++ output without face normals
-
-1 10.5 17.5 0.5 16 (-0.785714,-1.64286,0.0714286) (-2.5,-0.5,-1.38778e-16) (-0.5,-1.5,0.5) (0.5,0.5,-0.5) (-0.5,-1.5,-0.5) (0.5,0.5,0.5) (-1.5,0.5,-0.5) (-1.5,-1.16667,-0.5) (0.5,-0.5,0.5) (0.5,-0.5,-0.5) (-1.83333,0.5,0.5) (-2.07143,0.5,-0.214286) (-0.785714,-1.64286,-0.5) (-2.5,-0.25,-1.59595e-16) (-1,-1.5,0.5) (-2.5,-0.5,0.5) (1,13,15) (1,7,6,11,13) (1,15,14,0,12,7) (2,0,14) (2,4,12,0) (2,8,9,4) (2,14,15,10,5,8) (3,5,10,11,6) (3,9,8,5) (3,6,7,12,4,9) (10,15,13,11)
-
-2 12.5 23.5 10.5 21 (0.5,-0.5,-0.5) (5.55112e-17,-1,-0.5) (1,-0.5,1.22125e-15) (-0.5,-1.5,0.5) (-0.5,-0.5,-0.5) (0.5,1.5,0.5) (0.25,-2,0.75) (0.2,-2.1,1.1) (-0.5,0.5,-0.5) (0.0714286,1.78571,1.07143) (0.5,0.5,-0.5) (-0.5,1.5,0.5) (3.70074e-17,-1.5,2.77556e-16) (1.3,0.1,0.3) (1.16667,-0.166667,0.833333) (1.16667,0.5,0.166667) (0.5,0.5,1.5) (0.5,-1.5,1.5) (0.192308,-2.11538,1.03846) (0.25,-2,1.25) (-2.06779e-15,-2,1) (1,4,3,12) (1,0,10,8,4) (1,12,6,2,0) (2,13,15,10,0) (2,6,18,7,19,17,14,13) (3,4,8,11) (3,20,18,6,12) (3,11,9,16,17,19,20) (5,15,13,14,16,9) (5,10,15) (5,11,8,10) (5,9,11) (7,18,20) (7,20,19) (14,17,16)
-
-voro++ output in absolute coordinates without face normals
-
-1 10.5 17.5 0.5 16 
-(9.71429,15.8571,0.571429) 
-(8,17,0.5) 
-(10,16,1) 
-(11,18,0) 
-(10,16,0) 
-(11,18,1) 
-(9,18,0) 
-(9,16.3333,0) 
-(11,17,1) 
-(11,17,0) 
-(8.66667,18,1) 
-(8.42857,18,0.285714) 
-(9.71429,15.8571,0) 
-(8,17.25,0.5) 
-(9.5,16,1) 
-(8,17,1) 
-(1,13,15) (1,7,6,11,13) (1,15,14,0,12,7) (2,0,14) (2,4,12,0) (2,8,9,4) (2,14,15,10,5,8) (3,5,10,11,6) (3,9,8,5) (3,6,7,12,4,9) (10,15,13,11)
-
-Always 2 in common
-
-2 12.5 23.5 10.5 21 (13,23,10) (12.5,22.5,10) (13.5,23,10.5) (12,22,11) (12,23,10) (13,25,11) (12.75,21.5,11.25) (12.7,21.4,11.6) (12,24,10) (12.5714,25.2857,11.5714) (13,24,10) (12,25,11) (12.5,22,10.5) (13.8,23.6,10.8) (13.6667,23.3333,11.3333) (13.6667,24,10.6667) (13,24,12) (13,22,12) (12.6923,21.3846,11.5385) (12.75,21.5,11.75) (12.5,21.5,11.5) (1,4,3,12) (1,0,10,8,4) (1,12,6,2,0) (2,13,15,10,0) (2,6,18,7,19,17,14,13) (3,4,8,11) (3,20,18,6,12) (3,11,9,16,17,19,20) (5,15,13,14,16,9) (5,10,15) (5,11,8,10) (5,9,11) (7,18,20) (7,20,19) (14,17,16)
-
-(1,13,15) -> (8,17,0.5) (8,17,1) (8,17.25,0.5)
-
-
-Current parser output: seems improperly sorted
-
-2000
-10.500000 17.500000 0.500000 16 11 5 4 6 4 6 5 4 4 6 3 3
-11.000000 17.000000 1.000000 
-11.000000 18.000000 -0.000000 
-8.666667 18.000000 1.000000 
-9.000000 18.000000 0.000000 
-8.428571 18.000000 0.285714 
-11.000000 17.000000 -0.000000 
-9.714286 15.857143 0.000000
- 11.000000 18.000000 1.000000 
- 8.000000 17.000000 1.000000 
- 8.000000 17.250000 0.500000 
- 9.714286 15.857143 0.571429 
- 9.500000 16.000000 1.000000 
- 10.000000 16.000000 -0.000000 
- 10.000000 16.000000 1.000000
- 9.000000 16.333333 0.000000 
- 8.000000 17.000000 0.500000 
- 6 2 8 3 5 4 5 2 6 1 8 7 2 4 15 7 13 6 5 3 9 10 5 7 3 8 1 14 12 9 6 4 5 10 16 15 5 6 13 14 1 5 7 11 14 13 7 7 15 16
-
- (7,15,16) -> (9.714286 15.857143 0.000000) (9.000000 16.333333 0.000000) (8,17,0.5) 
-
- 
-
-12.500000 23.500000 10.500000 21 15 5 5 5 3 7 5 3 6 8 4 4 3 4 3 3
-13.666667 24.000000 10.666667 13.000000 23.000000 10.000000 12.500000 21.500000 11.500000 13.800000 23.600000 10.800000 12.000000 25.000000 11.000000 12.571429 25.285714 11.571429 12.750000 21.500000
-11.750000 12.000000 24.000000 10.000000 12.000000 22.000000 11.000000 13.000000 22.000000 12.000000 12.500000 22.500000 10.000000 12.000000 23.000000 10.000000 12.692308 21.384615 11.538462 13.000000
-24.000000 12.000000 13.500000 23.000000 10.500000 12.750000 21.500000 11.250000 12.500000 22.000000 10.500000 12.700000 21.400000 11.600000 13.000000 25.000000 11.000000 13.000000 24.000000 10.000000
-13.666667 23.333333 11.333333 6 2 11 17 16 15 6 2 20 8 12 11 6 2 15 4 1 20 4 3 7 18 8 3 9 5 6 14 10 7 6 3 13 16 17 9 4 3 18 13 7 4 21 14 6 19 1 9 4 15 16 13 18 7 10 21 5 5 8 20 19 5 5 9 12 8 4 5
-1.500000 2.500000 10.500000 40 25 6 7 6 6 3 7 3 6 5 5 3 6 4 7 4 5 4 7 3 9 5 3 4 4 4
-
-
+        2000
+        1.0000000000000000
+        0.0000000000000000
+        0.0000000000000000
+        13824.000000000000
+        119244
+        49996
+        34491
+        2.8465466781177895
+        1.3079602754612063E-002
+        1.5456996167600574
+        2.8465466781177895
+        1.8930148098899810E-003
+        0.31012480998479874
+        0.138192996
+        2.42200494E-03
+        131.378937
+        13.3360004
+        27
+        10
+        13.6403434276581
 
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
@@ -322,9 +244,9 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
     real time spent during Monte Carlo
     number of neighbor cells
     np number of threads used in parallel
+    total walltime
     
     
-
 ## About <a name="about">
 
 Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
