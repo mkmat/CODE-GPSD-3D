@@ -244,12 +244,13 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
     volume fraction phi(reff)
     number of neighbor cells
     np number of threads used in parallel
-    cpu time used to process the voro++ output
-    real time used to process the voro++ output
-    cpu time used to setup triangles
-    real time used to setup triangles
-    cpu time spent during Monte Carlo 
-    real time spent during Monte Carlo 
+    cpu time used to process the voro++ output [secs]
+    real time used to process the voro++ output [secs]
+    cpu time used to setup triangles [secs]
+    real time used to setup triangles [secs]
+    cpu time spent during Monte Carlo [secs]
+    real time spent during Monte Carlo [secs]
+    total wall time [secs]
     
     
 ## About <a name="about">
