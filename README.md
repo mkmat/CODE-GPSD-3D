@@ -166,7 +166,7 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [GPSD-3D]                            neighborlist_size       8.000        8.000        8.000
         [GPSD-3D]                                  start MC ..
         [GPSD-3D]                    volume fraction phi(reff)       0.310
-        [GPSD-3D]                                      V(0|rc)    9536.835
+        [GPSD-3D]                                    V(0|reff)    9536.835
         [GPSD-3D]                              min pore radius       0.013
         [GPSD-3D]                             mean pore radius       1.546 +/-        0.002
         [GPSD-3D]                              max pore radius       2.847
