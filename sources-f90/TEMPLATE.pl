@@ -10,14 +10,15 @@ $installation_dir   = "InstallationDirectory";  # set by INSTALL.pl
 
 $code               = "$installation_dir/GPSD-3D.ex";
 $refcode            = "$installation_dir/GPSD-3D-grid.ex";
-$vorocode           = "voro++"; 
+$voroparser         = "$installation_dir/voro-parser.ex";
 $converter1         = "$installation_dir/convert-voro-output-to-triangles.pl";
-$converter2         = "$installation_dir/convert_samarth_to_config";
+$converter2         = "$installation_dir/convert_samarth_to_config.pl";
+$maxnp              = `$installation_dir/.maxnp.ex`+0;
 $pwd                = `pwd`; chomp $pwd; 
 
 # ------------------------------------------------
 sub USAGE { print<<EOF;
-perl $0 [-in=<configfile>] [-box=<boxfile>] [-rp=<rp>] [-ro=<ro>] [-rc=<rc>] [-q=<integer>] [-o=<outputfile>] [-more] [-quiet]
+perl $0 [-in=<configfile>] [-box=<boxfile>] [-rp=<rp>] [-ro=<ro>] [-rc=<rc>] [-q=<integer>] [-o=<outputfile>] [-more] [-info] [-quiet] [-np=<integer>]
 or
 perl $0 clean
 
@@ -33,11 +34,13 @@ where
 -ro=..      : particle radius (required for formats A and B) (if set, ignores radius in file format C, all particles have radius ro then)
 -rp=..      : probe particle radius (default: rp=0)
 -rc=..      : particle coating thickness (only taken into account if file format C is used, ro=radius+rc is used)
--q=..       : A positive integer (default: 1)
+-q=..       : A positive number (default: 10), determines the quality. The number of shots is q times the number of material spheres
 -o=..       : name of the resulting file containing a list of pore radii (if not specified, resulting file ends with .gpsd)
 -more       : if -more is added, not only the pore radius r (column 1) but also the center of the pore (columns 2-4) is added to outputfile.
+-info       : if -info is added, runtime information is collected in a file whose name ends with -info (more information, see github repository)
 -quiet      : if -quiet is added, GPSD-3D won't produce stdout.
 -clean      : remove temporary directories .tmp-GPSD*, if existing (such directories may exist after a crash or interrupt).
+-np=..      : maximum number of parallel processes to be used (between 1 and $maxnp)
 
 Note: 
 
@@ -51,11 +54,14 @@ Resulting files:
 <configfile>-radii-GPSD-3D.txt          : contains a list of pore radii (monodisperse systems, voronoi-based)
 <configfile>-radii-GPSD-3D-grid.txt     : contains a list of pore radii (polydisperse systems, grid-based)
 
-Examples: (using existing benchmarks)
+Example mentioned at our github site: (using a benchmark configuration available in your installation directory)
+perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10
+
+Examples using other existing benchmarks
 EOF
 $benchmarks = `ls -1 .bench*config | grep -c .`+0; 
 foreach $no (1 .. $benchmarks) { 
-    PRINT("perl $0 -in=.benchmark-$no-config -box=.benchmark-$no-box -rp=0.0 -ro=1.0 -q=1\n");
+    PRINT("perl $0 -in=.benchmark-$no-config -box=.benchmark-$no-box -rp=0.0 -ro=1.0 -q=10\n");
 }; 
 if ($ERROR) { 
     PRINT("________________________________________________\n\nERROR: $ERROR\n________________________________________________ cd $workdir\n"); 
@@ -70,8 +76,11 @@ sub PRINT {
 # check for -quiet
 if ("-quiet"~~@ARGV) { $quiet="true"; } else { $quiet="false";  print `cat MESSAGE.txt`; }; 
 
+# init walltime clock
+$walltime_tic=`date +"%s.%N"`+0; 
+
 # scan arguments
-$rc=0; $ro=0; $rp=0; $q=1; $box=0; $more="false";
+$rc=0; $ro=0; $rp=0; $q=10; $box=0; $more="false"; $np=$maxnp; 
 foreach $arg (@ARGV) { $arg=~s/=/==/; ($field,$value)=split(/==/,$arg);
     if ($field eq "-in")            { $config="$value";   PRINT("[INFO] using configuration file $config\n"); 
     } elsif ($field eq "-box")      { $boxfile="$value";  PRINT("[INFO] using box file $boxfile\n"); 
@@ -82,6 +91,7 @@ foreach $arg (@ARGV) { $arg=~s/=/==/; ($field,$value)=split(/==/,$arg);
     } elsif ($field eq "-clean")    { `rm -rf .tmp-GPSD-3D-*`; PRINT("[INFO] cleaned\n"); exit; 
     } elsif ($field eq "-quiet")    { $quiet="true"; 
     } elsif ($field eq "-more")     { $more="true"; 
+    } elsif ($field eq "-info")     { $info=1; 
     } elsif ($field eq "-xlo")      { $xlo=$value+0; $box+=1; 
     } elsif ($field eq "-xhi")      { $xhi=$value+0; $box+=1; 
     } elsif ($field eq "-ylo")      { $ylo=$value+0; $box+=1; 
@@ -91,6 +101,7 @@ foreach $arg (@ARGV) { $arg=~s/=/==/; ($field,$value)=split(/==/,$arg);
     } elsif ($field eq "-o")        { $outputfile="$value"; 
     } elsif ($field eq "--v")       { USAGE;
     } elsif ($field eq "-h")        { USAGE; 
+    } elsif ($field eq "-np")       { $np=$value; if ($np<1) { $np=1; }; if ($np>$maxnp) { $np=$maxnp; }; 
     } else                          { $ERROR="unknown argument $arg"; USAGE; };
 };
 $CONFIG = $config; 
@@ -193,41 +204,32 @@ PRINT("[INFO] created files in $workdir including .parameters.\n");
 
 sub VORO {
 # quality settings
-$shots = 10000*(1+$q);
-# start voro++
-$command = "cd $workdir; voro++ -p -o -c \"%i %x %y %z %s %l %w %p %t\" $xlo $xhi $ylo $yhi $zlo $zhi config.txt";
-PRINT("[GPSD-3D] calling $command\n");
-PRINT(`$command`);
-if (-s "$workdir/config.txt.vol") { } else { $ERROR="$workdir/config.txt.vol HAS NOT BEEN GENERATED. voro++ crashed."; USAGE; };
-PRINT("[GPSD-3D] creating voro++ triangles data ..\n");
-`cd $workdir; perl $converter1 config.txt.vol`;
-if (-s "$workdir/_triangles.txt") { } else { $ERROR="$workdir/_triangles.txt HAS NOT BEEN GENERATED". USAGE; };
-open(TRI,"<$workdir/.triangles-and-faces"); ($triangles,$faces) = split(/ /,<TRI>); close(TRI); chomp $faces;
-# create .parameters
+$shots = $q*$N;
 open(P,">$workdir/.parameters"); print P<<EOF;
 \&list
 N                                       = $N          ! number of particles
 rp                                      = $rp         ! test particle radius    
 ro                                      = $ro         ! particle radius
 rc                                      = $rc         ! shell radius
-faces                                   = $faces      ! faces
-triangles                               = $triangles  ! triangles
 shots                                   = $shots      ! former 1e6
 more                                    = .$more.
 quiet                                   = .$quiet.
+np                                      = $np
 /
 EOF
 close(P);
-PRINT("[GPSD-3D] Using $shots shots\n");
+PRINT("[GPSD-3D] Using $shots shots on $np threads\n");
 PRINT("[GPSD-3D] Please stand by ..\n");
 if ($quiet eq "true") {
-    `cd $workdir; $code`;
+    `cd $workdir; ($voroparser; $voroparser) | $code`;
 } else {
-    open my $cmd_mk, "cd $workdir; $code |";
+    open my $cmd_mk, "cd $workdir; ($voroparser; $voroparser) | $code |";
     while (<$cmd_mk>) { print "$_"; };
 };
 if (-s "$workdir/_r") { PRINT("[GPSD-3D] completed\n"); } else { $ERROR="GPSD-3D crashed. Remainings in $workdir"; USAGE; };
-if ($outputfile) { `mv $workdir/_r $outputfile`; } else { $outputfile="$CONFIG-ro=$ro-rp=$rp-rc=$rc.gpsd"; `mv $workdir/_r $outputfile`; };
+if ($outputfile) { } else { $outputfile="$CONFIG-ro=$ro-rp=$rp-rc=$rc.gpsd"; }; 
+`mv $workdir/_r $outputfile`; 
+if ($info eq 1) { `mv $workdir/_summary.txt $outputfile-info`; }; 
 };
 
 sub GRID {
@@ -258,13 +260,14 @@ if ($quiet eq "true") {
     while (<$cmd_mk>) { print "$_"; };
 };
 if (-s "$workdir/_radii") { PRINT("[GPSD-3D-GRID] completed\n"); } else { $ERROR="GPSD-3D-GRID crashed. Remainings in $workdir"; USAGE; }; 
-if ($outputfile) { `mv $workdir/_radii $outputfile`; } else { $outputfile="$CONFIG-ro=$ro-rp=$rp-rc=$rc.gpsd"; `mv $workdir/_radii $outputfile`; }; 
+if ($outputfile) { } else { $outputfile="$CONFIG-ro=$ro-rp=$rp-rc=$rc.gpsd"; }; 
+`mv $workdir/_radii $outputfile`; 
 };
 
-sub REMOVE_BLANKS_FROM_outputfile {
-    open(IN,"<$outputfile"); open(OUT,">$outputfile.tmp"); 
+sub REMOVE_BLANKS {
+    open(IN,"<$_[0]"); open(OUT,">$_[0].tmp"); 
     while (!eof(IN)) { $line=<IN>; $line=~s/\s+ / /g; $line=~s/^ //; print OUT $line; }; close(IN); close(OUT);
-    `mv $outputfile.tmp $outputfile`; 
+    `mv $_[0].tmp $_[0]`; 
 };
 
 if ($monodisperse) { 
@@ -276,10 +279,16 @@ if ($monodisperse) {
     GRID;
 };
 
-REMOVE_BLANKS_FROM_outputfile; 
+# stop walltime clock
+$walltime_toc=`date +"%s.%N"`+0; $walltime=$walltime_toc-$walltime_tic; 
+if ($info eq 1) { `echo "$walltime">>$outputfile-info`; };
+
+REMOVE_BLANKS("$outputfile");
+if ($info eq 1) { REMOVE_BLANKS("$outputfile-info"); print "[GPSD-3D] created: $outputfile-info\n"; };
 `rm -rf $workdir`; 
 print "[GPSD-3D] created: $outputfile\n";
 
 print<<EOF;
 # scp $CONFIG-radii* mkroeger\@polyphys-s11.ethz.ch:~/Downloads
 EOF
+
