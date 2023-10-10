@@ -13,7 +13,7 @@ Create a new directory named GPSD-3D. Download GPSD-3D.tar.gz to the new directo
 
 This will create the following files: GPSD-3D.f90, and GPSD-3D-grid.f90, voro-parser.cpp, get-max-threads.f90, INSTALL.pl, TEMPLATE.pl, MESSAGE.txt. Then switch to the new directory and call the installation script via
 
-    cd GPSD-3D; perl ./INSTALL.pl
+    perl ./INSTALL.pl
 
 This will produce some message on your screen like 
 
