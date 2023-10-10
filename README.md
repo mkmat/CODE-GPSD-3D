@@ -1,5 +1,5 @@
 # CODE-GPSD-3D
-Generalized geometric pore size distribution (G-PSD) for periodic systems composed of spheres. This quantity was defined by Gelb and Gubbins, there are other pore size distributions such as T-PSD, as discussed in detail in the accompanying [article](#about)). The spheres constitute the 'material', which is surrounded by 'pore space'. This codes allows to calculate the distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*  of pore radii *r* for such system as function of the radius *r<sub>p</sub>* of a thought probe particle and a thought coating thickness *r<sub>c</sub>* of the material spheres. 
+Generalized geometric pore size distribution (G-PSD) for periodic systems composed of spheres. This quantity was defined by Gelb and Gubbins, there are other pore size distributions such as T-PSD, as discussed in detail in the accompanying [article](#about). The spheres constitute the 'material', which is surrounded by 'pore space'. This codes allows to calculate the distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*  of pore radii *r* for such system as function of the radius *r<sub>p</sub>* of a thought probe particle and a thought coating thickness *r<sub>c</sub>* of the material spheres. 
 
 <img src="images/schematic-GPSD3D-github.png" width="100%">  
 
@@ -34,7 +34,7 @@ and a new file GPSD-3D (a perl script). Ideally, it finishes with saying
 
 But, if you have voro++ not yet installed, or no fortran compiler, you will end up with an error message that provides you with a download link. In this case you need to do the installation, and call the installation script INSTALL.pl again. 
 
-## Configuration file formats
+## Configuration and box file formats <a name=format>
 
 The input required by GPSD-3D are (i) coordinates: the center positions of *N* monodisperse or polydisperse spheres, that are located inside a rectangular, periodic box, whose corners are specified by (ii) box geometry: 6 values: xlo,xhi,ylo,yhi,zlo,zhi. We offer various file formats, where each of the *N* lines contains the coordinates, and eventually also the radius of a single sphere
 
@@ -51,7 +51,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
       perl GPSD-3D
           -in=<filename>
           -box=<filename> OR -xlo=.. -xhi=.. ylo=.. -yhi=.. -zlo=.. -zhi=..
-          [-ro=<value>] 
+          [-ro=<positive value>] 
           [-rp=<value>] 
           [-rc=<value>] 
           [-q=<integer>] 
@@ -62,29 +62,29 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-quiet]
           [-clean]
 
-**-in=configfilename**:    name of the file containing the configuration (as described above)
+**-in=**    name of the file containing the material sphere [coordinates](#format) (for polydisperse systems also the sphere radii).
 
-**-box=< boxfile >**:      name of the file containing the box geometry (as described above, alternatively, the box size can be passed over on the command line)
+**-box=**   name of the file containing the box [geometry](#format) (alternatively, the box size can be passed over on the command line using -xlo= .. -zhi=..).
 
-**-ro= *r<sub>o</sub>***:   particle radius *r<sub>o</sub>* (required, if the particle radii are not contained in the input file. If *r<sub>o</sub>* is specified, existing radii in the input file are ignored)
+**-ro=** material circle radius *r<sub>o</sub>* (required, if the particle radii are not contained in the input file). If *r<sub>o</sub>* is specified, existing radii in the input file are ignored).
 
-**-rp= *r<sub>p</sub>***:   (optionally) probe particle radius *r<sub>p</sub>*  (if not specified, *r<sub>p</sub>=0* is used)
+**-rp=** probe particle radius *r<sub>p</sub>*. If not specified, *r<sub>p</sub>=0* is used.
 
-**-rc= *r<sub>c</sub>***:   (optionally) shell thickness *r<sub>c</sub>* (if not specified, *r<sub>c</sub>=0* is used)
+**-rc=** shell thickness  *r<sub>c</sub>*. If not specified, *r<sub>c</sub>=0* is used.
 
-**-q= *q***:    (optionally) positive quality value *q* (if not specified, *q=10* is used. The number of random shots is *q* times the number of material spheres)
+**-q=** positive quality value (optionally). If not specified, *q=10* is used. The number of random shots is *q* times the number of material spheres.
 
-**-o=outputfilename**:     (optionally) name of the resulting file containing a list of pore radii (if not specified, the list is saved in configfilename.gpsd)
+**-o=** name of the resulting file containing a list of pore radii. If not specified, the list is saved in a .gpsd-file.
 
-**-np= *n<sub>p</sub>***:  (optionally) number of threads *n<sub>p</sub>* to be used (default: maximum number of threads)
+**-np=** number of threads np to be used. If not specified, *n<sub>p</sub>* is set to the available number of threads.
 
-**-more**:                 (optionally) add, besides pore radius (column 1), the corresponding pore center (columns 2,3,4) to the outputfile (for visualization purposes)
+**-more**: tell the code to add, besides pore radius, the corresponding pore center coordinate to the output file.
 
-**-info**:                 (optionally) runtime information (cpu times etc) is collected in a file whose name ends with -info (see <a href="#info">below</a> for detailed information)
+**-info**: triggers storing runtime information (cpu times etc) in a separate [info](#info) file.
 
-**-quiet**:                (optionally) do not produce any stdout.
+**-quiet**: prevents GPSD-3D to create stdout.
 
-**-clean**:                GPSD-3D -clean removes all temporary directories that may have been generated during previous crashes. 
+**-clean**: removes all temporary directories that may have been generated during previous crashes.
 
 ### Comments: 
 
@@ -93,6 +93,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 3. GPSD-3D can be called in parallel. 
 4. Each GPSD-3D call runs in a unique temporary directory, upon successful completion the temporary directory is removed.
 5. The maximum number of threads used by OpenMP is reported during the installation and also if GPSD-3D is called without arguments. For very large systems with, say, more than 1000000 spheres, running at the maximum number of threats must not be an advantage and you should check the speed also using a single processor, using -np=1
+6. Negative values *r<sub>p</sub>* and *r<sub>c</sub>* are allowed as long as *r<sub>p</sub>*+*r<sub>c</sub>*+*r<sub>o</sub>* is positive. A [negative coating thickness](#about) effectively reduces the material sphere radius.
 
 
 ## Output
