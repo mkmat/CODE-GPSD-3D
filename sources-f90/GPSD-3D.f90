@@ -1,10 +1,10 @@
 module shared
 implicit none
 
-    integer         :: stdout
-    integer(kind=4) :: N,faces,triangles,shots
-    real*8          :: ro,rp,rc,ro_plus_rc,rs,rs2,lo(3),hi(3),box(3),lo_plus_halfbox(3)
-    real*8          :: UpperPoreRadius
+    integer         :: stdout,np
+    integer(kind=4) :: N,triangles,shots,count_r
+    real*8          :: ro,rp,rc,ro_plus_rc,rs,rs2,lo(3),hi(3),box(3),lo_plus_halfbox(3),volume,volume_fraction
+    real*8          :: UpperPoreRadius,min_pore_radius,max_pore_radius,mean_pore_radius,std_pore_radius
     integer         :: neighborlist_M(3)
     real*8          :: neighborlist_size(3)
     real*8          :: max_triangle_max_extension
@@ -20,12 +20,15 @@ implicit none
     integer, dimension(:,:,:), allocatable  :: neighborlist_firstT
     integer, dimension(:), allocatable      :: neighborlist_nextT
 
-    character(len=100), parameter        :: form100='("[GPSD-3D]",A40,3(I10,1x))'
-    character(len=100), parameter        :: form101='("[GPSD-3D]",A40,3(F10.3,1x))'
-    character(len=100), parameter        :: form102='("[GPSD-3D]",A40,F10.3,A,F10.3)'
+    character(len=100), parameter        :: form100='("[GPSD-3D]",A45,3(I12,1x))'
+    character(len=100), parameter        :: form101='("[GPSD-3D]",A45,3(F12.3,1x))'
+    character(len=100), parameter        :: form102='("[GPSD-3D]",A45,F12.3,A,F12.3)'
+    character(len=100), parameter        :: form104='("[VORO++] ",A45,3(I12,1x))'
     character(len=100), parameter        :: form200='(4(F12.4,1x))'
 
-    namelist /list/ ro,rp,rc,shots,N,triangles,faces,quiet,more
+    real cpu_and_real_time(5,2)
+
+    namelist /list/ ro,rp,rc,shots,N,quiet,more,np
 
     contains 
 
@@ -91,6 +94,21 @@ implicit none
     return
     end
 
+    subroutine manage_cpu_and_real_clock(no)
+    integer :: no,realcount,countrate
+    real    :: realtime,cputime
+        call system_clock(realcount,countrate)
+        call cpu_time(cputime)
+        realtime = realcount/dble(countrate)
+        if (no.eq.1) then 
+            cpu_and_real_time(no,:)=[cputime,realtime]
+        else
+            cpu_and_real_time(no,:)  =[cputime,realtime]
+            cpu_and_real_time(no-1,:)=cpu_and_real_time(no,:)-cpu_and_real_time(no-1,:)
+        endif
+    return
+    end
+
     subroutine init_seed
     logical EX
     integer oldseed(20)
@@ -112,36 +130,86 @@ implicit none
     return
     end
 
-    subroutine read_voro_output
+    subroutine read_voro_parser
+    ! parser
+    integer :: voro_max_vertices,voro_max_faces,voro_max_vertices_for_face
+    integer :: voro_vertices,voro_faces
+    integer :: itmp(2000),j2
+    real*8  :: rskip_rest
+    integer, dimension(:), allocatable   :: voro_vertices_for_face
+    integer, dimension(:,:), allocatable :: voro_vid
+    real*8, dimension(:,:), allocatable  :: voro_vertex
+    ! triangles
     integer(kind=4)     :: tri,face,i,j,id
     real*8  :: coord(3)
-    real*8  :: A(3),B(3),C(3)
+    real*8  :: A(3),B(3),C(3),E(3),facenormal(3)
     real*8  :: normAB,normAC,normBC
     real*8  :: normAM,normBM,normCM
     real*8  :: normBX,normCX,normpM,pTmin,pTmax
     real*8  :: triangle_max_extension
+    ! parser
+    real*8  :: smalld,largeD
 
-        allocate(triangle_A(triangles,3))
-        allocate(triangle_B(triangles,3))
-        allocate(triangle_C(triangles,3))
-        allocate(triangle_X(triangles,3))
-        allocate(triangle_M(triangles,3))
-        allocate(triangle_n(triangles,3))
-        allocate(triangle_rho(triangles))
+    ! read once to determine field sizes
+    voro_max_vertices           = 0
+    voro_max_faces              = 0
+    voro_max_vertices_for_face  = 0
+    triangles                   = 0
 
-        write(stdout,form100) 'reading _triangles.txt'
-        open(2,file='_triangles.txt'); rewind(2)
-        UpperPoreRadius = 0.D0
-        write(stdout,form100) 'reading and processing triangles ..'
-        tri = 0
-        max_triangle_max_extension = 0.D0
-        do face=1,faces
-            read(2,*) id,i
-            read(2,*) coord
-            read(2,*) A
-            do j=1,i
+    read(*,*) N        ! attention: overwriting N as seen by voro++
+    do id=1,N
+        read(*,*) coord,voro_vertices,voro_faces,(itmp(face),face=1,voro_faces)
+        read(*,*) rskip_rest
+        voro_max_vertices = max(voro_max_vertices,voro_vertices)
+        voro_max_faces    = max(voro_max_faces,voro_faces)
+        do face=1,voro_faces
+            voro_max_vertices_for_face = max(voro_max_vertices_for_face,itmp(face))
+            triangles = triangles + itmp(face)
+        enddo
+    enddo
+
+    write(stdout,form104) 'max_vertices',voro_max_vertices
+    write(stdout,form104) 'voro_max_faces',voro_max_faces
+    write(stdout,form104) 'voro_max_vertices_for_face',voro_max_vertices_for_face
+    write(stdout,form100) 'triangles',triangles
+
+    allocate(voro_vertices_for_face(voro_max_vertices))
+    allocate(voro_vid(voro_max_faces,voro_max_vertices_for_face))
+    allocate(voro_vertex(voro_max_vertices,3))
+
+    allocate(triangle_A(triangles,3))
+    allocate(triangle_B(triangles,3))
+    allocate(triangle_C(triangles,3))
+    allocate(triangle_X(triangles,3))
+    allocate(triangle_M(triangles,3))
+    allocate(triangle_n(triangles,3))
+    allocate(triangle_rho(triangles))
+
+    tri = 0
+    UpperPoreRadius = 0.D0
+    max_triangle_max_extension = 0.D0
+
+    read(*,*) itmp(1)        ! attention: overwriting N as seen by voro++
+    if (N.ne.itmp(1)) stop 'parser error (called twice?)'
+    do id=1,N
+        read(*,*) coord,voro_vertices,voro_faces,(voro_vertices_for_face(face),face=1,voro_faces)
+        read(*,*) (voro_vertex(j,:),j=1,voro_vertices),((voro_vid(face,j),j=1,voro_vertices_for_face(face)),face=1,voro_faces)    ! I am assuming absolute, folded, vertex coordinates here
+        do face=1,voro_faces
+            ! @iBs = split(/,/,$vertexnos[$face]);
+            ! get one A (X-projected on face) for all triangles of a face
+            B   = voro_vertex(voro_vid(face,1),:)
+            C   = voro_vertex(voro_vid(face,2),:)   ! requires vertices_for_face > 2
+            E   = voro_vertex(voro_vid(face,3),:)
+            call cross((B-C)/norm(B-C),(E-C)/norm(E-C),facenormal)
+            facenormal = facenormal/norm(facenormal)            ! sign does not matter
+            smalld  = dot_product(B,facenormal)  ! plane n.x = d
+            largeD  = dot_product(coord,facenormal)-smalld
+            A       = coord-largeD*facenormal
+            do j=1,voro_vertices_for_face(face)   ! (0 .. $#iBs) {
+                j2 = j+1; if (j2.eq.1+voro_vertices_for_face(face)) j2=1     ! sorted via voro++     
+                B   = voro_vertex(voro_vid(face,j) ,:)                 
+                C   = voro_vertex(voro_vid(face,j2),:)                 
                 tri = tri + 1
-                read(2,*) B,C
                 triangle_A(tri,:) = A
                 triangle_B(tri,:) = B
                 triangle_C(tri,:) = C
@@ -153,29 +221,31 @@ implicit none
                 triangle_M(tri,:) = (normAB*C+normAC*B+normBC*A)/(normAB+normAC+normBC)     ! triangle center
                 normBX = norm(B-coord)
                 normCX = norm(C-coord)
-                triangle_rho(tri) = max(normBX,normCX)                                     ! >= r+ro_plus_rc 
+                triangle_rho(tri) = max(normBX,normCX)                                     ! >= r+ro_plus_rc
                 UpperPoreRadius = max(UpperPoreRadius,triangle_rho(tri)-ro_plus_rc)
                 normAM = norm(A-triangle_M(tri,:))
                 normBM = norm(B-triangle_M(tri,:))
                 normCM = norm(C-triangle_M(tri,:))
                 triangle_max_extension = max(max(normAM,normBM),normCM)                     ! >= distance from M to any triangle corner
-                max_triangle_max_extension = max(max_triangle_max_extension,triangle_max_extension) 
+                max_triangle_max_extension = max(max_triangle_max_extension,triangle_max_extension)
             enddo
         enddo
-        close(2)
-        write(stdout,form100) 'N',N
-        write(stdout,form100) 'triangles',triangles
-        write(stdout,form101) 'UpperPoreRadius',UpperPoreRadius
-        write(stdout,form101) 'ro',ro
-        write(stdout,form101) 'rc',rc
-        write(stdout,form101) 'rp',rp
-        write(stdout,form101) 'reff = rc+rp',rc+rp
-        ! write(stdout,form101) 'max_triangle_max_extension',max_triangle_max_extension
-        if (triangles.ne.tri) stop 'format error'
+    enddo
+    write(stdout,form100) 'parallel processes (np)',np
+    write(stdout,form100) 'N',N
+    write(stdout,form100) 'triangles',triangles
+    write(stdout,form101) 'UpperPoreRadius',UpperPoreRadius     ! this value is correct
+    write(stdout,form101) 'ro',ro
+    write(stdout,form101) 'rc',rc
+    write(stdout,form101) 'rp',rp
+    write(stdout,form101) 'reff = rc+rp',rc+rp
+    write(stdout,form101) 'max_triangle_max_extension',max_triangle_max_extension
+    if (triangles.ne.tri) stop 'format error'
+    
+    deallocate(voro_vertices_for_face)
+    deallocate(voro_vid)
+    deallocate(voro_vertex)
 
-        ! clear histogram
-        ! binsize = UpperPoreRadius/bins
-        ! PoreRadiusDistribution = 0.D0
     return
     end
 
@@ -207,27 +277,26 @@ implicit none
     end
 
     subroutine MonteCarlo
-    real    :: tic,toc,myrand3(3)
-    real*8  :: r,min_pore_radius,max_pore_radius,mean_pore_radius,std_pore_radius,volume,volume_fraction
+    real    :: myrand3(3)
+    real*8  :: r
     real*8  :: pTmin,pTmax,pTmin_Upper
     real*8  :: p(3),pA(3),center(3)
     real*8  :: A(3),B(3),C(3),X(3)
     real*8  :: facenormal(3)
-    integer :: icell(3),jcell(3),ii,i1,i2,i3
+    integer :: icell(3),jcell(3),k,i1,i2,i3
     integer :: tmp_type
     real*8  :: tmp_r,tmp_rprime,tmp_center(3)
-    integer(kind=4) :: shot,i,count_mean_pore_radius
+    integer(kind=4) :: shot,i
     integer :: i1min,i2min,i3min
     integer :: i1max,i2max,i3max
 
         write(stdout,form100) 'start MC ..'
-        call cpu_time(tic)
 
         min_pore_radius        = 100.0*UpperPoreRadius
         max_pore_radius        = -1.0
         mean_pore_radius       = 0.D0
         std_pore_radius        = 0.D0
-        count_mean_pore_radius = 0
+        count_r                = 0
         pTmin_Upper            = UpperPoreRadius+ro_plus_rc-rp
         volume                 = box(1)*box(2)*box(3)
 
@@ -244,6 +313,8 @@ implicit none
         if (neighborlist_M(3).eq.2) i3min=0
 
         open(3,file='_r'); rewind(3)
+!$omp parallel num_threads ( np) shared ( i1min, i1max, i2min, i2max, neighborlist_M, neighborlist_size, triangle_rho, neighborlist_nextT, lo, box, more ) private ( shot, myrand3, p, icell, jcell, k, i, pTmax, A, facenormal, pA, pTmin, B, C, X, tmp_r, tmp_center, tmp_type, tmp_rprime, r, center )
+!$omp do reduction (min : min_pore_radius) reduction (max : max_pore_radius) reduction( + : mean_pore_radius, count_r, std_pore_radius)
         do shot=1,shots
             call random_number(myrand3)
             r     = 0.D0
@@ -255,11 +326,11 @@ implicit none
                 jcell(1) = icell(1)+i1
                 jcell(2) = icell(2)+i2
                 jcell(3) = icell(3)+i3
-                do ii=1,3
-                    if (jcell(ii).eq.neighborlist_M(ii)+1) then
-                        jcell(ii)=1
-                    elseif (jcell(ii).eq.0) then
-                        jcell(ii)=neighborlist_M(ii)
+                do k=1,3
+                    if (jcell(k).eq.neighborlist_M(k)+1) then
+                        jcell(k)=1
+                    elseif (jcell(k).eq.0) then
+                        jcell(k)=neighborlist_M(k)
                     endif
                 enddo
                 i = neighborlist_firstT(jcell(1),jcell(2),jcell(3))
@@ -297,21 +368,21 @@ implicit none
                 max_pore_radius         = max(max_pore_radius,r)
                 mean_pore_radius        = mean_pore_radius + r
                 std_pore_radius         = std_pore_radius  + r**2
-                count_mean_pore_radius  = count_mean_pore_radius + 1
+                count_r                 = count_r + 1
             endif
         enddo ! shot
+!$omp end do
+!$omp end parallel
         close(3)
-        call cpu_time(toc)
 
-        volume_fraction  = 1.D0-dble(count_mean_pore_radius)/dble(shots)
-        mean_pore_radius = mean_pore_radius / dble(count_mean_pore_radius)
-        std_pore_radius  = std_pore_radius / dble(count_mean_pore_radius)
-        std_pore_radius  = (std_pore_radius-mean_pore_radius**2)/dsqrt(dble(count_mean_pore_radius))
+        volume_fraction  = 1.D0-dble(count_r)/dble(shots)
+        mean_pore_radius = mean_pore_radius / dble(count_r)
+        std_pore_radius  = std_pore_radius / dble(count_r)
+        std_pore_radius  = (std_pore_radius-mean_pore_radius**2)/dsqrt(dble(count_r))
 
 
-        write(stdout,form101) 'cpu per 1000 shots [secs]',1000.D0*(toc-tic)/dble(shots)
         write(stdout,form101) 'volume fraction phi(reff)',volume_fraction
-        write(stdout,form101) 'V(0|rc)',(1-volume_fraction)*volume
+        write(stdout,form101) 'V(0|reff)',(1-volume_fraction)*volume
         write(stdout,form101) 'min pore radius',min_pore_radius
         write(stdout,form102) 'mean pore radius',mean_pore_radius,' +/- ',std_pore_radius
         write(stdout,form101) 'max pore radius',max_pore_radius
@@ -359,39 +430,47 @@ implicit none
         ! type 1 and 2 (triangle corners), return immediately if test passed for longer side 
         if (B2.ge.C2) then
             largeR      = norm(XX-BB)-ro_plus_rc        ! rho-ro-rc
-            largeRprime = norm(pp-BB)+rp
-            if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) then
-                r       = largeR
-                rprime  = largeRprime
-                center  = B
-                type    = 1
-                return
+            if (largeR.ge.r) then
+                largeRprime = norm(pp-BB)+rp
+                if (largeR.ge.largeRprime-mkeps) then
+                    r       = largeR
+                    rprime  = largeRprime
+                    center  = B
+                    type    = 1
+                    return
+                endif
             endif
             largeR      = norm(XX-CC)-ro_plus_rc
-            largeRprime = norm(pp-CC)+rp
-            if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) then
-                r       = largeR
-                rprime  = largeRprime
-                center  = C
-                type    = 2
+            if (largeR.ge.r) then
+                largeRprime = norm(pp-CC)+rp
+                if (largeR.ge.largeRprime-mkeps) then
+                    r       = largeR
+                    rprime  = largeRprime
+                    center  = C
+                    type    = 2
+                endif
             endif
         else
             largeR      = norm(XX-CC)-ro_plus_rc
-            largeRprime = norm(pp-CC)+rp
-            if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) then
-                r       = largeR
-                rprime  = largeRprime
-                center  = C
-                type    = 1
-                return
+            if (largeR.ge.r) then
+                largeRprime = norm(pp-CC)+rp
+                if (largeR.ge.largeRprime-mkeps) then
+                    r       = largeR
+                    rprime  = largeRprime
+                    center  = C
+                    type    = 1
+                    return
+                endif
             endif
             largeR      = norm(XX-BB)-ro_plus_rc
-            largeRprime = norm(pp-BB)+rp
-            if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) then
-                r       = largeR
-                rprime  = largeRprime
-                center  = B
-                type    = 2
+            if (largeR.ge.r) then
+                largeRprime = norm(pp-BB)+rp
+                if (largeR.ge.largeRprime-mkeps) then
+                    r       = largeR
+                    rprime  = largeRprime
+                    center  = B
+                    type    = 2
+                endif
             endif
         endif
 
@@ -447,12 +526,12 @@ implicit none
             t2m = xm*o2 
             if (t1p.ge.0.D0.and.t1p.le.1D0.and.t2p.gt.0.D0.and.t2p.le.1.D0-t1p) then    ! inside triangle
                 largeCenter = [xp,0.D0,0.D0] 
-                call largeRs(z,px,pz,largeCenter, largeR,largeRprime)
+                call largeRs(z,px,pz2,largeCenter, largeR,largeRprime)
                 if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) call add(largeR,largeRprime,largeCenter,3,r,rprime,center,type)
             endif
             if (t1m.ge.0D0.and.t1m.le.1.D0.and.t2m.ge.0.D0.and.t2m.le.1.D0-t1m) then    ! inside triangle
                 largeCenter = [xm,0.D0,0.D0]
-                call largeRs(z,px,pz,largeCenter, largeR,largeRprime)
+                call largeRs(z,px,pz2,largeCenter, largeR,largeRprime)
                 if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) call add(largeR,largeRprime,largeCenter,3,r,rprime,center,type)
             endif
         endif
@@ -467,12 +546,12 @@ implicit none
             t1m = (o1-o2)/o3
             if (t1p.ge.0.D0.and.t1p.le.1.D0) then
                 largeCenter = [t1p*Cx,t1p*Cy,0.D0] 
-                call largeRs(z,px,pz,largeCenter, largeR,largeRprime) 
+                call largeRs(z,px,pz2,largeCenter, largeR,largeRprime) 
                 if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) call add(largeR,largeRprime,largeCenter,4,r,rprime,center,type)
             endif
             if (t1m.ge.0.D0.and.t1m.le.1.D0) then
                 largeCenter = [t1m*Cx,t1m*Cy,0.D0] 
-                call largeRs(z,px,pz,largeCenter, largeR,largeRprime)       ! DEBUG THIS COMMAND WAS MISSING
+                call largeRs(z,px,pz2,largeCenter, largeR,largeRprime)      
                 if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) call add(largeR,largeRprime,largeCenter,4,r,rprime,center,type)
             endif
         endif
@@ -487,12 +566,12 @@ implicit none
             t1m = (o1-o2)/o3
             if (t1p.ge.0.D0.and.t1p.le.1.D0) then
                 largeCenter = [t1p*Bx,t1p*By,0.D0]
-                call largeRs(z,px,pz,largeCenter, largeR,largeRprime)
+                call largeRs(z,px,pz2,largeCenter, largeR,largeRprime)
                 if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) call add(largeR,largeRprime,largeCenter,5,r,rprime,center,type)
             endif
             if (t1m.ge.0.D0.and.t1m.le.1.D0) then
                 largeCenter = [t1m*Bx,t1m*By,0.D0]
-                call largeRs(z,px,pz,largeCenter, largeR,largeRprime)
+                call largeRs(z,px,pz2,largeCenter, largeR,largeRprime)
                 if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) call add(largeR,largeRprime,largeCenter,5,r,rprime,center,type)
             endif
         endif
@@ -507,12 +586,12 @@ implicit none
             t1m = (o1-o2)/o3
             if (t1p.ge.0.D0.and.t1p.le.1.D0) then
                 largeCenter = [Bx+t1p*BCx,By+t1p*BCy,0.D0] 
-                call largeRs(z,px,pz,largeCenter, largeR,largeRprime)
+                call largeRs(z,px,pz2,largeCenter, largeR,largeRprime)
                 if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) call add(largeR,largeRprime,largeCenter,6,r,rprime,center,type)
             endif
             if (t1m.ge.0.D0.and.t1m.le.1.D0) then
                 largeCenter = [Bx+t1m*BCx,By+t1m*BCy,0.D0] 
-                call largeRs(z,px,pz,largeCenter, largeR,largeRprime)
+                call largeRs(z,px,pz2,largeCenter, largeR,largeRprime)
                 if (largeR.ge.largeRprime-mkeps.and.largeR.ge.r) call add(largeR,largeRprime,largeCenter,6,r,rprime,center,type)
             endif
         endif
@@ -534,37 +613,67 @@ implicit none
     return
     end
 
-    subroutine largeRs(z,px,pz,largeCenter, largeR,largeRprime)
-    real*8, intent(in)  :: z,px,pz,largeCenter(3)
+    subroutine largeRs(z,px,pz2,largeCenter, largeR,largeRprime)
+    real*8, intent(in)  :: z,px,pz2,largeCenter(3)
     real*8, intent(out) :: largeR,largeRprime
     real*8 :: norm
     external norm
         largeR      = dsqrt(largeCenter(1)**2+largeCenter(2)**2+z**2)-ro_plus_rc    ! X-Center
-        largeRprime = dsqrt((px-largeCenter(1))**2+largeCenter(2)**2+pz**2)+rp      ! p-Center
+        largeRprime = dsqrt((px-largeCenter(1))**2+largeCenter(2)**2+pz2)+rp      ! p-Center
     return
     end
 
 end module shared
 
 program GPSD_3D
+use omp_lib
 use shared
-    real :: cpu_read_voro_output
-    real :: cpu_setup_triangles
-    real :: cpu_MonteCarlo
+    if (np.gt.OMP_GET_MAX_THREADS()) stop 'np > OMP_GET_MAX_THREADS'
 
+    call manage_cpu_and_real_clock(1)
     call read_parameters
     call constants
     call read_box
-    call cpu_time(tic); call read_voro_output; call cpu_time(toc); cpu_read_voro_output=toc-tic
-    call cpu_time(tic); call setup_triangles_neighborlist; ; call cpu_time(toc); cpu_setup_triangles=toc-tic
     call init_seed
-    call cpu_time(tic); call MonteCarlo; call cpu_time(toc); call cpu_time(toc); cpu_MonteCarlo=toc-tic
+    call manage_cpu_and_real_clock(2); call read_voro_parser
+    call manage_cpu_and_real_clock(3); call setup_triangles_neighborlist
+    call manage_cpu_and_real_clock(4); call MonteCarlo
+    call manage_cpu_and_real_clock(5)
     call finalize_seed
 
+    ! speed etc. information about the run
     write(stdout,form100) 'shots (use -q to enlarge)',shots
-    write(stdout,form101) 'time spent in read_voro_output [secs]',cpu_read_voro_output
-    write(stdout,form101) 'time spent in setup_triangles [secs]',cpu_setup_triangles
-    write(stdout,form101) 'time spent in MonteCarlo [secs]',cpu_MonteCarlo
+    write(stdout,form101) 'cpu+real time spent in overhead [secs]',cpu_and_real_time(1,:)
+    write(stdout,form101) 'cpu+real time spent in read_voro_output [secs]',cpu_and_real_time(2,:)
+    write(stdout,form101) 'cpu+real time spent in setup_triangles [secs]',cpu_and_real_time(3,:)
+    write(stdout,form101) 'cpu+real time spent in MonteCarlo [secs]',cpu_and_real_time(4,:)
+    write(stdout,form101) 'cpu+real time per 10000 shots [secs]',10000.D0*cpu_and_real_time(4,:)/dble(shots)
+
+
+    open(2,file='_summary.txt'); rewind(2)
+    write(2,*) N
+    write(2,*) ro
+    write(2,*) rp
+    write(2,*) rc
+    write(2,*) volume
+    write(2,*) triangles
+    write(2,*) shots
+    write(2,*) count_r
+    write(2,*) UpperPoreRadius
+    write(2,*) min_pore_radius
+    write(2,*) mean_pore_radius
+    write(2,*) max_pore_radius
+    write(2,*) std_pore_radius
+    write(2,*) volume_fraction  ! phi(reff)
+    write(2,*) neighborlist_M(1)*neighborlist_M(2)*neighborlist_M(3)    ! cells
+    write(2,*) np
+    write(2,*) cpu_and_real_time(2,1)
+    write(2,*) cpu_and_real_time(2,2)
+    write(2,*) cpu_and_real_time(3,1)
+    write(2,*) cpu_and_real_time(3,2)
+    write(2,*) cpu_and_real_time(4,1)
+    write(2,*) cpu_and_real_time(4,2)
+    close(2)
 
 stop
 end
