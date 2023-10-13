@@ -119,11 +119,11 @@ where *x*,*y*,*z* are the center coordinates of the pore with radius *r*.
 
 ## Test configurations and test runs
 
-A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call, using 10 of the available threads, 50000 Monte Carlo trials (*q=5*), for a probe sphere with zero radius, and materials spheres of radius 1.0 is 
+A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call, using 10 of the available threads, 20000 Monte Carlo trials (*q=10*), for a probe sphere with zero radius, and *N=2000* materials spheres of radius *r*<sub>o</sub>=1.0 is 
 
         perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10
 
-As we did not suppress stdout via -quiet, it should produce the following:
+As we did not suppress stdout via -quiet, it should produce the following within less than 10 secs:
 
        _______________________________________________________________________________________________________________________________
 
@@ -179,7 +179,7 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
-and the following file (a list of roughly 40000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
+and the following file (a list of roughly 20000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
         .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
