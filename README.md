@@ -136,26 +136,24 @@ As we did not suppress stdout via -quiet, it should produce the following:
         GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
         _______________________________________________________________________________________________________________________________
 
-
         [INFO] using configuration file .benchmark-7-config
         [INFO] using box file .benchmark-7-box
         [PREPARING] scanning .benchmark-7-box
         [PREPARING] recognized format (B)
         [INFO] monodisperse: 1
         [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-176735 including .parameters.
+        [INFO] created files in .tmp-GPSD-3D-48739 including .parameters.
         [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
         [GPSD-3D] Using 20000 shots on 10 threads
         [GPSD-3D] Please stand by ..
         [GPSD-3D]                               reading box ..
         [GPSD-3D]                                          box      24.000       24.000       24.000
         [VORO++]                                  max_vertices          53
-        [VORO++]                                voro_max_faces          31
+        [VORO++]                                voro_max_faces          26
         [VORO++]                    voro_max_vertices_for_face          12
-        [GPSD-3D]                                    triangles      119244
+        [GPSD-3D]                                    triangles       59622
         [GPSD-3D]                      parallel processes (np)          10
         [GPSD-3D]                                            N        2000
-        [GPSD-3D]                                    triangles      119244
         [GPSD-3D]                              UpperPoreRadius       2.847
         [GPSD-3D]                                           ro       1.000
         [GPSD-3D]                                           rc       0.000
@@ -166,21 +164,20 @@ As we did not suppress stdout via -quiet, it should produce the following:
         [GPSD-3D]                               neighborlist_M           3            3            3
         [GPSD-3D]                            neighborlist_size       8.000        8.000        8.000
         [GPSD-3D]                                  start MC ..
-        [GPSD-3D]                    volume fraction phi(reff)       0.386
-        [GPSD-3D]                                    V(0|reff)    8492.083
+        [GPSD-3D]                    volume fraction phi(reff)       0.389
+        [GPSD-3D]                                    V(0|reff)    8450.611
         [GPSD-3D]                              min pore radius       0.034
         [GPSD-3D]                             mean pore radius       1.575 +/-        0.003
         [GPSD-3D]                              max pore radius       2.847
         [GPSD-3D]             created a list {r} of pore radii
         [GPSD-3D]                    shots (use -q to enlarge)       20000
         [GPSD-3D]       cpu+real time spent in overhead [secs]       0.000        0.000
-        [GPSD-3D]cpu+real time spent in read_voro_output [secs       0.142        0.250
+        [GPSD-3D]cpu+real time spent in read_voro_output [secs       0.116        0.250
         [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.001        0.000
-        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]     138.384       14.000
-        [GPSD-3D]         cpu+real time per 10000 shots [secs]      69.192        7.000
+        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      69.739        7.125
+        [GPSD-3D]         cpu+real time per 10000 shots [secs]      34.869        3.562
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
-
 
 and the following file (a list of roughly 40000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
@@ -192,31 +189,31 @@ With such list of values at hand, creating the normalized histogram (the pore ra
 
 a second file will have been generated (all entries in this file are described <a href="#info">below</a>
 
-         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd-info
+        [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd-info
 
         2000
         1.0000000000000000
         0.0000000000000000
         0.0000000000000000
         13824.000000000000
-        119244
+        59622
         20000
-        12286
-        2.8465466781177895
+        12226
+        2.8465461581708604
         3.4013094635688024E-002
-        1.5754224618962354
-        2.8465466781177899
-        3.1006436282299370E-003
-        0.38570000000000004
+        1.5752346684031902
+        2.8465461581708604
+        3.1013263214864266E-003
+        0.38870000000000005
         27
         10
-        0.142474994
+        0.116226003
         0.250000000
-        9.66995955E-04
+        5.83000481E-04
         0.00000000
-        138.383987
-        14.0000000
-        14.2804579734802
+        69.7387085
+        7.12500000
+        7.34732604026794
 
 
 
