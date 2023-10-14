@@ -123,7 +123,7 @@ A number of configurations and corresponding box-files are available from the cu
 
         perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10
 
-As we did not suppress stdout via -quiet, it should produce the following within less than 10 secs:
+As we did not suppress stdout via -quiet, it should produce the following within a few seconds:
 
        _______________________________________________________________________________________________________________________________
 
@@ -136,48 +136,43 @@ As we did not suppress stdout via -quiet, it should produce the following within
         GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
         _______________________________________________________________________________________________________________________________
 
-        [INFO] using configuration file .benchmark-7-config
-        [INFO] using box file .benchmark-7-box
-        [PREPARING] scanning .benchmark-7-box
-        [PREPARING] recognized format (B)
-        [INFO] monodisperse: 1
-        [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-48739 including .parameters.
-        [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
         [GPSD-3D] Using 20000 shots on 10 threads
         [GPSD-3D] Please stand by ..
         [GPSD-3D]                               reading box ..
         [GPSD-3D]                                          box      24.000       24.000       24.000
-        [VORO++]                                  max_vertices          53
-        [VORO++]                                voro_max_faces          26
-        [VORO++]                    voro_max_vertices_for_face          12
+        [VORO++]                                  max vertices          53
+        [VORO++]                                     max faces          26
+        [VORO++]                             max face-vertices          12
         [GPSD-3D]                                    triangles       59622
         [GPSD-3D]                      parallel processes (np)          10
-        [GPSD-3D]                                            N        2000
+        [GPSD-3D]                         material spheres (N)        2000
         [GPSD-3D]                              UpperPoreRadius       2.847
         [GPSD-3D]                                           ro       1.000
         [GPSD-3D]                                           rc       0.000
         [GPSD-3D]                                           rp       0.000
         [GPSD-3D]                                 reff = rc+rp       0.000
-        [GPSD-3D]                   max_triangle_max_extension       3.303
+        [GPSD-3D]                                 rs = ro+reff       1.000
+        [GPSD-3D]                       max triangle extension       1.893
         [GPSD-3D]                    creating neighbor list ..
-        [GPSD-3D]                               neighborlist_M           3            3            3
-        [GPSD-3D]                            neighborlist_size       8.000        8.000        8.000
-        [GPSD-3D]                                  start MC ..
+        [GPSD-3D]                               neighborlist_M           5            5            5
+        [GPSD-3D]                            neighborlist_size       4.800        4.800        4.800
+        [GPSD-3D]                           triangles per cell     476.976
+        [GPSD-3D]                      starting Monte Carlo ..
         [GPSD-3D]                    volume fraction phi(reff)       0.389
-        [GPSD-3D]                                    V(0|reff)    8450.611
+        [GPSD-3D]                                    V(0|reff)    8449.920
         [GPSD-3D]                              min pore radius       0.034
         [GPSD-3D]                             mean pore radius       1.575 +/-        0.003
         [GPSD-3D]                              max pore radius       2.847
         [GPSD-3D]             created a list {r} of pore radii
         [GPSD-3D]                    shots (use -q to enlarge)       20000
         [GPSD-3D]       cpu+real time spent in overhead [secs]       0.000        0.000
-        [GPSD-3D]cpu+real time spent in read_voro_output [secs       0.116        0.250
+        [GPSD-3D]cpu+real time spent in read_voro_output [secs       0.113        0.250
         [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.001        0.000
-        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      69.739        7.125
-        [GPSD-3D]         cpu+real time per 10000 shots [secs]      34.869        3.562
+        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      20.906        2.125
+        [GPSD-3D]         cpu+real time per 10000 shots [secs]      10.453        1.062
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
+
 
 and the following file (a list of roughly 20000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
@@ -198,22 +193,22 @@ a second file will have been generated (all entries in this file are described <
         13824.000000000000
         59622
         20000
-        12226
+        12225
         2.8465461581708604
         3.4013094635688024E-002
-        1.5752346684031902
+        1.5753878809678585
         2.8465461581708604
-        3.1013263214864266E-003
-        0.38870000000000005
-        27
+        3.1008668316096829E-003
+        0.38875000000000004
+        125
         10
-        0.116226003
+        0.113164999
         0.250000000
-        5.83000481E-04
+        6.10001385E-04
         0.00000000
-        69.7387085
-        7.12500000
-        7.34732604026794
+        20.9056034
+        2.12500000
+        2.41562652587891
 
 
 
