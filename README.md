@@ -136,6 +136,14 @@ As we did not suppress stdout via -quiet, it should produce the following within
         GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
         _______________________________________________________________________________________________________________________________
 
+        [INFO] using configuration file .benchmark-7-config
+        [INFO] using box file .benchmark-7-box
+        [PREPARING] scanning .benchmark-7-box
+        [PREPARING] recognized format (B)
+        [INFO] monodisperse: 1
+        [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
+        [INFO] created files in .tmp-GPSD-3D-17590 including .parameters.
+        [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
         [GPSD-3D] Using 20000 shots on 10 threads
         [GPSD-3D] Please stand by ..
         [GPSD-3D]                               reading box ..
@@ -158,20 +166,21 @@ As we did not suppress stdout via -quiet, it should produce the following within
         [GPSD-3D]                            neighborlist_size       4.800        4.800        4.800
         [GPSD-3D]                           triangles per cell     476.976
         [GPSD-3D]                      starting Monte Carlo ..
-        [GPSD-3D]                    volume fraction phi(reff)       0.389
-        [GPSD-3D]                                    V(0|reff)    8449.920
-        [GPSD-3D]                              min pore radius       0.034
-        [GPSD-3D]                             mean pore radius       1.575 +/-        0.003
+        [GPSD-3D]                    volume fraction phi(reff)       0.386
+        [GPSD-3D]                                    V(0|reff)    8486.554
+        [GPSD-3D]                              min pore radius       0.039
+        [GPSD-3D]                             mean pore radius       1.580 +/-        0.003
         [GPSD-3D]                              max pore radius       2.847
         [GPSD-3D]             created a list {r} of pore radii
         [GPSD-3D]                    shots (use -q to enlarge)       20000
         [GPSD-3D]       cpu+real time spent in overhead [secs]       0.000        0.000
-        [GPSD-3D]cpu+real time spent in read_voro_output [secs       0.113        0.250
+        [GPSD-3D]cpu+real time spent in read_voro_output [secs       2.457        2.461
         [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.001        0.000
-        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      20.906        2.125
-        [GPSD-3D]         cpu+real time per 10000 shots [secs]      10.453        1.062
+        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      14.586        1.469
+        [GPSD-3D]         cpu+real time per 10000 shots [secs]       7.293        0.734
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
+
 
 
 and the following file (a list of roughly 20000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
@@ -187,28 +196,29 @@ a second file will have been generated (all entries in this file are described <
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd-info
 
         2000
-        1.0000000000000000
-        0.0000000000000000
-        0.0000000000000000
-        13824.000000000000
+        1.00000000000000
+        0.000000000000000E+000
+        0.000000000000000E+000
+        13824.0000000000
         59622
         20000
-        12225
-        2.8465461581708604
-        3.4013094635688024E-002
-        1.5753878809678585
-        2.8465461581708604
-        3.1008668316096829E-003
-        0.38875000000000004
+        12278
+        2.84654615817086
+        3.872175256570376E-002
+        1.57995407352756
+        2.84654615817086
+        3.146979127020632E-003
+        0.386100000000000
         125
         10
-        0.113164999
-        0.250000000
-        6.10001385E-04
-        0.00000000
-        20.9056034
-        2.12500000
-        2.41562652587891
+        2.456945
+        2.460938
+        7.8701973E-04
+        0.0000000E+00
+        14.58626
+        1.468750
+        3.96854281425476
+
 
 
 
