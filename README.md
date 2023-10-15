@@ -142,46 +142,44 @@ As we did not suppress stdout via -quiet, it should produce the following within
         [PREPARING] recognized format (B)
         [INFO] monodisperse: 1
         [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-17590 including .parameters.
+        [INFO] created files in .tmp-GPSD-3D-83900 including .parameters.
         [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
         [GPSD-3D] Using 20000 shots on 10 threads
         [GPSD-3D] Please stand by ..
         [GPSD-3D]                               reading box ..
-        [GPSD-3D]                                          box      24.000       24.000       24.000
-        [VORO++]                                  max vertices          53
-        [VORO++]                                     max faces          26
-        [VORO++]                             max face-vertices          12
-        [GPSD-3D]                                    triangles       59622
-        [GPSD-3D]                      parallel processes (np)          10
-        [GPSD-3D]                         material spheres (N)        2000
-        [GPSD-3D]                              UpperPoreRadius       2.847
-        [GPSD-3D]                                           ro       1.000
-        [GPSD-3D]                                           rc       0.000
-        [GPSD-3D]                                           rp       0.000
-        [GPSD-3D]                                 reff = rc+rp       0.000
-        [GPSD-3D]                                 rs = ro+reff       1.000
-        [GPSD-3D]                       max triangle extension       1.893
+        [GPSD-3D]                                          box      24.0000       24.0000       24.0000
+        [VORO++]                                  max vertices           53
+        [VORO++]                                     max faces           26
+        [VORO++]                             max face-vertices           12
+        [GPSD-3D]                                    triangles        59622
+        [GPSD-3D]                      parallel processes (np)           10
+        [GPSD-3D]                         material spheres (N)         2000
+        [GPSD-3D]                              UpperPoreRadius       2.8465
+        [GPSD-3D]                                           ro       1.0000
+        [GPSD-3D]                                           rc       0.0000
+        [GPSD-3D]                                           rp       0.0000
+        [GPSD-3D]                                 reff = rc+rp       0.0000
+        [GPSD-3D]                                 rs = ro+reff       1.0000
+        [GPSD-3D]                       max triangle extension       1.8932
         [GPSD-3D]                    creating neighbor list ..
-        [GPSD-3D]                               neighborlist_M           5            5            5
-        [GPSD-3D]                            neighborlist_size       4.800        4.800        4.800
-        [GPSD-3D]                           triangles per cell     476.976
+        [GPSD-3D]                               neighborlist_M            5             5             5
+        [GPSD-3D]                            neighborlist_size       4.8000        4.8000        4.8000
+        [GPSD-3D]                           triangles per cell     476.9760
         [GPSD-3D]                      starting Monte Carlo ..
-        [GPSD-3D]                    volume fraction phi(reff)       0.386
-        [GPSD-3D]                                    V(0|reff)    8486.554
-        [GPSD-3D]                              min pore radius       0.039
-        [GPSD-3D]                             mean pore radius       1.580 +/-        0.003
-        [GPSD-3D]                              max pore radius       2.847
+        [GPSD-3D]                    volume fraction phi(reff)       0.3767
+        [GPSD-3D]                                    V(0|reff)    8617.1904
+        [GPSD-3D]                              min pore radius       0.0179
+        [GPSD-3D]                             mean pore radius       1.5525+/-     0.0033
+        [GPSD-3D]                              max pore radius       2.8465
         [GPSD-3D]             created a list {r} of pore radii
-        [GPSD-3D]                    shots (use -q to enlarge)       20000
-        [GPSD-3D]       cpu+real time spent in overhead [secs]       0.000        0.000
-        [GPSD-3D]cpu+real time spent in read_voro_output [secs       2.457        2.461
-        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.001        0.000
-        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      14.586        1.469
-        [GPSD-3D]         cpu+real time per 10000 shots [secs]       7.293        0.734
+        [GPSD-3D]                    shots (use -q to enlarge)        20000
+        [GPSD-3D]       cpu+real time spent in overhead [secs]       0.0002        0.0000
+        [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.1131        0.2500
+        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0006        0.0000
+        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      21.0204        2.1250
+        [GPSD-3D]         cpu+real time per 10000 shots [secs]      10.5102        1.0625
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
-
-
 
 and the following file (a list of roughly 20000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
@@ -196,31 +194,28 @@ a second file will have been generated (all entries in this file are described <
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd-info
 
         2000
-        1.00000000000000
-        0.000000000000000E+000
-        0.000000000000000E+000
-        13824.0000000000
+        1.0000000000000000
+        0.0000000000000000
+        0.0000000000000000
+        13824.000000000000
         59622
         20000
-        12278
-        2.84654615817086
-        3.872175256570376E-002
-        1.57995407352756
-        2.84654615817086
-        3.146979127020632E-003
-        0.386100000000000
+        12467
+        2.8465461581708604
+        1.7858377514456736E-002
+        1.5524606092369337
+        2.8465461581708600
+        3.2635952420051765E-003
+        0.37665000000000004
         125
         10
-        2.456945
-        2.460938
-        7.8701973E-04
-        0.0000000E+00
-        14.58626
-        1.468750
-        3.96854281425476
-
-
-
+        0.113067001
+        0.250000000
+        6.13994896E-04
+        0.00000000
+        21.0204201
+        2.12500000
+        2.42629528045654
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
