@@ -142,7 +142,7 @@ As we did not suppress stdout via -quiet, it should produce the following within
         [PREPARING] recognized format (B)
         [INFO] monodisperse: 1
         [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-83900 including .parameters.
+        [INFO] created files in .tmp-GPSD-3D-49303 including .parameters.
         [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
         [GPSD-3D] Using 20000 shots on 10 threads
         [GPSD-3D] Please stand by ..
@@ -160,11 +160,11 @@ As we did not suppress stdout via -quiet, it should produce the following within
         [GPSD-3D]                                           rp       0.0000
         [GPSD-3D]                                 reff = rc+rp       0.0000
         [GPSD-3D]                                 rs = ro+reff       1.0000
-        [GPSD-3D]                       max triangle extension       1.8932
+        [GPSD-3D]                       max triangle extension       2.8398
         [GPSD-3D]                    creating neighbor list ..
-        [GPSD-3D]                               neighborlist_M            5             5             5
-        [GPSD-3D]                            neighborlist_size       4.8000        4.8000        4.8000
-        [GPSD-3D]                           triangles per cell     476.9760
+        [GPSD-3D]                               neighborlist_M            4             4             4
+        [GPSD-3D]                            neighborlist_size       6.0000        6.0000        6.0000
+        [GPSD-3D]                           triangles per cell     931.5938
         [GPSD-3D]                      starting Monte Carlo ..
         [GPSD-3D]                    volume fraction phi(reff)       0.3767
         [GPSD-3D]                                    V(0|reff)    8617.1904
@@ -174,10 +174,11 @@ As we did not suppress stdout via -quiet, it should produce the following within
         [GPSD-3D]             created a list {r} of pore radii
         [GPSD-3D]                    shots (use -q to enlarge)        20000
         [GPSD-3D]       cpu+real time spent in overhead [secs]       0.0002        0.0000
-        [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.1131        0.2500
-        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0006        0.0000
-        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      21.0204        2.1250
-        [GPSD-3D]         cpu+real time per 10000 shots [secs]      10.5102        1.0625
+        [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.1144        0.2500
+        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0005        0.0000
+        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      16.4258        1.6250
+        [GPSD-3D]         cpu+real time per 10000 shots [secs]       8.2129        0.8125
+        [GPSD-3D] completed
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
@@ -203,19 +204,19 @@ a second file will have been generated (all entries in this file are described <
         12467
         2.8465461581708604
         1.7858377514456736E-002
-        1.5524606092369337
+        1.5524619675473206
         2.8465461581708600
-        3.2635952420051765E-003
+        3.2635904069227960E-003
         0.37665000000000004
-        125
+        64
         10
-        0.113067001
+        0.114386998
         0.250000000
-        6.13994896E-04
+        4.58002090E-04
         0.00000000
-        21.0204201
-        2.12500000
-        2.42629528045654
+        16.4257870
+        1.62500000
+        1.96279191970825
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
