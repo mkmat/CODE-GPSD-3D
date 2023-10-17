@@ -169,7 +169,7 @@ As we did not suppress stdout via -quiet, it should produce the following within
         [GPSD-3D]                    volume fraction phi(reff)       0.3767
         [GPSD-3D]                                    V(0|reff)    8617.1904
         [GPSD-3D]                              min pore radius       0.0179
-        [GPSD-3D]                             mean pore radius       1.5525+/-     0.0033
+        [GPSD-3D]                             mean pore radius       1.5525 +/-    0.0033
         [GPSD-3D]                              max pore radius       2.8465
         [GPSD-3D]             created a list {r} of pore radii
         [GPSD-3D]                    shots (use -q to enlarge)        20000
