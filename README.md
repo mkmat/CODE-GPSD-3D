@@ -260,6 +260,3 @@ Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.
 GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
 
 GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
-
-test comment
-
