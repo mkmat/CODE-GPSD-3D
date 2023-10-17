@@ -179,7 +179,6 @@ As we did not suppress stdout via -quiet, it should produce the following within
         [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      16.4258        1.6250
         [GPSD-3D]         cpu+real time per 10000 shots [secs]       8.2129        0.8125
         [GPSD-3D] completed
-        [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
 and the following file (a list of roughly 20000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
