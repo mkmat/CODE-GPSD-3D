@@ -250,7 +250,7 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
     real time spent during Monte Carlo [secs]
     total wall time [secs]
 
-## Benchmarks
+## Benchmarks (fortran90 version)
 
 Benchmark configurations are available as .benchmark-#-config and .benchmark-#-box files. 
 
@@ -269,6 +269,10 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 |11 | 1600 | 1 | 0.1 | 0 | 63 | 30 | 100800 | 19752 | 0.38 | 0.41 | 0.38 s | 1.51 s | 
 |12 | 1600 | 1 | 0.1 | 0.1 | 63 | 30 | 100800 | 19752 | 0.29 | 0.31 | 0.25 s | 1.22 s | 
 |13 | 1600 | 1 | 0 | 0 | 63 | 3 | 100800 | 19752 | 0.34 | 0.41 | 0.25 s | 11.12 s | 
+
+## Benchmarks (c++ version)
+
+to come
 
 ## About <a name="about">
 
