@@ -252,6 +252,8 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
 
 ## Benchmarks
 
+Benchmark configurations are available as .benchmark-#-config and .benchmark-#-box files. 
+
 | no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 |1 | 16 | 0.1 | 0 | 0 | 6251 | 30 | 100016 | 490 | 1.46 | 1.6 | 0 s | 0.3 s | 
