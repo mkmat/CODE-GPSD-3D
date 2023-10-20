@@ -15,10 +15,10 @@ const double z_min=-1,z_max=1;
 const double cvol=(x_max-x_min)*(y_max-y_min)*(x_max-x_min);
  
 // Set up the number of blocks that the container is divided into
-const int n_x=1,n_y=1,n_z=1;
+const int n_x=6,n_y=6,n_z=6;
  
 // Set the number of particles that are going to be randomly introduced
-const int particles=20;
+const int particles=100;
  
 // This function returns a random double between 0 and 1
 double rnd() {return double(rand())/RAND_MAX;}
@@ -36,15 +36,15 @@ int main() {
          std::vector<double> f_areas;
          std::vector<int> f_orders;
 
-         FILE *f = fopen("coords.csv", "w");
+         //FILE *f = fopen("coords.csv", "w");
  
          // Create a container with the geometry given above, and make it
          // non-periodic in each of the three coordinates. Allocate space for
          // eight particles within each computational block
          container con(x_min,x_max,y_min,y_max,z_min,z_max,n_x,n_y,n_z,
-                         false,false,false,particles);
+                         true,true,true,particles);
  
-         fprintf(f, "p_id,x,y,z\n");
+         //fprintf(f, "p_id,x,y,z\n");
          // Randomly add particles into the container
          for(i=0;i<particles;i++) {
                  x=x_min+rnd()*(x_max-x_min);
@@ -52,13 +52,13 @@ int main() {
                  z=z_min+rnd()*(z_max-z_min);
                  con.put(i,x,y,z);
                  //std::cout<<"\t x = "<<x<<"\t y = "<<"\t z = "<<z<<std::endl;
-                 fprintf(f, "%d,%lf,%lf,%lf\n",i,x,y,z);
+                 //fprintf(f, "%d,%lf,%lf,%lf\n",i,x,y,z);
 
          }
 
-         fclose(f);
+         //fclose(f);
 
-         int idx;
+         /*int idx;
          int f_sum = 0;
 
          FILE *verts = fopen("vertices.csv", "w");
@@ -132,7 +132,22 @@ int main() {
          } while (cl.inc());
 
         fclose(verts);
-        fclose(faces);
+        fclose(faces);*/
+
+        double vx = 0.99;
+        double vy = 0.99;
+        double vz = 0.99;
+
+        c_loop_subset cl(con);
+        cl.setup_sphere(vx, vy, vz, 0.5, true);
+
+        if (cl.start()) do if(con.compute_cell(c, cl)){
+                cl.pos(x,y,z);id=cl.pid();
+             std::cout<<"id = "<<id<<"\t x = "<<x<<"\t y = "<<y<<"\t z = "<<z<<std::endl;   
+        } while(cl.inc());
+
+        return 0;
+
 
  
 }
