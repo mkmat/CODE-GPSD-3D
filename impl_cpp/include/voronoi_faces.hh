@@ -37,8 +37,32 @@ voronoi_faces::voronoi_faces(std::vector<std::vector<double>> vertices)
     gx /= (1. * num_vertices);
 
     geometrical_centre.set_coords(gx, gy, gz);
+    std::vector<double> gc_vec = geometrical_centre.convert_to_vector();
 
-    
+    std::vector<std::vector<double>> temp_triangle_vertices;
+    triangle temp_triangle;
+
+    for (int i = 0; i < (num_vertices-1); i++){
+
+        temp_triangle_vertices.clear();
+        
+        temp_triangle_vertices.push_back(vertices[i]);
+        temp_triangle_vertices.push_back(vertices[i+1]);
+        temp_triangle_vertices.push_back(gc_vec);
+
+        
+        face_triangles.push_back(temp_triangle_vertices);
+
+    }
+
+    temp_triangle_vertices.clear();
+    temp_triangle_vertices.push_back(vertices[num_vertices-1]);
+    temp_triangle_vertices.push_back(vertices[0]);
+    temp_triangle_vertices.push_back(gc_vec);
+
+    face_triangles.push_back()
+
+
 
 }
 

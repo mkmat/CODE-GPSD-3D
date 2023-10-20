@@ -12,6 +12,7 @@ public:
 
     void set_coords(std::vector<double> v);
     void set_coords(double x_c, double y_c, double z_c);
+    std::vector<double> convert_to_vector();
 
     double x;
     double y;
@@ -31,6 +32,17 @@ void coords::set_coords(double x_c, double y_c, double z_c)
     x = x_c;
     y = y_c;
     z = z_c;
+}
+
+std::vector<double> coords::convert_to_vector()
+{
+    std::vector<double> temp;
+
+    temp.push_back(x);
+    temp.push_back(y);
+    temp.push_back(z);
+
+    return temp;
 }
 
 
