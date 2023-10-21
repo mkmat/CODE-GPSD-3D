@@ -13,14 +13,14 @@ private:
     int num_vertices;
 
 public:
-    voronoi_faces(std::vector<std::vector<double>> vertices);
-    ~voronoi_faces();
+    void set_voronoi_faces(std::vector<std::vector<double>> vertices);
 };
 
-voronoi_faces::voronoi_faces(std::vector<std::vector<double>> vertices)
+void voronoi_faces::set_voronoi_faces(std::vector<std::vector<double>> vertices)
 {
 
     num_vertices = vertices.size();
+    face_triangles.clear();
 
     double gx = 0.;
     double gy = 0.;
@@ -50,8 +50,8 @@ voronoi_faces::voronoi_faces(std::vector<std::vector<double>> vertices)
         temp_triangle_vertices.push_back(vertices[i+1]);
         temp_triangle_vertices.push_back(gc_vec);
 
-        
-        face_triangles.push_back(temp_triangle_vertices);
+        temp_triangle.set_vertices(temp_triangle_vertices);
+        face_triangles.push_back(temp_triangle);
 
     }
 
@@ -60,17 +60,10 @@ voronoi_faces::voronoi_faces(std::vector<std::vector<double>> vertices)
     temp_triangle_vertices.push_back(vertices[0]);
     temp_triangle_vertices.push_back(gc_vec);
 
-    face_triangles.push_back()
-
-
+    temp_triangle.set_vertices(temp_triangle_vertices);
+    face_triangles.push_back(temp_triangle);
 
 }
-
-voronoi_faces::~voronoi_faces()
-{
-}
-
-
 
 }
 

@@ -35,8 +35,16 @@ void triangle::set_vertices(std::vector<std::vector<double>> vertices){
     double cz = 0.;
 
     for (int i = 0; i < 3; i++){
-        cx 
+        cx += vertices[i][0];
+        cy += vertices[i][1];
+        cz += vertices[i][2];
     }
+
+    cx /= 3.;
+    cy /= 3.;
+    cz /= 3.;
+
+    centroid.set_coords(cx, cy, cz);
 
 }
 

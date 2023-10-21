@@ -37,10 +37,15 @@ void coords::set_coords(double x_c, double y_c, double z_c)
 std::vector<double> coords::convert_to_vector()
 {
     std::vector<double> temp;
+    temp.resize(3);
 
-    temp.push_back(x);
+    /*temp.push_back(x);
     temp.push_back(y);
-    temp.push_back(z);
+    temp.push_back(z);*/
+
+    temp[0] = x;
+    temp[1] = y;
+    temp[2] = z;
 
     return temp;
 }
