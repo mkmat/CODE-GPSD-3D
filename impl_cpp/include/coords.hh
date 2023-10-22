@@ -13,6 +13,7 @@ public:
     void set_coords(std::vector<double> v);
     void set_coords(double x_c, double y_c, double z_c);
     std::vector<double> convert_to_vector();
+    void print_coords();
 
     double x;
     double y;
@@ -48,6 +49,11 @@ std::vector<double> coords::convert_to_vector()
     temp[2] = z;
 
     return temp;
+}
+
+void coords::print_coords()
+{
+    std::cout<<x<<","<<y<<","<<z<<std::endl;
 }
 
 
