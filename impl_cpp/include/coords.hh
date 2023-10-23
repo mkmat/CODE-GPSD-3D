@@ -56,6 +56,14 @@ void coords::print_coords()
     std::cout<<x<<","<<y<<","<<z<<std::endl;
 }
 
+/*coords& coords::operator=(coords &a)
+{
+    this->x = a.x;
+    this->y = a.y;
+    this->z = a.z;
+
+    return *this;
+}*/
 
 }
 
