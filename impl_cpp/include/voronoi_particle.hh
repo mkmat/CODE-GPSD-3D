@@ -15,17 +15,21 @@ public:
     void set_particle_coord(double x, double y, double z);
     void clear_faces();
     void print_particle();
-    int num_faces();
     coords position;
+    double return_max_lpes_radius(coords p, double rs);
 
 private:
     std::vector<voronoi_faces> all_faces;
+    double particle_r_max;
+    double face_r_max;
+    int num_faces;
 
 };
 
 void voronoi_particle::clear_faces()
 {
     all_faces.clear();
+    num_faces = 0;
 }
 
 void voronoi_particle::set_voronoi_face(std::vector<coords> vertices)
@@ -33,6 +37,7 @@ void voronoi_particle::set_voronoi_face(std::vector<coords> vertices)
     voronoi_faces temp;
     temp.set_voronoi_faces(vertices);
     all_faces.push_back(temp);
+    num_faces += 1;
 }
 
 void voronoi_particle::set_particle_coord(double x, double y, double z)
@@ -48,9 +53,20 @@ void voronoi_particle::print_particle()
     }
 }
 
-int voronoi_particle::num_faces()
+
+double voronoi_particle::return_max_lpes_radius(coords p, double rs)
 {
-    return all_faces.size();
+    particle_r_max = 0.;
+
+    for (int i = 0; i < num_faces; i++){
+        face_r_max = all_faces[i].return_max_radius_for_face(p, position, rs);
+        
+        if (face_r_max > particle_r_max)
+            particle_r_max = face_r_max;
+    }
+
+    return particle_r_max;
+
 }
 
 

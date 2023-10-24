@@ -1,4 +1,5 @@
 #include <triangle.hh>
+#include <algorithm>
 
 #ifndef VORONOI_FACES_HH
 #define VORONOI_FACES_HH
@@ -11,11 +12,17 @@ class voronoi_faces
 public:
     void set_voronoi_faces(std::vector<coords> vertices);
     void print_face();
+    double return_max_radius_for_face(coords p, coords vx, double rs);
 
 private:
     std::vector<triangle> face_triangles;
     coords geometrical_centre;
     int num_vertices;
+    std::vector<double> candidate_r_max;
+    int num_triangles;
+    double face_r_max;
+    int    argmax;
+    double triangle_r_max;
 };
 
 void voronoi_faces::set_voronoi_faces(std::vector<coords> vertices)
@@ -76,6 +83,9 @@ void voronoi_faces::set_voronoi_faces(std::vector<coords> vertices)
         face_triangles.push_back(temp_triangle);
     }
 
+    num_triangles = face_triangles.size();
+    //candidate_r_max.resize(num_triangles);
+
 }
 
 void voronoi_faces::print_face()
@@ -84,6 +94,20 @@ void voronoi_faces::print_face()
         std::cout<<"triangle "<<i<<std::endl;
         face_triangles[i].print_triangle();
     }
+}
+
+double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs)
+{
+    face_r_max = 0.;
+
+    for (int i = 0; i < num_triangles; i++){
+        triangle_r_max = face_triangles[i].return_max_distance_for_triangle(p, vx, rs);
+        
+        if (triangle_r_max > face_r_max)
+            face_r_max = triangle_r_max;
+    }
+
+    return face_r_max;
 }
 
 }

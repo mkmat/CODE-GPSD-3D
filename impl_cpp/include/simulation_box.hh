@@ -30,6 +30,7 @@ private:
     double ro = 1.;
     double rc = 0.;
     double rp = 0.;
+    double rs;
     const int dim = 3;
     int    num_shots = 1;
     int    num_particles;
@@ -78,6 +79,7 @@ std::vector<std::string> simulation_box::split_string_by_delimiter(const std::st
 
 simulation_box::simulation_box(char *filename)
 {
+    rs = ro + rc + rp;
 
     std::ifstream parser(filename, std::ifstream::in);
     std::string str;
@@ -287,8 +289,25 @@ void simulation_box::get_position_in_grid(coords cx)
 
 void simulation_box::calculate_gpsd()
 {
-    for (int i = 0; i < num_shots; i++){
+    bool condition;
+    int  num_count = 0;
+
+    double particle_max;
+    double r_max;
+
+    while (num_count < num_shots){
+
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
+        condition = check_probe_centre_viability();
+
+        if(condition){
+            num_count++;
+
+            for (int i = 0; i < temp_neighbour_list.size(); i++)
+                particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre, rs);
+
+        }
+
     }
 }
 
