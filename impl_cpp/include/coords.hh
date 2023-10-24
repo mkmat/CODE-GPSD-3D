@@ -14,6 +14,8 @@ public:
     void set_coords(double x_c, double y_c, double z_c);
     std::vector<double> convert_to_vector();
     void print_coords();
+    double return_distance_sq(coords cx);
+    double return_distance(coords cx);
 
     double x;
     double y;
@@ -56,14 +58,15 @@ void coords::print_coords()
     std::cout<<x<<","<<y<<","<<z<<std::endl;
 }
 
-/*coords& coords::operator=(coords &a)
+double coords::return_distance_sq(coords cx)
 {
-    this->x = a.x;
-    this->y = a.y;
-    this->z = a.z;
+    return ((this->x-cx.x)*(this->x-cx.x) + (this->y-cx.y)*(this->y-cx.y) + (this->z-cx.z)*(this->z-cx.z));
+}
 
-    return *this;
-}*/
+double coords::return_distance(coords cx)
+{
+    return sqrt(return_distance_sq(cx));
+}
 
 }
 

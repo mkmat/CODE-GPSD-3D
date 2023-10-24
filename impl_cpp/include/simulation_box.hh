@@ -4,6 +4,7 @@
 #include<sstream>
 #include<fstream>
 #include<cmath>
+#include<random>
 
 #ifndef SIMULATION_BOX_HH
 #define SIMULATION_BOX_HH
@@ -19,6 +20,10 @@ public:
     void print_coords();
     void test_setup(int n);
     int  return_position_in_grid(int *pos); 
+    void get_position_in_grid(coords cx);
+    void calculate_gpsd();
+    void get_LPES();
+    bool check_probe_centre_viability();
 
 private:
 
@@ -26,10 +31,12 @@ private:
     double rc = 0.;
     double rp = 0.;
     const int dim = 3;
-    int num_particles;
+    int    num_shots = 1;
+    int    num_particles;
     double r_max;
+    double r_max_squared;
     double delta_x;
-    int *nx;
+    int    *nx;
     double xlo;
     double xhi;
     double ylo;
@@ -41,12 +48,19 @@ private:
     int    *L_eff;
     double *delta_x;
     double *inv_deltax;
+    int    *position_in_grid;
 
     std::vector<voronoi_particle> all_particles;
     std::vector<coords> all_coords;
     std::vector<int> neighbour_ids;
     std::vector<std::vector<int>> grid;
     std::vector<int> neighbour_list;
+    std::mt19937 generator;
+    std::uniform_real_distribution<double> dis;
+    std::vector<int> temp_neighbour_list;  
+
+    coords lpes_centre;
+    coords probe_centre;
 
 };
 
@@ -203,7 +217,6 @@ simulation_box::simulation_box(char *filename)
 
     grid.resize(L_total);
 
-    int *position_in_grid;
     int *neigh_position_in_grid;
 
     position_in_grid       = (int*)malloc(sizeof(int) * dim);
@@ -215,10 +228,7 @@ simulation_box::simulation_box(char *filename)
     for (int i = 0; i < num_particles; i++){
 
         cx = all_particles[i].position;
-
-        position_in_grid[0] = (int)(cx.x * inv_deltax[0]);
-        position_in_grid[1] = (int)(cx.y * inv_deltax[1]);
-        position_in_grid[2] = (int)(cx.z * inv_deltax[2]);
+        get_position_in_grid(cx);
 
         for (int ii = -1; ii <= 1; ii++){
             for (int jj = -1; jj <= 1; jj++){
@@ -242,11 +252,11 @@ simulation_box::simulation_box(char *filename)
 
     }
 
-    free(position_in_grid);
     free(neigh_position_in_grid);
     
-
 }
+
+
 
 void simulation_box::print_coords()
 {
@@ -266,6 +276,35 @@ int simulation_box::return_position_in_grid(int *pos)
 
     for (int axis = 0; axis < dim; axis++)
         counter += pos[axis] * L_eff[axis];
+}
+
+void simulation_box::get_position_in_grid(coords cx)
+{
+    position_in_grid[0] = (int)(cx.x * inv_deltax[0]);
+    position_in_grid[1] = (int)(cx.y * inv_deltax[1]);
+    position_in_grid[2] = (int)(cx.z * inv_deltax[2]);
+}
+
+void simulation_box::calculate_gpsd()
+{
+    for (int i = 0; i < num_shots; i++){
+        probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
+    }
+}
+
+bool simulation_box::check_probe_centre_viability()
+{
+    temp_neighbour_list.clear();
+    get_position_in_grid(probe_centre);
+    temp_neighbour_list = grid[return_position_in_grid(position_in_grid)];
+
+    for (int i = 0; i < temp_neighbour_list.size(); i++){
+        if (probe_centre.return_distance_sq(all_particles[temp_neighbour_list[i]].position) < r_max_squared)
+            return false;
+    }
+
+    return true;    
+
 }
 
 
