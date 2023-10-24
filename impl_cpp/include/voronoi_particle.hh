@@ -15,9 +15,10 @@ public:
     void set_particle_coord(double x, double y, double z);
     void clear_faces();
     void print_particle();
+    int num_faces();
+    coords position;
 
 private:
-    coords position;
     std::vector<voronoi_faces> all_faces;
 
 };
@@ -45,6 +46,11 @@ void voronoi_particle::print_particle()
         std::cout<<"face "<<i<<std::endl;
         all_faces[i].print_face();
     }
+}
+
+int voronoi_particle::num_faces()
+{
+    return all_faces.size();
 }
 
 
