@@ -1,5 +1,4 @@
 #include <triangle.hh>
-#include <algorithm>
 
 #ifndef VORONOI_FACES_HH
 #define VORONOI_FACES_HH

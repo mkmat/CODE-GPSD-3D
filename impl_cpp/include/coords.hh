@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include<cmath>
 
 #ifndef COORDS_HH
 #define COORDS_HH
@@ -65,7 +66,7 @@ double coords::return_distance_sq(coords cx)
 
 double coords::return_distance(coords cx)
 {
-    return sqrt(return_distance_sq(cx));
+    return std::sqrt(return_distance_sq(cx));
 }
 
 }

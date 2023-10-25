@@ -3,7 +3,6 @@
 #include<cstring>
 #include<sstream>
 #include<fstream>
-#include<cmath>
 #include<random>
 
 #ifndef SIMULATION_BOX_HH
@@ -36,7 +35,6 @@ private:
     int    num_particles;
     double r_max;
     double r_max_squared;
-    double delta_x;
     int    *nx;
     double xlo;
     double xhi;
@@ -45,7 +43,6 @@ private:
     double zlo;
     double zhi;
     double *L;
-    int    *nx;
     int    *L_eff;
     double *delta_x;
     double *inv_deltax;
@@ -79,6 +76,14 @@ std::vector<std::string> simulation_box::split_string_by_delimiter(const std::st
 
 simulation_box::simulation_box(char *filename)
 {
+
+    xlo = 0.;
+    xhi = 10.;
+    ylo = 0.;
+    yhi = 10.;
+    zlo = 0.;
+    zhi = 10.;
+
     rs = ro + rc + rp;
 
     std::ifstream parser(filename, std::ifstream::in);
@@ -198,7 +203,7 @@ simulation_box::simulation_box(char *filename)
         inv_deltax[axis] = 1./r_max;
         nx[axis]         = (int)(L[axis] * inv_deltax[axis]);
         delta_x[axis]    = L[axis]/(1. * nx[axis]);
-        inv_deltax[axis] = 1. * delta_x[axis];
+        inv_deltax[axis] = 1./delta_x[axis];
     }
 
     L_eff = (int*)malloc(sizeof(int)*dim);
@@ -219,6 +224,12 @@ simulation_box::simulation_box(char *filename)
 
     grid.resize(L_total);
 
+    //for (int axis = 0; axis < dim; axis++)
+        //std::cout<<L_eff[axis]<<std::endl;
+
+    //std::cout<<"L total = "<<L_total<<"grid size = "<<grid.size()<<std::endl;
+
+
     int *neigh_position_in_grid;
 
     position_in_grid       = (int*)malloc(sizeof(int) * dim);
@@ -232,6 +243,11 @@ simulation_box::simulation_box(char *filename)
         cx = all_particles[i].position;
         get_position_in_grid(cx);
 
+        //cx.print_coords();
+
+        //for (int axis = 0; axis < dim; axis++)
+            //std::cout<<"first = "<<inv_deltax[axis]<<std::endl;
+
         for (int ii = -1; ii <= 1; ii++){
             for (int jj = -1; jj <= 1; jj++){
                 for (int kk = -1; kk <= 1; kk++){
@@ -242,9 +258,11 @@ simulation_box::simulation_box(char *filename)
 
                     for (int axis = 0; axis < dim; axis++){
                         temp_index = neigh_position_in_grid[axis];
-                        neigh_position_in_grid[axis] += nx[axis] * ((temp_index >= nx[axis]) - (temp_index < 0));  
+                        neigh_position_in_grid[axis] += nx[axis] * ((temp_index < 0) - (temp_index >= nx[axis]));
+                        //std::cout<<"temp_index = "<<temp_index<<" axis = "<<axis<<" index = "<<neigh_position_in_grid[axis]<<std::endl;
                     }
 
+                    //std::cout<<"position in grid = "<<return_position_in_grid(neigh_position_in_grid)<<std::endl;
                     grid[return_position_in_grid(neigh_position_in_grid)].push_back(i);
 
                 }
@@ -278,6 +296,8 @@ int simulation_box::return_position_in_grid(int *pos)
 
     for (int axis = 0; axis < dim; axis++)
         counter += pos[axis] * L_eff[axis];
+
+    return counter;
 }
 
 void simulation_box::get_position_in_grid(coords cx)
@@ -298,13 +318,20 @@ void simulation_box::calculate_gpsd()
     while (num_count < num_shots){
 
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
-        condition = check_probe_centre_viability();
+        condition = check_probe_centre_viability();        
 
         if(condition){
             num_count++;
+            r_max = 0.;
 
-            for (int i = 0; i < temp_neighbour_list.size(); i++)
+            for (int i = 0; i < temp_neighbour_list.size(); i++){
                 particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre, rs);
+                std::cout<<"particle max = "<<particle_max<<std::endl;
+                    if (particle_max > r_max)
+                        r_max = particle_max;
+            }
+
+            //std::cout<<"r_max = "<<r_max<<std::endl;
 
         }
 
