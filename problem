@@ -1,5 +1,7 @@
 examples: one cannot rule out case (iii)
 
+rs = 1; 
+
 vA = A;
 vB = A+B;
 vC = A+C;
