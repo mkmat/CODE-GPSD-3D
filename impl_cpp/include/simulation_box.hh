@@ -32,7 +32,7 @@ private:
     double rp = 0.;
     double rs;
     const int dim = 3;
-    int    num_shots = 1;
+    int    num_shots = 100;
     int    num_particles;
     double r_max;
     double r_max_squared;
@@ -101,6 +101,7 @@ simulation_box::simulation_box(char *filename)
     coords temp_c;
 
     num_particles = 0;
+    generator.seed(5);
 
     while(getline(parser,str)){
 
@@ -346,12 +347,13 @@ void simulation_box::calculate_gpsd()
                 probe_centre_image = get_probe_centre_image(probe_centre, all_particles[i].position);
                 particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs);
                 //particle_max = all_particles[0].return_max_lpes_radius(probe_centre, rs);
-                std::cout<<"particle max = "<<particle_max<<std::endl;
+                //std::cout<<"particle max = "<<particle_max<<std::endl;
                     if (particle_max > r_max)
                         r_max = particle_max;
             }
 
-            std::cout<<"r_max = "<<r_max<<std::endl;
+            std::cout<<"r_max = "<<r_max<<"\t";
+            probe_centre.print_coords();
 
         }
 

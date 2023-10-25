@@ -57,7 +57,6 @@ void triangle::get_candidate_rmax(coords p, coords vx, double rs, coords candida
 {
     R1 = vx.return_distance(candidate_p);
     R2 = p.return_distance(candidate_p);
-    //std::cout<<"R1 = "<<R1<<"\t R2 = "<<R2<<std::endl;
     condition = 1.*(R1 > r_max)*(R1 >= R2);
     r_max = R1*condition + r_max*(1. - condition);
 }
