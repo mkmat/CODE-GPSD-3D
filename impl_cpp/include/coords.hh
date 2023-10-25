@@ -17,6 +17,8 @@ public:
     void print_coords();
     double return_distance_sq(coords cx);
     double return_distance(coords cx);
+    double return_norm();
+    double return_norm_sq();
 
     double x;
     double y;
@@ -67,6 +69,16 @@ double coords::return_distance_sq(coords cx)
 double coords::return_distance(coords cx)
 {
     return std::sqrt(return_distance_sq(cx));
+}
+
+double coords::return_norm_sq()
+{
+    return ((this->x * this->x) + (this->y * this->y) + (this->z * this->z));
+}
+
+double coords::return_norm()
+{
+    return std::sqrt(return_norm_sq());
 }
 
 }

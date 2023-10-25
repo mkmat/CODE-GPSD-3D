@@ -23,6 +23,7 @@ public:
     void calculate_gpsd();
     void get_LPES();
     bool check_probe_centre_viability();
+    coords get_probe_centre_image(coords a, coords b);
 
 private:
 
@@ -43,10 +44,16 @@ private:
     double zlo;
     double zhi;
     double *L;
+    double *inv_L;
     int    *L_eff;
     double *delta_x;
     double *inv_deltax;
-    int    *position_in_grid;
+    int    *position_in_grid;    
+    double periodic_distance_sq;
+    double x_periodic;
+    double y_periodic;
+    double z_periodic;
+    double diff;
 
     std::vector<voronoi_particle> all_particles;
     std::vector<coords> all_coords;
@@ -59,6 +66,8 @@ private:
 
     coords lpes_centre;
     coords probe_centre;
+    coords probe_centre_image;
+    coords temp_periodic_coords;
 
 };
 
@@ -146,7 +155,8 @@ simulation_box::simulation_box(char *filename)
         temp_particle.set_particle_coord(temp_x, temp_y, temp_z);
 
         c.face_vertices(f_vert);
-        c.vertices(temp_x, temp_y, temp_z, v);
+        //c.vertices(temp_x, temp_y, temp_z, v);
+        c.vertices(v);
 
         all_vertices.clear();
         num_vertices = v.size()/3;
@@ -193,6 +203,11 @@ simulation_box::simulation_box(char *filename)
     L[0] = xhi - xlo;
     L[1] = yhi - ylo;
     L[2] = zhi - zlo;
+
+    inv_L = (double*)malloc(sizeof(double) * dim);
+
+    for (int axis = 0; axis < dim; axis++)
+        inv_L[axis] = 1./L[axis];
 
     delta_x    = (double*)malloc(sizeof(double) * dim);
     inv_deltax = (double*)malloc(sizeof(double) * dim);
@@ -318,20 +333,25 @@ void simulation_box::calculate_gpsd()
     while (num_count < num_shots){
 
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
-        condition = check_probe_centre_viability();        
+        condition = check_probe_centre_viability();
+
+        //probe_centre = all_particles[0].position;
+        //condition = check_probe_centre_viability();
 
         if(condition){
             num_count++;
             r_max = 0.;
 
             for (int i = 0; i < temp_neighbour_list.size(); i++){
-                particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre, rs);
+                probe_centre_image = get_probe_centre_image(probe_centre, all_particles[i].position);
+                particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs);
+                //particle_max = all_particles[0].return_max_lpes_radius(probe_centre, rs);
                 std::cout<<"particle max = "<<particle_max<<std::endl;
                     if (particle_max > r_max)
                         r_max = particle_max;
             }
 
-            //std::cout<<"r_max = "<<r_max<<std::endl;
+            std::cout<<"r_max = "<<r_max<<std::endl;
 
         }
 
@@ -345,12 +365,29 @@ bool simulation_box::check_probe_centre_viability()
     temp_neighbour_list = grid[return_position_in_grid(position_in_grid)];
 
     for (int i = 0; i < temp_neighbour_list.size(); i++){
-        if (probe_centre.return_distance_sq(all_particles[temp_neighbour_list[i]].position) < r_max_squared)
+        probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list[i]].position);
+        if (probe_centre_image.return_norm_sq() <= r_max_squared)
             return false;
     }
 
     return true;    
 
+}
+
+coords simulation_box::get_probe_centre_image(coords a, coords b)
+{
+    diff = (a.x - b.x);
+    x_periodic = diff - (L[0]*round(diff*inv_L[0]));
+
+    diff = (a.y - b.y);
+    y_periodic = diff - (L[1]*round(diff*inv_L[1]));
+
+    diff = (a.z - b.z);
+    z_periodic = diff - (L[2]*round(diff*inv_L[2]));
+
+    temp_periodic_coords.set_coords(x_periodic, y_periodic, z_periodic);
+
+    return temp_periodic_coords;
 }
 
 
