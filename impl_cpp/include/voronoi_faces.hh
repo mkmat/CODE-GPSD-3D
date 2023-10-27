@@ -9,7 +9,8 @@ class voronoi_faces
 {
 
 public:
-    void set_voronoi_faces(std::vector<coords> vertices);
+    void set_face_vertices(std::vector<coords> vertices);
+    void set_normal(double nx, double ny, double nz);
     void print_face();
     double return_max_radius_for_face(coords p, coords vx, double rs);
 
@@ -22,9 +23,13 @@ private:
     double face_r_max;
     int    argmax;
     double triangle_r_max;
+    coords material_projection;
+    coords n_f;
+    coords n_p;
+    coords n_q;
 };
 
-void voronoi_faces::set_voronoi_faces(std::vector<coords> vertices)
+void voronoi_faces::set_face_vertices(std::vector<coords> vertices)
 {
 
     num_vertices = vertices.size();
@@ -107,6 +112,12 @@ double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs)
     }
 
     return face_r_max;
+}
+
+void voronoi_faces::set_normal(double nx, double ny, double nz)
+{
+    n_f.set_coords(nx, ny, nz);
+    n_f.normalize();
 }
 
 }

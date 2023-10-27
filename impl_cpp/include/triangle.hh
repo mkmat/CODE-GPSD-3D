@@ -25,8 +25,10 @@ private:
     coords vA;
     coords vB;
     coords vC;
-    coords centroid;
 
+    coords vA_modified;
+    coords vB_modified;
+    coords vC_modified;
 };
 
 void triangle::set_vertices(std::vector<coords> vertices)
@@ -35,15 +37,6 @@ void triangle::set_vertices(std::vector<coords> vertices)
     vB.set_coords(vertices[1].x, vertices[1].y, vertices[1].z);
     vC.set_coords(vertices[2].x, vertices[2].y, vertices[2].z);
 
-    double cx = 0.;
-    double cy = 0.;
-    double cz = 0.;
-
-    cx = (vA.x + vB.x + vC.x)/3.;
-    cy = (vA.y + vB.y + vC.y)/3.;
-    cz = (vA.z + vB.z + vC.z)/3.;
-
-    centroid.set_coords(cx, cy, cz);
 }
 
 void triangle::print_triangle()

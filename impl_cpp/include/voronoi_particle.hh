@@ -11,7 +11,8 @@ class voronoi_particle
 
 public:
 
-    void set_voronoi_face(std::vector<coords> vertices);
+    void set_voronoi_faces(std::vector<coords> vertices);
+    void set_face_normal(double nx, double ny, double nz);
     void set_particle_coord(double x, double y, double z);
     void clear_faces();
     void print_particle();
@@ -33,12 +34,17 @@ void voronoi_particle::clear_faces()
     num_faces = 0;
 }
 
-void voronoi_particle::set_voronoi_face(std::vector<coords> vertices)
+void voronoi_particle::set_voronoi_faces(std::vector<coords> vertices)
 {
     voronoi_faces temp;
-    temp.set_voronoi_faces(vertices);
+    temp.set_face_vertices(vertices);
     all_faces.push_back(temp);
     num_faces += 1;
+}
+
+void voronoi_particle::set_face_normal(double nx, double ny, double nz)
+{
+    all_faces[num_faces].set_normal(nx, ny, nz);
 }
 
 void voronoi_particle::set_particle_coord(double x, double y, double z)

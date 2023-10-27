@@ -142,8 +142,10 @@ simulation_box::simulation_box(char *filename)
     int num_vertices;
     voronoi_faces temp_face;
     int f_sum;
+    int f_count;
     std::vector<coords> temp_face_vertex_coords;
     int v_idx;
+    std::vector<double> face_normals;
 
     r_max = 0.;
 
@@ -158,6 +160,7 @@ simulation_box::simulation_box(char *filename)
         c.face_vertices(f_vert);
         //c.vertices(temp_x, temp_y, temp_z, v);
         c.vertices(v);
+        c.normals(face_normals);
 
         all_vertices.clear();
         num_vertices = v.size()/3;
@@ -168,33 +171,33 @@ simulation_box::simulation_box(char *filename)
         }
 
         f_sum = 0;
+        f_count = 0;
 
         while (f_sum < f_vert.size()){
 
             total_verts = f_vert[f_sum];
             temp_face_vertex_coords.clear();
 
-            //std::cout<<"hmmm"<<total_verts<<std::endl;
-
             for (int j = 0; j < total_verts; j++){
                 f_sum += 1;
                 v_idx  = f_vert[f_sum];
-                //std::cout<<"v index "<<v_idx<<"\t"<<all_vertices.size()<<std::endl;
                 temp_face_vertex_coords.push_back(all_vertices[v_idx]);
             }
 
-            //std::cout<<f_sum<<"\t"<<f_vert.size()<<std::endl;
-
-            temp_particle.set_voronoi_face(temp_face_vertex_coords);
+            temp_particle.set_voronoi_faces(temp_face_vertex_coords);
             f_sum += 1;
+
+            temp_particle.set_face_normal(face_normals[3*f_count], face_normals[3*f_count+1], face_normals[3*f_count+2]);
+            f_count += 1;
 
         }
 
         all_particles[id] = temp_particle;
 
-        //std::cout<<"faces = "<<c.number_of_faces()<<"\t"<<all_particles[id].num_faces()<<std::endl;
+        //std::cout<<"faces = "<<c.number_of_faces()<<"\t"<<all_particles[id].num_faces<<std::endl;
         if (c.max_radius_squared() > r_max)
             r_max = c.max_radius_squared();
+
 
     } while (cl.inc());
 
