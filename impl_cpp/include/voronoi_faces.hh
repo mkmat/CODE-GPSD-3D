@@ -26,6 +26,7 @@ private:
     int    argmax;
     double triangle_r_max;
     coords material_projection;
+    coords material_position;
     coords n_f;
     coords n_p;
     coords n_q;
@@ -110,6 +111,9 @@ void voronoi_faces::set_new_coordinate_system(coords p)
     n_q.set_coords((n_f.y*n_p.z)-(n_f.z*n_p.y), (n_f.z*n_p.x)-(n_f.x*n_p.z), (n_f.x*n_p.y)-(n_f.y*n_p.x));
     n_q.normalize();
 
+    material_projection = (n_f * geometrical_centre) * n_f;
+
+    //std::cout<<"dots = "<<face_triangles[0].vA * n_f<<"\t"<<face_triangles[0].vB * n_f<<"\t"<<face_triangles[0].vC * n_f<<std::endl;
     //std::cout<<"norms = "<<n_f*n_f<<"\t"<<n_p*n_p<<"\t"<<n_q*n_q<<std::endl; 
     //std::cout<<"dots  = "<<n_f*n_p<<"\t"<<n_p*n_q<<"\t"<<n_q*n_f<<std::endl; 
 }
@@ -117,21 +121,12 @@ void voronoi_faces::set_new_coordinate_system(coords p)
 double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs)
 {
 
-    /*std::cout<<"before--------------------------"<<std::endl;
-    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
-    n_f.print_coords();*/
-
     set_new_coordinate_system(p);
-
-    /*std::cout<<"after--------------------------"<<std::endl;
-    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
-    n_f.print_coords();
-
-    exit(EXIT_FAILURE);*/
 
     face_r_max = 0.;
 
     for (int i = 0; i < num_triangles; i++){
+        face_triangles[i].transform_all_coordinates(p, material_projection, n_f, n_p, n_q);
         triangle_r_max = face_triangles[i].return_max_distance_for_triangle(p, vx, rs);
         
         if (triangle_r_max > face_r_max)
@@ -143,23 +138,8 @@ double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs)
 
 void voronoi_faces::set_normal(double nx, double ny, double nz)
 {
-    /*std::cout<<"before--------------------------"<<std::endl;
-    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
-    n_f.print_coords();*/
-
     n_f.set_coords(nx, ny, nz);
     n_f.normalize();
-
-    /*std::cout<<"after--------------------------"<<std::endl;
-    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
-    n_f.print_coords();
-
-    std::cout<<"after again--------------------------"<<std::endl;
-    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
-    n_f.print_coords();
-
-    exit(EXIT_FAILURE);*/
-
 }
 
 void voronoi_faces::print_n_coords()

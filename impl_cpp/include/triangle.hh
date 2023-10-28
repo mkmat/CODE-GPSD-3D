@@ -12,7 +12,10 @@ public:
     void set_vertices(std::vector<coords> vertices);
     void print_triangle();
     void get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p);
+    void transform_all_coordinates(coords p, coords mp, coords n_f, coords n_p, coords n_q);
+    coords transform_one_coordinate(coords cx, coords n_f, coords n_p, coords n_q);
     double return_max_distance_for_triangle(coords p, coords vx, double rs);
+    
     
     std::vector<double> distances;
     double r_max;
@@ -21,7 +24,6 @@ public:
     double condition;
 
 private:
-
     coords vA;
     coords vB;
     coords vC;
@@ -29,6 +31,9 @@ private:
     coords vA_modified;
     coords vB_modified;
     coords vC_modified;
+    coords origin;
+    coords material_position;
+    coords probe_position;
 };
 
 void triangle::set_vertices(std::vector<coords> vertices)
@@ -64,6 +69,30 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
 
     return r_max;
 }
+
+coords triangle::transform_one_coordinate(coords cx, coords n_f, coords n_p, coords n_q)
+{
+    return coords(cx*n_f, cx*n_p, cx*n_q);
+}
+
+void triangle::transform_all_coordinates(coords p, coords mp, coords n_f, coords n_p, coords n_q)
+{
+    vA_modified    = transform_one_coordinate(vA, n_f, n_p, n_q);
+    vB_modified    = transform_one_coordinate(vB, n_f, n_p, n_q);
+    vC_modified    = transform_one_coordinate(vC, n_f, n_p, n_q);
+    probe_position = transform_one_coordinate(p, n_f, n_p, n_q);
+    origin         = transform_one_coordinate(mp, n_f, n_p, n_q);
+
+    vA_modified       = vA_modified - origin;
+    vB_modified       = vB_modified - origin;
+    vC_modified       = vC_modified - origin;
+    probe_position    = probe_position - origin;
+    material_position = material_position - origin;
+    origin            = origin - origin;
+    
+}
+
+
 
 }
 
