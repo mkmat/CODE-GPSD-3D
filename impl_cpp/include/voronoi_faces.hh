@@ -13,6 +13,8 @@ public:
     void set_normal(double nx, double ny, double nz);
     void print_face();
     double return_max_radius_for_face(coords p, coords vx, double rs);
+    void set_new_coordinate_system(coords p);
+    void print_n_coords();
 
 private:
     std::vector<triangle> face_triangles;
@@ -100,8 +102,33 @@ void voronoi_faces::print_face()
     }
 }
 
+void voronoi_faces::set_new_coordinate_system(coords p)
+{
+    n_p = p - (p*n_f) * n_f;
+    n_p.normalize();
+
+    n_q.set_coords((n_f.y*n_p.z)-(n_f.z*n_p.y), (n_f.z*n_p.x)-(n_f.x*n_p.z), (n_f.x*n_p.y)-(n_f.y*n_p.x));
+    n_q.normalize();
+
+    //std::cout<<"norms = "<<n_f*n_f<<"\t"<<n_p*n_p<<"\t"<<n_q*n_q<<std::endl; 
+    //std::cout<<"dots  = "<<n_f*n_p<<"\t"<<n_p*n_q<<"\t"<<n_q*n_f<<std::endl; 
+}
+
 double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs)
 {
+
+    /*std::cout<<"before--------------------------"<<std::endl;
+    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
+    n_f.print_coords();*/
+
+    set_new_coordinate_system(p);
+
+    /*std::cout<<"after--------------------------"<<std::endl;
+    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
+    n_f.print_coords();
+
+    exit(EXIT_FAILURE);*/
+
     face_r_max = 0.;
 
     for (int i = 0; i < num_triangles; i++){
@@ -116,8 +143,28 @@ double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs)
 
 void voronoi_faces::set_normal(double nx, double ny, double nz)
 {
+    /*std::cout<<"before--------------------------"<<std::endl;
+    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
+    n_f.print_coords();*/
+
     n_f.set_coords(nx, ny, nz);
     n_f.normalize();
+
+    /*std::cout<<"after--------------------------"<<std::endl;
+    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
+    n_f.print_coords();
+
+    std::cout<<"after again--------------------------"<<std::endl;
+    std::cout<<"n_f = "<<n_f.return_norm()<<"\t"<<n_f*n_f<<"\t";
+    n_f.print_coords();
+
+    exit(EXIT_FAILURE);*/
+
+}
+
+void voronoi_faces::print_n_coords()
+{
+    n_f.print_coords();
 }
 
 }

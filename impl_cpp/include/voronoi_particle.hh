@@ -11,7 +11,7 @@ class voronoi_particle
 
 public:
 
-    void set_voronoi_faces(std::vector<coords> vertices);
+    void set_voronoi_faces(std::vector<coords> vertices, double nx, double ny, double nz);
     void set_face_normal(double nx, double ny, double nz);
     void set_particle_coord(double x, double y, double z);
     void clear_faces();
@@ -19,6 +19,7 @@ public:
     coords position;
     coords rel_position;
     double return_max_lpes_radius(coords p, double rs);
+    void print_normal();
 
 private:
     std::vector<voronoi_faces> all_faces;
@@ -34,10 +35,11 @@ void voronoi_particle::clear_faces()
     num_faces = 0;
 }
 
-void voronoi_particle::set_voronoi_faces(std::vector<coords> vertices)
+void voronoi_particle::set_voronoi_faces(std::vector<coords> vertices, double nx, double ny, double nz)
 {
     voronoi_faces temp;
     temp.set_face_vertices(vertices);
+    temp.set_normal(nx, ny, nz);
     all_faces.push_back(temp);
     num_faces += 1;
 }
@@ -75,6 +77,12 @@ double voronoi_particle::return_max_lpes_radius(coords p, double rs)
 
     return particle_r_max;
 
+}
+
+void voronoi_particle::print_normal()
+{
+    for (int i = 0; i < num_faces; i++)
+        all_faces[i].print_n_coords();
 }
 
 

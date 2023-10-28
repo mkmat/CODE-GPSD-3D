@@ -101,7 +101,7 @@ simulation_box::simulation_box(char *filename)
     coords temp_c;
 
     num_particles = 0;
-    generator.seed(5);
+    generator.seed(1729);
 
     while(getline(parser,str)){
 
@@ -184,11 +184,12 @@ simulation_box::simulation_box(char *filename)
                 temp_face_vertex_coords.push_back(all_vertices[v_idx]);
             }
 
-            temp_particle.set_voronoi_faces(temp_face_vertex_coords);
-            f_sum += 1;
-
-            temp_particle.set_face_normal(face_normals[3*f_count], face_normals[3*f_count+1], face_normals[3*f_count+2]);
+            temp_particle.set_voronoi_faces(temp_face_vertex_coords, face_normals[3*f_count], face_normals[3*f_count+1], face_normals[3*f_count+2]);
+            f_sum   += 1;
             f_count += 1;
+
+            /*temp_particle.set_face_normal(face_normals[3*f_count], face_normals[3*f_count+1], face_normals[3*f_count+2]);
+            f_count += 1;*/
 
         }
 
@@ -200,6 +201,14 @@ simulation_box::simulation_box(char *filename)
 
 
     } while (cl.inc());
+
+    /*for (int i = 0; i < num_particles; i++)
+    {
+        std::cout<<"--------------------------\n";
+        all_particles[i].print_normal();
+        std::cout<<"--------------------------\n";
+        exit(EXIT_FAILURE);
+    }*/
 
     r_max      = sqrt(r_max);
 
@@ -334,7 +343,7 @@ void simulation_box::calculate_gpsd()
     double particle_max;
     double r_max;
 
-    while (num_count < num_shots){
+    while (num_count < 1){
 
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
         condition = check_probe_centre_viability();
