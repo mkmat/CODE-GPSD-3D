@@ -11,10 +11,10 @@ public:
 
     void set_vertices(std::vector<coords> vertices);
     void print_triangle();
-    void get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p);
+    void get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p, coords &lpes_c);
     void transform_all_coordinates(coords p, coords mp, coords n_f, coords n_p, coords n_q);
     coords transform_one_coordinate(coords cx, coords n_f, coords n_p, coords n_q);
-    double return_max_distance_for_triangle(coords p, coords vx, double rs);
+    double return_max_distance_for_triangle(coords p, coords vx, double rs, coords &lpes_c);
     
     
     std::vector<double> distances;
@@ -71,21 +71,22 @@ void triangle::print_triangle()
     vC.print_coords();
 }
 
-void triangle::get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p)
+void triangle::get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p, coords &lpes_c)
 {
     R1 = vx.return_distance(candidate_p)-rs;
     R2 = p.return_distance(candidate_p);
     condition = 1.*(R1 > r_max)*(R1 >= R2);
-    r_max = R1*condition + r_max*(1. - condition);
+    r_max  = R1*condition + r_max*(1. - condition);
+    lpes_c = (condition * candidate_p) + ((1.-condition)*lpes_c);  
 }
 
-double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs)
+double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs, coords &lpes_c)
 {
     r_max = 0.;
 
-    get_candidate_rmax(p, vx, rs, vA);
-    get_candidate_rmax(p, vx, rs, vB);
-    get_candidate_rmax(p, vx, rs, vC);
+    get_candidate_rmax(p, vx, rs, vA, lpes_c);
+    get_candidate_rmax(p, vx, rs, vB, lpes_c);
+    get_candidate_rmax(p, vx, rs, vC, lpes_c);
 
     inv_C = 1./vC_modified.z; 
 

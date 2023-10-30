@@ -12,7 +12,7 @@ public:
     void set_face_vertices(std::vector<coords> vertices);
     void set_normal(double nx, double ny, double nz);
     void print_face();
-    double return_max_radius_for_face(coords p, coords vx, double rs);
+    double return_max_radius_for_face(coords p, coords vx, double rsc, coords &lpes_c);
     void set_new_coordinate_system(coords p);
     void print_n_coords();
 
@@ -118,7 +118,7 @@ void voronoi_faces::set_new_coordinate_system(coords p)
     //std::cout<<"dots  = "<<n_f*n_p<<"\t"<<n_p*n_q<<"\t"<<n_q*n_f<<std::endl; 
 }
 
-double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs)
+double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs, coords &lpes_c)
 {
 
     set_new_coordinate_system(p);
@@ -127,7 +127,7 @@ double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs)
 
     for (int i = 0; i < num_triangles; i++){
         face_triangles[i].transform_all_coordinates(p, material_projection, n_f, n_p, n_q);
-        triangle_r_max = face_triangles[i].return_max_distance_for_triangle(p, vx, rs);
+        triangle_r_max = face_triangles[i].return_max_distance_for_triangle(p, vx, rs, lpes_c);
         
         if (triangle_r_max > face_r_max)
             face_r_max = triangle_r_max;

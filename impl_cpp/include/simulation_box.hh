@@ -32,7 +32,7 @@ private:
     double rp = 0.;
     double rs;
     const int dim = 3;
-    int    num_shots = 100;
+    int    num_shots = 1000;
     int    num_particles;
     double r_max;
     double r_max_squared;
@@ -54,6 +54,7 @@ private:
     double y_periodic;
     double z_periodic;
     double diff;
+    coords lpes_c;
 
     std::vector<voronoi_particle> all_particles;
     std::vector<coords> all_coords;
@@ -343,7 +344,10 @@ void simulation_box::calculate_gpsd()
     double particle_max;
     double r_max;
 
-    while (num_count < 1){
+    FILE *f;
+    f = fopen("r_max_details.csv", "w");
+
+    while (num_count < num_shots){
 
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
         condition = check_probe_centre_viability();
@@ -357,19 +361,24 @@ void simulation_box::calculate_gpsd()
 
             for (int i = 0; i < temp_neighbour_list.size(); i++){
                 probe_centre_image = get_probe_centre_image(probe_centre, all_particles[i].position);
-                particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs);
+                particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c);
                 //particle_max = all_particles[0].return_max_lpes_radius(probe_centre, rs);
                 //std::cout<<"particle max = "<<particle_max<<std::endl;
                     if (particle_max > r_max)
                         r_max = particle_max;
             }
 
-            std::cout<<"r_max = "<<r_max<<"\t";
+            //std::cout<<"r_max = "<<r_max<<"\t";
+            //probe_centre.print_coords();
+
+            fprintf(f, "%lf,%lf,%lf,%lf\n", r_max,lpes_c.x,lpes_c.y,lpes_c.z);
             probe_centre.print_coords();
 
         }
 
     }
+
+    fclose(f);
 }
 
 bool simulation_box::check_probe_centre_viability()
