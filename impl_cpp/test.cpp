@@ -2,23 +2,47 @@
 
 int main(int agrc, char *argv[])
 {
-    //std::cout<<argv[0]<<"\t"<<argv[1]<<std::endl;
+    bool filename_b = false;
+    bool outfile_b  = false;
+    
+    bool xlo_b = false;
+    bool xhi_b = false;
+    bool ylo_b = false;
+    bool yhi_b = false;
+    bool zlo_b = false;
+    bool zhi_b = false;
+    
+    bool ro_b = false;
+    bool rc_b = false;
+    bool rp_b = false;
+    bool q_b  = false;
+    bool more_b = false;
+    bool info_b = false;
+    bool quiet_b = false;
+    bool clean_b = false;
+
+    char *in_filename;
+    char *out_filename;
+    
+    double xlo;
+    double xhi;
+    double ylo;
+    double yhi;
+    double zlo;
+    double zhi;
+    
+    double ro;
+    double rp;
+    double rc;
+
+    
+
+    
+
+
+    std::vector<std::string> results;
     gpsd_3d::simulation_box test(argv[1]);
-    test.calculate_gpsd();
 
-    /*gpsd_3d::coords a(1,1,1);
-    gpsd_3d::coords b(2,-1,-2);
-    gpsd_3d::coords c;
-
-    c = a-b;
-    c.print_coords();
-
-    double dot = 3;
-    c = dot*b;
-    //std::cout<<dot<<std::endl;
-    c.print_coords();*/
 
     return 0;
-
-
 }

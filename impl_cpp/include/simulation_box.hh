@@ -14,7 +14,7 @@ class simulation_box{
 
 public:
 
-    std::vector<std::string> split_string_by_delimiter(const std::string& s, char delimiter);    
+    friend std::vector<std::string> split_string_by_delimiter(const std::string& s, char delimiter);    
     simulation_box(char *filename);
     void print_coords();
     void test_setup(int n);
@@ -72,7 +72,7 @@ private:
 
 };
 
-std::vector<std::string> simulation_box::split_string_by_delimiter(const std::string& s, char delimiter)
+std::vector<std::string> split_string_by_delimiter(const std::string& s, char delimiter)
 {
    std::vector<std::string> tokens;
    std::string token;

@@ -116,7 +116,7 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             r_max = R1*(R1 > r_max) + r_max*(r_max >= R1);
         }
 
-        t_plus = (numerator - discriminant)*denominator;
+        t_plus = (numerator + discriminant)*denominator;
         u_plus = -1.*(h+(f*t_plus));
 
         if ((t_plus >= 0.) && (u_plus > 0.) && ((t_plus+u_plus) <= 1.)){
