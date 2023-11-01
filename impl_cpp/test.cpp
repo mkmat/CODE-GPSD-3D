@@ -1,8 +1,8 @@
 #include <simulation_box.hh>
 
-int main(int agrc, char *argv[])
+int main(int argc, char *argv[])
 {
-    bool filename_b = false;
+    /*bool filename_b = false;
     bool outfile_b  = false;
     
     bool xlo_b = false;
@@ -31,17 +31,23 @@ int main(int agrc, char *argv[])
     double zlo;
     double zhi;
     
-    double ro;
-    double rp;
-    double rc;
-
-    
-
-    
-
+    double ro=1.;
+    double rp=0.;
+    double rc=0.;
 
     std::vector<std::string> results;
+
+    for (int i = 0; i < argc; i++)
+    {
+        results.clear();
+        results = gpsd_3d::split_string_by_delimiter(argv[i],'=');
+
+        
+    }*/  
+
+
     gpsd_3d::simulation_box test(argv[1]);
+    test.calculate_gpsd();
 
 
     return 0;

@@ -31,6 +31,7 @@ private:
     double rc = 0.;
     double rp = 0.;
     double rs;
+    double r_coated;
     const int dim = 3;
     int    num_shots = 1000;
     int    num_particles;
@@ -95,6 +96,7 @@ simulation_box::simulation_box(char *filename)
     zhi = 10.;
 
     rs = ro + rc + rp;
+    r_coated = ro + rc;
 
     std::ifstream parser(filename, std::ifstream::in);
     std::string str;
@@ -147,6 +149,7 @@ simulation_box::simulation_box(char *filename)
     std::vector<coords> temp_face_vertex_coords;
     int v_idx;
     std::vector<double> face_normals;
+    coords temp_r_max;
 
     r_max = 0.;
 
@@ -197,8 +200,12 @@ simulation_box::simulation_box(char *filename)
         all_particles[id] = temp_particle;
 
         //std::cout<<"faces = "<<c.number_of_faces()<<"\t"<<all_particles[id].num_faces<<std::endl;
-        if (c.max_radius_squared() > r_max)
-            r_max = c.max_radius_squared();
+        for (int i = 0; i < num_vertices; i++){
+            temp_r_max.set_coords(v[3*i], v[3*i+1], v[3*i+2]);
+
+            if (temp_r_max.return_norm_sq() > r_max)
+                r_max = temp_r_max.return_norm_sq();
+        }
 
 
     } while (cl.inc());
@@ -211,7 +218,9 @@ simulation_box::simulation_box(char *filename)
         exit(EXIT_FAILURE);
     }*/
 
-    r_max      = sqrt(r_max);
+    r_max      = std::sqrt(r_max);
+    //std::cout<<"r_max = "<<r_max<<std::endl;
+    //exit(EXIT_FAILURE);
 
     L = (double*)malloc(sizeof(double) * dim);
     L[0] = xhi - xlo;
@@ -342,43 +351,69 @@ void simulation_box::calculate_gpsd()
     int  num_count = 0;
 
     double particle_max;
-    double r_max;
+    double lpes_max;
+    int i_index=1729;
+    //FILE *f;
+    //f = fopen("r_max_details.csv", "w");
 
-    FILE *f;
-    f = fopen("r_max_details.csv", "w");
-
-    while (num_count < num_shots){
+    while (num_count < 10000){
 
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
+        //probe_centre.set_coords(7.25927,5.26002,3.81528);
         condition = check_probe_centre_viability();
 
         //probe_centre = all_particles[0].position;
         //condition = check_probe_centre_viability();
 
         if(condition){
-            num_count++;
-            r_max = 0.;
 
-            for (int i = 0; i < temp_neighbour_list.size(); i++){
-                probe_centre_image = get_probe_centre_image(probe_centre, all_particles[i].position);
-                particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c);
-                //particle_max = all_particles[0].return_max_lpes_radius(probe_centre, rs);
-                //std::cout<<"particle max = "<<particle_max<<std::endl;
-                    if (particle_max > r_max)
-                        r_max = particle_max;
-            }
-
-            //std::cout<<"r_max = "<<r_max<<"\t";
             //probe_centre.print_coords();
 
-            fprintf(f, "%lf,%lf,%lf,%lf\n", r_max,lpes_c.x,lpes_c.y,lpes_c.z);
-            probe_centre.print_coords();
+            num_count++;
+            lpes_max = 0.;
+
+            //std::cout<<"------------------------\n";
+
+            for (int i = 0; i < temp_neighbour_list.size(); i++){
+
+                probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list[i]].position);
+                //std::cout<<probe_centre_image.return_norm()<<"\t"<<probe_centre.return_distance(all_particles[temp_neighbour_list[i]].position)<<std::endl;
+                //std::cout<<probe_centre_image.return_norm()<<"\t"<<r_max<<std::endl;
+
+                if (probe_centre_image.return_norm() <= r_max){
+
+                    //std::cout<<"heeereee"<<std::endl;
+                    /*std::cout<<"-------------------------\n";
+                    std::cout<<"probe centre       = "; probe_centre.print_coords();
+                    std::cout<<"probe centre image = "; probe_centre.print_coords();
+                    std::cout<<"material position  = "; all_particles[temp_neighbour_list[i]].position.print_coords();
+                    std::cout<<"-------------------------\n";*/
+
+
+                    particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c);
+                    //particle_max = all_particles[0].return_max_lpes_radius(probe_centre, rs);
+                    //std::cout<<"particle max = "<<particle_max<<std::endl;
+                    if (particle_max > lpes_max){
+                        lpes_max = particle_max;
+                        i_index = i;
+                    }
+
+                }
+            }
+
+            //std::cout<<"r_max = "<<lpes_max<<" "<<i_index<<" "; probe_centre.print_coords();
+            std::cout<<lpes_max<<"\n";
+
+            
+
+            //fprintf(f, "%lf,%lf,%lf,%lf\n", r_max,lpes_c.x,lpes_c.y,lpes_c.z);
+            //probe_centre.print_coords();
 
         }
 
     }
 
-    fclose(f);
+    //fclose(f);
 }
 
 bool simulation_box::check_probe_centre_viability()
@@ -389,12 +424,11 @@ bool simulation_box::check_probe_centre_viability()
 
     for (int i = 0; i < temp_neighbour_list.size(); i++){
         probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list[i]].position);
-        if (probe_centre_image.return_norm_sq() <= r_max_squared)
+        if (probe_centre_image.return_norm() <= r_coated)
             return false;
     }
 
-    return true;    
-
+    return true;
 }
 
 coords simulation_box::get_probe_centre_image(coords a, coords b)

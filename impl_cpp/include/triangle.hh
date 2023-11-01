@@ -61,7 +61,6 @@ void triangle::set_vertices(std::vector<coords> vertices)
     vA.set_coords(vertices[0].x, vertices[0].y, vertices[0].z);
     vB.set_coords(vertices[1].x, vertices[1].y, vertices[1].z);
     vC.set_coords(vertices[2].x, vertices[2].y, vertices[2].z);
-
 }
 
 void triangle::print_triangle()
@@ -77,7 +76,8 @@ void triangle::get_candidate_rmax(coords p, coords vx, double rs, coords candida
     R2 = p.return_distance(candidate_p);
     condition = 1.*(R1 > r_max)*(R1 >= R2);
     r_max  = R1*condition + r_max*(1. - condition);
-    lpes_c = (condition * candidate_p) + ((1.-condition)*lpes_c);  
+    //lpes_c = (condition * candidate_p) + ((1.-condition)*lpes_c);
+    //std::cout<<"R1 = "<<R1<<"\t R2 = "<<R2<<"\t condition = "<<condition<<std::endl;
 }
 
 double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs, coords &lpes_c)
@@ -110,19 +110,89 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
         t_minus = (numerator - discriminant)*denominator;
         u_minus = -1.*(h+(f*t_minus));
 
-        if ((t_minus >= 0.) && (u_minus > 0.) && ((t_minus+u_minus) <= 1.)){
+        if ((t_minus >= 0.) && (u_minus > 0.) && ((t_minus+u_minus) < (1.+1e-4)) && ((a+(b*t_minus)) > 0.)){
             analytical_r_max = vA_modified + (t_minus * vB_modified) + (u_minus * vC_modified);
-            R1 = vx.return_distance(analytical_r_max)-rs;
-            r_max = R1*(R1 > r_max) + r_max*(r_max >= R1);
+            R1 = X_modified.return_distance(analytical_r_max)-rs;
+            R2 = P_modified.return_distance(analytical_r_max);
+            
+            if (R1 > r_max){
+                r_max = R1;
+                //lpes_c = analytical_r_max;
+            }
+            /*std::cout<<"---------minus----------"<<std::endl;
+            std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\n";
+            std::cout<<t_minus<<" "<<u_minus<<"\t"<<(c+(2*d*t_minus)+(e*t_minus*t_minus))<<"\n";*/
         }
 
         t_plus = (numerator + discriminant)*denominator;
         u_plus = -1.*(h+(f*t_plus));
 
-        if ((t_plus >= 0.) && (u_plus > 0.) && ((t_plus+u_plus) <= 1.)){
+        if ((t_plus >= 0.) && (u_plus > 0.) && ((t_plus+u_plus) < (1.+1e-4)) &&  ((a+(b*t_plus)) > 0.)){
             analytical_r_max = vA_modified + (t_plus * vB_modified) + (u_plus * vC_modified);
-            R1 = vx.return_distance(analytical_r_max)-rs;
-            r_max = R1*(R1 > r_max) + r_max*(r_max >= R1);
+            R1 = X_modified.return_distance(analytical_r_max)-rs;
+            R2 = P_modified.return_distance(analytical_r_max);
+
+            if (R1 > r_max){
+                r_max = R1;
+                //lpes_c = analytical_r_max;
+            }
+
+            /*std::cout<<"---------plus----------"<<std::endl;
+            std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\n";
+            std::cout<<t_plus<<" "<<u_plus<<"\t"<<(c+(2*d*t_plus)+(e*t_plus*t_plus))<<"\n";*/
+        }
+    }
+
+    h = -1.;
+    f =  1.;
+
+    a = (2.*(vA_modified.y+vC_modified.y)*P_modified.y) + (rs*rs) + (X_modified.x*X_modified.x) - (P_modified*P_modified);
+    b = 2.*(vB_modified.y-vC_modified.y)*P_modified.y;
+    c = 4.*rs*rs*((X_modified.x*X_modified.x) + ((vA_modified+vC_modified)*(vA_modified+vC_modified)));
+    d = 4.*rs*rs*((vB_modified-vC_modified)*(vA_modified+vC_modified));
+    e = 4.*rs*rs*((vB_modified-vC_modified)*(vB_modified-vC_modified));
+
+    discriminant = (a*a*e)-(2.*a*b*d)+(d*d)+(b*b*c)-(c*e);
+
+    if (discriminant >= 0.)
+    {
+        numerator = (d - (a*b));
+        discriminant = std::sqrt(discriminant);
+        denominator = 1./((b*b) - e); 
+
+        t_minus = (numerator - discriminant)*denominator;
+
+        if ((t_minus >= 0.) && (t_minus < 1.) && ((a+(b*t_minus)) > 0.)){
+            u_minus = 1. - t_minus;
+            analytical_r_max = vA_modified + (t_minus * vB_modified) + (u_minus * vC_modified);
+            R1 = X_modified.return_distance(analytical_r_max)-rs;
+            R2 = P_modified.return_distance(analytical_r_max);
+            
+            if ((R1 > r_max) && ((R1-R2) < 1e-8)){
+                r_max = R1;
+                //lpes_c = analytical_r_max;
+            }
+            //std::cout<<"---------minus----------"<<std::endl;
+            //std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\n";
+            //std::cout<<t_minus+u_minus<<"\n";
+        }
+
+        t_plus = (numerator + discriminant)*denominator;
+
+        if ((t_plus >= 0.) && (t_plus < 1.) &&  ((a+(b*t_plus)) > 0.)){
+            u_plus = 1. - t_plus;            
+            analytical_r_max = vA_modified + (t_plus * vB_modified) + (u_plus * vC_modified);
+            R1 = X_modified.return_distance(analytical_r_max)-rs;
+            R2 = P_modified.return_distance(analytical_r_max);
+
+            if ((R1 > r_max) && ((R1-R2) < 1e-8)){
+                r_max = R1;
+                //lpes_c = analytical_r_max;
+            }
+
+            //std::cout<<"---------plus----------"<<std::endl;
+            //std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\n";
+            //std::cout<<t_plus+u_plus<<"\n";
         }
     }
 
@@ -143,6 +213,8 @@ void triangle::transform_all_coordinates(coords p, coords mp, coords n_f, coords
     vC_modified    = transform_one_coordinate(vC, n_f, n_p, n_q);
     P_modified     = transform_one_coordinate(p, n_f, n_p, n_q);
     origin         = transform_one_coordinate(mp, n_f, n_p, n_q);
+    
+    X_modified.set_coords(0.,0.,0.);
 
     vA_modified       = vA_modified - origin;
     vB_modified       = vB_modified - origin;
@@ -152,7 +224,8 @@ void triangle::transform_all_coordinates(coords p, coords mp, coords n_f, coords
     origin            = origin - origin; 
 
     vB_modified = vB_modified - vA_modified;
-    vC_modified = vC_modified - vA_modified;   
+    vC_modified = vC_modified - vA_modified;
+
 }
 
 
