@@ -168,7 +168,7 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             R1 = X_modified.return_distance(analytical_r_max)-rs;
             R2 = P_modified.return_distance(analytical_r_max);
             
-            if ((R1 > r_max) && ((R1-R2) < 1e-8)){
+            if ((R1 > r_max)){
                 r_max = R1;
                 //lpes_c = analytical_r_max;
             }
@@ -185,7 +185,7 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             R1 = X_modified.return_distance(analytical_r_max)-rs;
             R2 = P_modified.return_distance(analytical_r_max);
 
-            if ((R1 > r_max) && ((R1-R2) < 1e-8)){
+            if ((R1 > r_max)){
                 r_max = R1;
                 //lpes_c = analytical_r_max;
             }

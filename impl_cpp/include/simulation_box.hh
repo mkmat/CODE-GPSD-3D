@@ -353,8 +353,8 @@ void simulation_box::calculate_gpsd()
     double particle_max;
     double lpes_max;
     int i_index=1729;
-    //FILE *f;
-    //f = fopen("r_max_details.csv", "w");
+    FILE *f;
+    f = fopen("r_max_details.csv", "w");
 
     while (num_count < 10000){
 
@@ -402,18 +402,18 @@ void simulation_box::calculate_gpsd()
             }
 
             //std::cout<<"r_max = "<<lpes_max<<" "<<i_index<<" "; probe_centre.print_coords();
-            std::cout<<lpes_max<<"\n";
+            //std::cout<<lpes_max<<"\n";
 
-            
+            probe_centre.print_coords();
 
-            //fprintf(f, "%lf,%lf,%lf,%lf\n", r_max,lpes_c.x,lpes_c.y,lpes_c.z);
+            fprintf(f, "%lf\n", lpes_max);
             //probe_centre.print_coords();
 
         }
 
     }
 
-    //fclose(f);
+    fclose(f);
 }
 
 bool simulation_box::check_probe_centre_viability()
