@@ -355,6 +355,9 @@ void simulation_box::calculate_gpsd()
     int i_index=1729;
     FILE *f;
     f = fopen("r_max_details.csv", "w");
+    fprintf(f, "px,py,pz,cx,cy,cz,lpes,type\n");
+    std::string sol_type;
+
 
     while (num_count < 10000){
 
@@ -368,8 +371,6 @@ void simulation_box::calculate_gpsd()
         if(condition){
 
             //probe_centre.print_coords();
-
-            num_count++;
             lpes_max = 0.;
 
             //std::cout<<"------------------------\n";
@@ -390,7 +391,7 @@ void simulation_box::calculate_gpsd()
                     std::cout<<"-------------------------\n";*/
 
 
-                    particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c);
+                    particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c, sol_type, lpes_max);
                     //particle_max = all_particles[0].return_max_lpes_radius(probe_centre, rs);
                     //std::cout<<"particle max = "<<particle_max<<std::endl;
                     if (particle_max > lpes_max){
@@ -404,9 +405,11 @@ void simulation_box::calculate_gpsd()
             //std::cout<<"r_max = "<<lpes_max<<" "<<i_index<<" "; probe_centre.print_coords();
             //std::cout<<lpes_max<<"\n";
 
-            probe_centre.print_coords();
+            //probe_centre.print_coords();
 
-            fprintf(f, "%lf\n", lpes_max);
+            fprintf(f, "%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%s\n", num_count, probe_centre.x, probe_centre.y, probe_centre.z, lpes_c.x, lpes_c.y, lpes_c.z, lpes_max, sol_type.c_str());
+            num_count++;
+
             //probe_centre.print_coords();
 
         }

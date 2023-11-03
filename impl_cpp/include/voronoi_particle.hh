@@ -18,7 +18,7 @@ public:
     void print_particle();
     coords position;
     coords rel_position;
-    double return_max_lpes_radius(coords p, double rs, coords &lpes_c);
+    double return_max_lpes_radius(coords p, double rs, coords &lpes_c, std::string &sol_type, double current_box_max);
     void print_normal();
 
 private:
@@ -64,15 +64,18 @@ void voronoi_particle::print_particle()
 }
 
 
-double voronoi_particle::return_max_lpes_radius(coords p, double rs, coords &lpes_c)
+double voronoi_particle::return_max_lpes_radius(coords p, double rs, coords &lpes_c, std::string &sol_type, double current_box_max)
 {
     particle_r_max = 0.;
 
     for (int i = 0; i < num_faces; i++){
-        face_r_max = all_faces[i].return_max_radius_for_face(p, rel_position, rs, lpes_c);
+        face_r_max = all_faces[i].return_max_radius_for_face(p, rel_position, rs, lpes_c, sol_type, current_box_max);
         
-        if (face_r_max > particle_r_max)
+        if (face_r_max > current_box_max){
             particle_r_max = face_r_max;
+            current_box_max = particle_r_max;
+            lpes_c = (lpes_c + position); 
+        }
     }
 
     return particle_r_max;
