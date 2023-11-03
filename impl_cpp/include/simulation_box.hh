@@ -355,7 +355,7 @@ void simulation_box::calculate_gpsd()
     int i_index=1729;
     FILE *f;
     f = fopen("r_max_details.csv", "w");
-    fprintf(f, "px,py,pz,cx,cy,cz,lpes,type\n");
+    fprintf(f, "id,px,py,pz,cx,cy,cz,lpes,type\n");
     std::string sol_type;
 
 
