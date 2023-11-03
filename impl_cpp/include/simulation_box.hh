@@ -375,13 +375,15 @@ void simulation_box::calculate_gpsd()
 
             //std::cout<<"------------------------\n";
 
-            for (int i = 0; i < temp_neighbour_list.size(); i++){
+            //for (int i = 0; i < temp_neighbour_list.size(); i++){
+            for (int i = 0; i < num_particles; i++){
 
-                probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list[i]].position);
+                //probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list[i]].position);
+                probe_centre_image = get_probe_centre_image(probe_centre, all_particles[i].position);
                 //std::cout<<probe_centre_image.return_norm()<<"\t"<<probe_centre.return_distance(all_particles[temp_neighbour_list[i]].position)<<std::endl;
                 //std::cout<<probe_centre_image.return_norm()<<"\t"<<r_max<<std::endl;
 
-                if (probe_centre_image.return_norm() <= r_max){
+                //if (probe_centre_image.return_norm() <= r_max){
 
                     //std::cout<<"heeereee"<<std::endl;
                     /*std::cout<<"-------------------------\n";
@@ -391,7 +393,8 @@ void simulation_box::calculate_gpsd()
                     std::cout<<"-------------------------\n";*/
 
 
-                    particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c, sol_type, lpes_max);
+                    //particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c, sol_type, lpes_max);
+                    particle_max = all_particles[i].return_max_lpes_radius(probe_centre_image, rs, lpes_c, sol_type, lpes_max);
                     //particle_max = all_particles[0].return_max_lpes_radius(probe_centre, rs);
                     //std::cout<<"particle max = "<<particle_max<<std::endl;
                     if (particle_max > lpes_max){
@@ -399,7 +402,7 @@ void simulation_box::calculate_gpsd()
                         i_index = i;
                     }
 
-                }
+                //}
             }
 
             //std::cout<<"r_max = "<<lpes_max<<" "<<i_index<<" "; probe_centre.print_coords();
