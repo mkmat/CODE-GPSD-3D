@@ -218,7 +218,7 @@ simulation_box::simulation_box(char *filename)
         exit(EXIT_FAILURE);
     }*/
 
-    r_max      = std::sqrt(r_max);
+    r_max      = 2. * std::sqrt(r_max);
     //std::cout<<"r_max = "<<r_max<<std::endl;
     //exit(EXIT_FAILURE);
 

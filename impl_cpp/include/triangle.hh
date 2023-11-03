@@ -151,7 +151,8 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             if (R1 > current_face_r_max){
                 r_max = R1;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
-                sol_type = "interior";            }
+                sol_type = "interior";            
+            }
 
             /*std::cout<<"---------plus----------"<<std::endl;
             std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\n";
