@@ -19,9 +19,9 @@ def get_probe_centre_distance(df):
     
     df['x_diff'] = df['x_diff'] - L*round(df['x_diff']/L)
     df['y_diff'] = df['y_diff'] - L*round(df['y_diff']/L)
-    df['z_diff'] = df['z_diff'] - L*round(df['y_diff']/L)
+    df['z_diff'] = df['z_diff'] - L*round(df['z_diff']/L)
     
-    df['R2'] = np.sqrt((df['x_diff']**2) + (df['x_diff']**2) + (df['x_diff']**2))
+    df['R2'] = np.sqrt((df['x_diff']**2) + (df['y_diff']**2) + (df['z_diff']**2))
     
     df = df.drop(columns = ['x_diff', 'y_diff', 'z_diff'])
     
@@ -37,7 +37,7 @@ def get_min_distance_from_particle(df, row):
     
     df['x_diff'] = df['x_diff'] - L*round(df['x_diff']/L)
     df['y_diff'] = df['y_diff'] - L*round(df['y_diff']/L)
-    df['z_diff'] = df['z_diff'] - L*round(df['y_diff']/L)
+    df['z_diff'] = df['z_diff'] - L*round(df['z_diff']/L)
     
     df['R2']         = np.sqrt((df['x_diff']**2) + (df['y_diff']**2) + (df['z_diff']**2)) - 1
 
@@ -59,8 +59,6 @@ df['diff'] = df['lpes_sa'] - df['lpes_mk']
 test_df    = df[abs(df['diff']) > 0.01]
 id_df      = test_df[['id']] 
 
-df_sa = df_sa.merge(id_df, on='id', how='inner')
-df_mk = df_mk.merge(id_df, on='id', how='inner')
 
 df_sa = get_probe_centre_distance(df_sa)
 df_mk = get_probe_centre_distance(df_mk)
@@ -79,5 +77,16 @@ for i in range(size):
     df_mk.loc[i, 'R1']     = r_min
     df_mk.loc[i, 'R1_idx'] = idx_min
     
-#df_sa.to_csv('sa_code_anomalies_stats.csv', index=False)
-#df_mk.to_csv('mk_code_anomalies_stats.csv', index=False)
+df_sa = df_sa.merge(id_df, on='id', how='inner')
+df_mk = df_mk.merge(id_df, on='id', how='inner')
+
+df_sa['R1-R2']   = df_sa['R1'] - df_sa['R2']
+df_sa['R1-LPES'] = df_sa['R1'] - df_sa['lpes']
+
+
+df_mk['R1-R2']   = df_mk['R1'] - df_mk['R2']
+df_mk['R1-LPES'] = df_mk['R1'] - df_mk['lpes']
+
+    
+df_sa.to_csv('sa_code_anomalies_stats.csv', index=False)
+df_mk.to_csv('mk_code_anomalies_stats.csv', index=False)
