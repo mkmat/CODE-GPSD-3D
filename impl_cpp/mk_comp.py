@@ -58,7 +58,9 @@ df    = df_sa.join(df_mk, on='id', how='inner', lsuffix='_sa', rsuffix='_mk')
 df['diff'] = df['lpes_sa'] - df['lpes_mk']
 test_df    = df[abs(df['diff']) > 0.01]
 id_df      = test_df[['id']] 
-
+    
+df_sa = df_sa.merge(id_df, on='id', how='inner')
+df_mk = df_mk.merge(id_df, on='id', how='inner')
 
 df_sa = get_probe_centre_distance(df_sa)
 df_mk = get_probe_centre_distance(df_mk)
@@ -76,16 +78,15 @@ for i in range(size):
     r_min, idx_min = get_min_distance_from_particle(coords_df, df_mk.iloc[i])
     df_mk.loc[i, 'R1']     = r_min
     df_mk.loc[i, 'R1_idx'] = idx_min
-    
-df_sa = df_sa.merge(id_df, on='id', how='inner')
-df_mk = df_mk.merge(id_df, on='id', how='inner')
+
 
 df_sa['R1-R2']   = df_sa['R1'] - df_sa['R2']
 df_sa['R1-LPES'] = df_sa['R1'] - df_sa['lpes']
-
+df_sa['LPES-R2'] = df_sa['lpes'] - df_sa['R2']
 
 df_mk['R1-R2']   = df_mk['R1'] - df_mk['R2']
 df_mk['R1-LPES'] = df_mk['R1'] - df_mk['lpes']
+df_mk['LPES-R2'] = df_mk['lpes'] - df_mk['R2']
 
     
 df_sa.to_csv('sa_code_anomalies_stats.csv', index=False)
