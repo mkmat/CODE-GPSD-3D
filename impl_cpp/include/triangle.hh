@@ -97,11 +97,13 @@ coords triangle::get_original_coords(coords cx, coords mp, coords n_f, coords n_
 double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs, coords &lpes_c, coords mp, coords n_f,
  coords n_p, coords n_q, std::string &sol_type, double current_face_r_max)
 {
-    r_max = 0.;
+    r_max = current_face_r_max;
 
     get_candidate_rmax(p, vx, rs, vA, lpes_c, mp, n_f, n_q, n_q, sol_type, current_face_r_max);
     get_candidate_rmax(p, vx, rs, vB, lpes_c, mp, n_f, n_q, n_q, sol_type, current_face_r_max);
     get_candidate_rmax(p, vx, rs, vC, lpes_c, mp, n_f, n_q, n_q, sol_type, current_face_r_max);
+
+    current_face_r_max = r_max;
 
     inv_C = 1./vC_modified.z; 
 
@@ -132,8 +134,14 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             
             if (R1 > current_face_r_max){
                 r_max  = R1;
+                current_face_r_max = r_max;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
-                sol_type = "interior";
+                sol_type = "interior_minus";
+
+                if (abs(R1-R2) > 0.01){
+                    std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\t"<<R2<<"\n";
+                }
+
             }
             /*std::cout<<"---------minus----------"<<std::endl;
             std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\n";
@@ -150,8 +158,13 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
 
             if (R1 > current_face_r_max){
                 r_max = R1;
+                current_face_r_max = r_max;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
-                sol_type = "interior";            
+                sol_type = "interior_plus";
+
+                if (abs(R1-R2) > 0.01){
+                    std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\t"<<R2<<"\n";
+                }            
             }
 
             /*std::cout<<"---------plus----------"<<std::endl;
@@ -159,9 +172,6 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             std::cout<<t_plus<<" "<<u_plus<<"\t"<<(c+(2*d*t_plus)+(e*t_plus*t_plus))<<"\n";*/
         }
     }
-
-    h = -1.;
-    f =  1.;
 
     a = (2.*(vA_modified.y+vC_modified.y)*P_modified.y) + (rs*rs) + (X_modified.x*X_modified.x) - (P_modified*P_modified);
     b = 2.*(vB_modified.y-vC_modified.y)*P_modified.y;
@@ -187,8 +197,14 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             
             if ((R1 > current_face_r_max)){
                 r_max = R1;
+                current_face_r_max = r_max;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
-                sol_type = "edge";
+                sol_type = "edge_minus";
+
+                if (abs(R1-R2) > 0.01){
+                    std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\t"<<R2<<"\n";
+                }
+                
             }
             //std::cout<<"---------minus----------"<<std::endl;
             //std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\n";
@@ -205,8 +221,14 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
 
             if ((R1 > current_face_r_max)){
                 r_max = R1;
+                current_face_r_max = r_max;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
-                sol_type = "edge";
+                sol_type = "edge_plus";
+
+                if (abs(R1-R2) > 0.01){
+                    
+                    std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\t"<<R2<<"\n";
+                }
             }
 
             //std::cout<<"---------plus----------"<<std::endl;
