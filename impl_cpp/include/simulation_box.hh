@@ -4,6 +4,9 @@
 #include<sstream>
 #include<fstream>
 #include<random>
+#include <chrono>
+#include <ctime>
+
 
 #ifndef SIMULATION_BOX_HH
 #define SIMULATION_BOX_HH
@@ -21,7 +24,7 @@ public:
     int  return_position_in_grid(int *pos); 
     void get_position_in_grid(coords cx);
     void calculate_gpsd();
-    void get_LPES();
+    void print_info_file();
     bool check_probe_centre_viability();
     coords get_probe_centre_image(coords a, coords b);
 
@@ -57,6 +60,21 @@ private:
     double diff;
     coords lpes_c;
     bool   more_b;
+    bool   info;
+
+    int    total_shots;
+    double abs_lpes_min;
+    double abs_lpes_max;
+    int    total_num_triangles;
+    double pore_mean;
+    double pore_std;
+
+    std::chrono::time_point<std::chrono::system_clock> start;
+    std::chrono::time_point<std::chrono::system_clock> end;
+
+    double voro_time;
+    double triangle_time;
+    double mc_time;
 
     std::vector<voronoi_particle> all_particles;
     std::vector<coords> all_coords;
@@ -65,7 +83,8 @@ private:
     std::vector<int> neighbour_list;
     std::mt19937 generator;
     std::uniform_real_distribution<double> dis;
-    std::vector<int> temp_neighbour_list;  
+    std::vector<int> temp_neighbour_list; 
+
 
     std::string out_filename;
 
@@ -101,6 +120,7 @@ simulation_box::simulation_box(int argc, char *argv[])
     bool outfilename_b = false;
 
     more_b = false;
+    info   = false;
     
     std::string filename;
 
@@ -174,6 +194,9 @@ simulation_box::simulation_box(int argc, char *argv[])
 
         if (results[0] == "-more")
             more_b = true;
+
+        if (results[0] == "-info")
+            info = true;
         
     }
 
@@ -207,11 +230,19 @@ simulation_box::simulation_box(int argc, char *argv[])
     if (!q_b)
         num_shots = 10 * num_particles;
 
+
+    start = std::chrono::high_resolution_clock::now();
+
     voro::container con(xlo,xhi,ylo,yhi,zlo,zhi,1,1,1,true,true,true,num_particles);
 
     for (int i = 0; i < num_particles; i++){
         con.put(i, all_coords[i].x, all_coords[i].y, all_coords[i].z);
     }
+
+    end = std::chrono::high_resolution_clock::now();
+
+    voro_time  = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+    voro_time *= 1e-9; 
 
     all_particles.resize(num_particles);
     voro::voronoicell c;
@@ -241,6 +272,8 @@ simulation_box::simulation_box(int argc, char *argv[])
     coords temp_r_max;
 
     r_max = 0.;
+
+    start = std::chrono::high_resolution_clock::now();
 
     if(cl.start()) do if(con.compute_cell(c,cl)) {
 
@@ -293,6 +326,12 @@ simulation_box::simulation_box(int argc, char *argv[])
 
 
     } while (cl.inc());
+
+    end = std::chrono::high_resolution_clock::now();
+
+    triangle_time  = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+    triangle_time *= 1e-9;     
+
 
     r_max      = 2. * std::sqrt(r_max);
 
@@ -425,6 +464,14 @@ void simulation_box::calculate_gpsd()
 
     std::string sol_type;
 
+    total_shots  = 0;
+    pore_mean    = 0.;
+    pore_std     = 0.;
+    abs_lpes_max = 0.;
+    abs_lpes_min = L[0]*L[0]+L[1]*L[1]+L[2]*L[2];
+
+    start = std::chrono::high_resolution_clock::now();
+
 
     while (num_count < num_shots){
 
@@ -452,11 +499,69 @@ void simulation_box::calculate_gpsd()
                 fprintf(f, "%d,%lf\n", num_count, lpes_max);
 
             num_count++;
+            pore_mean += lpes_max;
+            pore_std  += (lpes_max * lpes_max);
+
+            abs_lpes_max = (abs_lpes_max * (abs_lpes_max > lpes_max)) + (lpes_max * (lpes_max > abs_lpes_max));
+            abs_lpes_min = (abs_lpes_min * (abs_lpes_min < lpes_max)) + (lpes_max * (lpes_max < abs_lpes_min));
+
         }
+
+        total_shots += 1;
 
     }
 
     fclose(f);
+
+    end      = std::chrono::high_resolution_clock::now();
+    mc_time  = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+    mc_time *= 1e-9;
+
+    pore_mean = pore_mean/(1.*num_shots);
+    pore_std  = pore_std/(1.*num_shots);
+    pore_std  = pore_std - (pore_mean*pore_mean);
+
+    if (info)
+        print_info_file();
+
+}
+
+void simulation_box::print_info_file()
+{
+    std::string info_filename = "";
+    std::vector<std::string> results;
+
+    results = split_string_by_delimiter(out_filename, '.');
+
+    for (int i = 0; i < (results.size()-1); i++)
+        info_filename += results[i];
+
+    info_filename += "-INFO";
+    info_filename += "."+results[(results.size()-1)];
+
+    FILE *f;
+    f = fopen(info_filename.c_str(), "w");
+
+    fprintf(f, "N=%d\n",num_particles);
+    fprintf(f, "ro=%lf\n",ro);
+    fprintf(f, "rp=%lf\n",rp);
+    fprintf(f, "rc=%lf\n",rc);
+    fprintf(f, "box volume=%lf\n", L[0] * L[1] * L[2]);
+    fprintf(f, "total number of triangles = %d\n", total_num_triangles);
+    fprintf(f, "total number of shots=%d\n", total_shots);
+    fprintf(f, "total number of pore radius values=%d\n", num_shots);
+    fprintf(f, "minimum pore radius detected=%lf\n", abs_lpes_min);
+    fprintf(f, "maximum pore radius detected=%lf\n", abs_lpes_max);
+    fprintf(f, "mean pore radius=%lf\n", pore_mean);    
+    fprintf(f, "standard error of the mean pore radius=%lf\n", pore_std);
+    fprintf(f, "number of neighbor cells=1\n");
+    fprintf(f, "voronoi time=%lf\n", voro_time);
+    fprintf(f, "triangle setup time=%lf\n", triangle_time);
+    fprintf(f, "MC time=%lf\n", mc_time);
+
+    fclose(f);
+    
+
 }
 
 bool simulation_box::check_probe_centre_viability()

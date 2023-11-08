@@ -1,0 +1,16 @@
+N=200
+ro=1.000000
+rp=0.000000
+rc=0.000000
+box volume=1000.000000
+total number of triangles = 0
+total number of shots=15
+total number of pore radius values=5
+minimum pore radius detected=0.391173
+maximum pore radius detected=1.127815
+mean pore radius=0.820681
+standard error of the mean pore radius=0.069788
+number of neighbor cells=1
+voronoi time=0.000739
+triangle setup time=0.030041
+MC time=0.035150
