@@ -138,9 +138,9 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
                 sol_type = "interior_minus";
 
-                if (abs(R1-R2) > 0.01){
+                /*if (abs(R1-R2) > 0.01){
                     std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\t"<<R2<<"\n";
-                }
+                }*/
 
             }
             /*std::cout<<"---------minus----------"<<std::endl;
@@ -162,9 +162,9 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
                 sol_type = "interior_plus";
 
-                if (abs(R1-R2) > 0.01){
+                /*if (abs(R1-R2) > 0.01){
                     std::cout<<"R1 - R2 = "<<R1-R2<<"\t"<<R1<<"\t"<<R2<<"\n";
-                }            
+                }*/           
             }
 
             /*std::cout<<"---------plus----------"<<std::endl;

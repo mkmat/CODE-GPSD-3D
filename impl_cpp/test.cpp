@@ -12,9 +12,6 @@ int main(int argc, char *argv[])
     bool zlo_b = false;
     bool zhi_b = false;
     
-    bool ro_b = false;
-    bool rc_b = false;
-    bool rp_b = false;
     bool q_b  = false;
     bool more_b = false;
     bool info_b = false;
@@ -33,20 +30,9 @@ int main(int argc, char *argv[])
     
     double ro=1.;
     double rp=0.;
-    double rc=0.;
+    double rc=0.;*/
 
-    std::vector<std::string> results;
-
-    for (int i = 0; i < argc; i++)
-    {
-        results.clear();
-        results = gpsd_3d::split_string_by_delimiter(argv[i],'=');
-
-        
-    }*/  
-
-
-    gpsd_3d::simulation_box test(argv[1]);
+    gpsd_3d::simulation_box test(argc, argv);
     test.calculate_gpsd();
 
 
