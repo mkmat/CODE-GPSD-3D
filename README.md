@@ -234,7 +234,7 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
         $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
         $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
 
-## Benchmarks (fortran90 version)
+## Benchmarks (fortran90 version)  REQUIRES UPDATE VERSUS MANUSCRIPT ***
 
 Benchmark configurations are available as .benchmark-#-config and .benchmark-#-box files. 
 
@@ -246,13 +246,13 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 |4 | 100000 | 0.1 | 0 | 0 | 2 | 30 | 200000 | 4058940 | 2.47 | 3.86 | 20.00 s | 31.35 s | 
 |5 | 139218 | 0.1 | 0 | 0 | 1 | 30 | 139218 | 3917190 | 1.38 | 2.14 | 22.50 s | 27.16 s | 
 |6 | 1600 | 0.1 | 0 | 0 | 63 | 30 | 100800 | 19752 | 1.31 | 1.31 | 0.25 s | 1.54 s | 
+|6 | 1600 | 1 | 0 | 0 | 63 | 30 | 100800 | 19752 | 0.34 | 0.41 | 0.38 s | 1.59 s | 
+|6 | 1600 | 1 | 0.1 | 0 | 63 | 30 | 100800 | 19752 | 0.38 | 0.41 | 0.38 s | 1.51 s | 
+|6 | 1600 | 1 | 0.1 | 0.1 | 63 | 30 | 100800 | 19752 | 0.29 | 0.31 | 0.25 s | 1.22 s | 
+|6 | 1600 | 1 | 0 | 0 | 63 | 3 | 100800 | 19752 | 0.34 | 0.41 | 0.25 s | 11.12 s | 
 |7 | 2000 | 0.1 | 0 | 0 | 51 | 30 | 102000 | 59622 | 2.57 | 3.75 | 0.25 s | 5.42 s | 
 |8 | 10000 | 0.1 | 0 | 0 | 11 | 30 | 110000 | 307609 | 3.21 | 4.83 | 1.50 s | 8.55 s | 
 |9 | 139218 | 0.1 | 0 | 0 | 1 | 30 | 139218 | 3917190 | 1.38 | 2.14 | 21.00 s | 26.21 s | 
-|10 | 1600 | 1 | 0 | 0 | 63 | 30 | 100800 | 19752 | 0.34 | 0.41 | 0.38 s | 1.59 s | 
-|11 | 1600 | 1 | 0.1 | 0 | 63 | 30 | 100800 | 19752 | 0.38 | 0.41 | 0.38 s | 1.51 s | 
-|12 | 1600 | 1 | 0.1 | 0.1 | 63 | 30 | 100800 | 19752 | 0.29 | 0.31 | 0.25 s | 1.22 s | 
-|13 | 1600 | 1 | 0 | 0 | 63 | 3 | 100800 | 19752 | 0.34 | 0.41 | 0.25 s | 11.12 s | 
 
 ## Benchmarks (c++ version)
 
