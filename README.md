@@ -234,7 +234,7 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
         $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
         $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
 
-## Benchmarks (fortran90 version)  REQUIRES UPDATE VERSUS MANUSCRIPT ***
+## Benchmarks (fortran90 version) 
 
 Benchmark configurations are available as .benchmark-#-config and .benchmark-#-box files. 
 
