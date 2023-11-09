@@ -57,6 +57,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-q=<integer>] 
           [-o=<filename>]
           [-np=<integer>]
+          [-d=<delimiter>]
           [-more]
           [-info]
           [-quiet]
@@ -77,6 +78,8 @@ The six values for the box can be either saved in a txt-file (single line, six v
 **-o=** name of the resulting file containing a list of pore radii. If not specified, the list is saved in a .gpsd-file.
 
 **-np=** number of threads np to be used. If not specified, *n<sub>p</sub>* is set to the available number of threads.
+
+**-d=** delimiter (single character) present in the configuration and box-files, e.g. -d="\ " for a blank, default is -d=","
 
 **-more**: tell the code to add, besides pore radius, the corresponding pore center coordinate to the output file. This file then has 7 columns: point p, pore center coordinate, pore radius
 
