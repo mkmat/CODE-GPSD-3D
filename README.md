@@ -43,7 +43,7 @@ The input required by GPSD-3D are (i) coordinates: the center positions of *N* m
 3. id x y z radius  (polydisperse system, monodisperse if all radii are equal)
 4. samarth-type configuration file (do not specify box dimensions in that case, requires specifying -ro on the command line)
 
-The six values for the box can be either saved in a txt-file (single line, six values xlo xhi ylo yhi zlo zhi separated by blank or commata), or passed over on the command line.  
+The six values for the box can be either saved in a txt-file (single line, six values xlo xhi ylo yhi zlo zhi separated by blank or commata), or passed over on the command line. The delimiting character can be specified using the -d option.  
 
 
 ## How to run the code. Parameters. Command-line options
