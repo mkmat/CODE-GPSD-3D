@@ -237,10 +237,9 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
     total number of triangles
     total number of shots
     total number of pore radius values
-    maximum pore radius
-    minimum pore radius
+    minimum pore radius detected
+    maximum pore radius 
     mean pore radius
-    maximum pore radius detected
     standard error of the mean pore radius
     volume fraction phi(reff)
     number of neighbor cells
