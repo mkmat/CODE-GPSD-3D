@@ -190,7 +190,7 @@ and the following file (a list of roughly 20000 *r* values) should have been gen
 
 With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. 
 
-## .info file <a name="info">
+## -info file <a name="info">
 
 If you repeat the above command, now using the -info option
 
