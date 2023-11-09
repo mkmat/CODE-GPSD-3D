@@ -124,7 +124,7 @@ where *x*,*y*,*z* are the center coordinates of the pore with radius *r*.
 
 A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call, using 10 of the available threads, 20000 Monte Carlo trials (*q=10*), for a probe sphere with zero radius, and *N=2000* materials spheres of radius *r*<sub>o</sub>=1.0 is 
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -fortran
 
 As we did not suppress stdout via -quiet, it should produce the following within a few seconds:
 
@@ -188,37 +188,44 @@ and the following file (a list of roughly 20000 *r* values) should have been gen
 
         .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
-With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. If you repeat the above command, now using the -info option
+With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. 
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info
+## .info file <a name="info">
+
+If you repeat the above command, now using the -info option
+
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info -fortran
 
 a second file will have been generated (all entries in this file are described <a href="#info">below</a>
 
-        [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd-info
+        [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.info
 
-        2000
-        1.0000000000000000
-        0.0000000000000000
-        0.0000000000000000
-        13824.000000000000
-        59622
-        20000
-        12467
-        2.8465461581708604
-        1.7858377514456736E-002
-        1.5524619675473206
-        2.8465461581708600
-        3.2635904069227960E-003
-        0.37665000000000004
-        64
-        10
-        0.114386998
-        0.250000000
-        4.58002090E-04
-        0.00000000
-        16.4257870
-        1.62500000
-        1.96279191970825
+        N=2000                             (number of material spheres)
+        ro=1.00000                         (material sphere radius)
+        rp=0.00000                         (probe sphere radius)
+        rc=0.00000                         (shell thickness)
+        V=13824.00000                      (box volume)
+        triangles=59622                    (total number of triangles)
+        shots=20000                        (total number of shots)
+        radii=12656                        (total number of pore radius values)
+        min_pore_radius=0.01316            (minimum pore radius detected)
+        max_pore_radius=2.84655            (maximum pore radius detected)
+        mean_pore_radius=1.54575           (mean pore radius)
+        stderr_pore_radius=0.00333         (standard error of the mean pore radius)
+        phi_reff=0.36720                   (phi(reff))
+        cells=64                           (neighbor list cells)
+        threads=72                         (number of threads)
+        voro_cpu_time=0.11232              (cpu time used to process the voro++ output [secs])
+        voro_real_time=0.25000             (real time used to process the voro++ output [secs])
+        triangles_setup_cpu_time=0.00046   (cpu time used to setup triangles [secs])
+        triangles_setup_real-time=0.00000  (real time used to setup triangles [secs])
+        MonteCarlo_cpu_time=29.61485       (cpu time spent during Monte Carlo [secs])
+        MonteCarlo_real_time=0.50000       (real time spent during Monte Carlo [secs])
+        walltime=0.736114025115967         (total wall time [secs])
+
+## -inf file <a name="inf">
+
+A text-free version of the .info-file is available in the .inf-file. 
 
 ## Polydisperse systems: Grid-based <a name="hardcoded">
 
@@ -226,31 +233,6 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
 
         $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
         $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
-
-## -info file <a name="info">
-
-    N (number of material spheres)
-    ro (material sphere radius)
-    rp (probe sphere radius)
-    rc (shell thickness)
-    box volume
-    total number of triangles
-    total number of shots
-    total number of pore radius values
-    minimum pore radius detected
-    maximum pore radius 
-    mean pore radius
-    standard error of the mean pore radius
-    volume fraction phi(reff)
-    number of neighbor cells
-    np number of threads used in parallel
-    cpu time used to process the voro++ output [secs]
-    real time used to process the voro++ output [secs]
-    cpu time used to setup triangles [secs]
-    real time used to setup triangles [secs]
-    cpu time spent during Monte Carlo [secs]
-    real time spent during Monte Carlo [secs]
-    total wall time [secs]
 
 ## Benchmarks (fortran90 version)
 
