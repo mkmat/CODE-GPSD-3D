@@ -196,7 +196,7 @@ If you repeat the above command, now using the -info option
 
         perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info -fortran
 
-a second file will have been generated (all entries in this file are described <a href="#info">below</a>
+a second file will have been generated (all entries in this file are described in brackets)
 
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.info
 
