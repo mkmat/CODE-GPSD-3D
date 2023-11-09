@@ -285,3 +285,5 @@ GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
 GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
 
 SA: Please compile using g++ -O3 -I ./include/ -I ./voro++/include/ test.cpp ./voro++/lib/libvoro++.a
+
+MK: g++ -std=c++11 -O3 -I ./include/ -I ./voro++/include/ test.cpp ./voro++/lib/libvoro++.a
