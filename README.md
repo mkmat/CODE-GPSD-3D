@@ -257,7 +257,11 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 
 ## Benchmarks (c++ version)
 
-to come
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+|1 | 320 | 0.1 | 0 | 0 | 313 | 1 | 100160 | 2106252336 | 1.36 | 1.65 | 0 s | 157.93 s | 
+|2 | 1080 | 0.1 | 0 | 0 | 93 | 1 | 100440 | -385795024 | 31.29 | 0 | 0 s | 937.34 s | 
+|3 | 64 | 0.1 | 0 | 0 | 1563 | 1 | 100032 | -139113424 | 1.37 | 1.38 | 0 s | 42.57 s | 
 
 ## About <a name="about">
 
