@@ -25,6 +25,7 @@ public:
     void get_position_in_grid(coords cx);
     void calculate_gpsd();
     void print_info_file();
+    void print_info_numbers_file();     
     bool check_probe_centre_viability();
     coords get_probe_centre_image(coords a, coords b);
 
@@ -37,6 +38,7 @@ private:
     double r_coated;
     const int dim = 3;
     int    num_shots;
+    int    num_count = 0;  
     int    num_particles;
     double r_max;
     double r_max_squared;
@@ -65,7 +67,7 @@ private:
     int    total_shots;
     double abs_lpes_min;
     double abs_lpes_max;
-    int    total_num_triangles;
+    int    total_num_triangles = -1;     // MK question: where is this defined or calculated?
     double pore_mean;
     double pore_std;
 
@@ -87,6 +89,8 @@ private:
 
 
     std::string out_filename;
+    std::string str_delimiter;   
+    char mydelimiter = ',';     
 
     coords lpes_centre;
     coords probe_centre;
@@ -100,7 +104,7 @@ std::vector<std::string> split_string_by_delimiter(const std::string& s, char de
    std::vector<std::string> tokens;
    std::string token;
    std::istringstream tokenStream(s);
-   while (std::getline(tokenStream, token, delimiter))
+   while (std::getline(tokenStream, token, delimiter))   
    {
       tokens.push_back(token);
    }
@@ -116,13 +120,15 @@ simulation_box::simulation_box(int argc, char *argv[])
     bool zlo_b = false;
     bool zhi_b = false;
     bool filename_b = false;
-    bool q_b = false;
+    double q   = 10.0;         
     bool outfilename_b = false;
+    bool boxname_b = false;    
 
     more_b = false;
     info   = false;
     
     std::string filename;
+    std::string boxname;     
 
     ro = 1.;
     rc = 0.;
@@ -139,6 +145,11 @@ simulation_box::simulation_box(int argc, char *argv[])
             filename   = results[1];
             filename_b = true;
         }
+
+        if (results[0] == "-box"){          
+            boxname    = results[1];       
+            boxname_b  = true;             
+        }                                  
 
         if (results[0] == "-xlo"){
             xlo   = std::stod(results[1]);
@@ -183,8 +194,7 @@ simulation_box::simulation_box(int argc, char *argv[])
         }
 
         if (results[0] == "-q"){
-            num_shots = std::stoi(results[1]);
-            q_b       = true;
+            q  = std::stod(results[1]);  
         }
 
         if (results[0] == "-o"){
@@ -197,13 +207,41 @@ simulation_box::simulation_box(int argc, char *argv[])
 
         if (results[0] == "-info")
             info = true;
+
+        if (results[0] == "-d")                     
+            str_delimiter = results[1];             
+            mydelimiter = str_delimiter[1];         
         
     }
 
-    if (!xlo_b || !xhi_b || !ylo_b || !yhi_b || !zlo_b || !zhi_b || !filename_b){
-        std::cout<<"one of the necessary arguments is missing"<<std::endl;
-        exit(EXIT_FAILURE);
-    }
+    std::cout << "delimiter [" << mydelimiter << "]\n";
+
+    if (!filename_b)   
+        std::cout<<"configuration file name -in=<filename> is missing"<<std::endl;
+
+    if (boxname_b == true) {  
+        std::ifstream myfile (boxname);
+        if (myfile.is_open()) {
+            std::string str;
+            std::getline (myfile,str);
+            results = split_string_by_delimiter(str, mydelimiter); 
+            xlo = std::stod(results[0]);
+            xhi = std::stod(results[1]);
+            ylo = std::stod(results[2]);
+            yhi = std::stod(results[3]);
+            zlo = std::stod(results[4]);
+            zhi = std::stod(results[5]);
+            myfile.close();
+        } else { 
+            std::cout<<"unable to open boxfile " << boxname <<std::endl;
+            exit(EXIT_FAILURE);
+        };
+    } else { 
+        if (!xlo_b || !xhi_b || !ylo_b || !yhi_b || !zlo_b || !zhi_b) { 
+            std::cout<<"one of the necessary arguments is missing"<<std::endl;
+            exit(EXIT_FAILURE);
+        }; 
+    };
 
     rs = ro + rc + rp;
     r_coated = ro + rc;
@@ -220,15 +258,14 @@ simulation_box::simulation_box(int argc, char *argv[])
     generator.seed(1729);
 
     while(getline(parser,str)){
-        results = split_string_by_delimiter(str, ',');
-        temp_c.set_coords(stod(results[0]), stod(results[1]), stod(results[2]));
+        results = split_string_by_delimiter(str, mydelimiter); 
+        temp_c.set_coords(stod(results[1]), stod(results[2]), stod(results[3]));
         num_particles++;
         all_coords.push_back(temp_c);
     }
     parser.close();
 
-    if (!q_b)
-        num_shots = 10 * num_particles;
+    num_shots = q * num_particles; 
 
 
     start = std::chrono::high_resolution_clock::now();
@@ -448,8 +485,6 @@ void simulation_box::get_position_in_grid(coords cx)
 void simulation_box::calculate_gpsd()
 {
     bool condition;
-    int  num_count = 0;
-
     double particle_max;
     double lpes_max;
     FILE *f;
@@ -457,10 +492,6 @@ void simulation_box::calculate_gpsd()
 
     if (more_b)
         fprintf(f, "id,px,py,pz,cx,cy,cz,r\n");
-
-    else
-        fprintf(f, "id,r\n");
-
 
     std::string sol_type;
 
@@ -473,7 +504,7 @@ void simulation_box::calculate_gpsd()
     start = std::chrono::high_resolution_clock::now();
 
 
-    while (num_count < num_shots){
+    while (total_shots < num_shots){ 
 
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
         condition = check_probe_centre_viability();
@@ -496,7 +527,7 @@ void simulation_box::calculate_gpsd()
             if (more_b)
                 fprintf(f, "%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", num_count, probe_centre.x, probe_centre.y, probe_centre.z, lpes_c.x, lpes_c.y, lpes_c.z, lpes_max);
             else
-                fprintf(f, "%d,%lf\n", num_count, lpes_max);
+                fprintf(f, "%lf\n", lpes_max); 
 
             num_count++;
             pore_mean += lpes_max;
@@ -517,12 +548,14 @@ void simulation_box::calculate_gpsd()
     mc_time  = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
     mc_time *= 1e-9;
 
-    pore_mean = pore_mean/(1.*num_shots);
-    pore_std  = pore_std/(1.*num_shots);
+    pore_mean = pore_mean/(1.*num_count); 
+    pore_std  = pore_std/(1.*num_count);  
     pore_std  = pore_std - (pore_mean*pore_mean);
 
-    if (info)
+    if (info) {
         print_info_file();
+        print_info_numbers_file(); 
+    };
 
 }
 
@@ -536,7 +569,7 @@ void simulation_box::print_info_file()
     for (int i = 0; i < (results.size()-1); i++)
         info_filename += results[i];
 
-    info_filename += "-INFO";
+    info_filename += "-INFO"; 
     info_filename += "."+results[(results.size()-1)];
 
     FILE *f;
@@ -546,23 +579,69 @@ void simulation_box::print_info_file()
     fprintf(f, "ro=%lf\n",ro);
     fprintf(f, "rp=%lf\n",rp);
     fprintf(f, "rc=%lf\n",rc);
-    fprintf(f, "box volume=%lf\n", L[0] * L[1] * L[2]);
-    fprintf(f, "total number of triangles = %d\n", total_num_triangles);
-    fprintf(f, "total number of shots=%d\n", total_shots);
-    fprintf(f, "total number of pore radius values=%d\n", num_shots);
-    fprintf(f, "minimum pore radius detected=%lf\n", abs_lpes_min);
-    fprintf(f, "maximum pore radius detected=%lf\n", abs_lpes_max);
-    fprintf(f, "mean pore radius=%lf\n", pore_mean);    
-    fprintf(f, "standard error of the mean pore radius=%lf\n", pore_std);
-    fprintf(f, "number of neighbor cells=1\n");
-    fprintf(f, "voronoi time=%lf\n", voro_time);
-    fprintf(f, "triangle setup time=%lf\n", triangle_time);
-    fprintf(f, "MC time=%lf\n", mc_time);
+    fprintf(f, "V=%lf\n", L[0] * L[1] * L[2]);                 
+    fprintf(f, "triangles = %d\n", total_num_triangles);
+    fprintf(f, "shots=%d\n", total_shots);
+    fprintf(f, "radii=%d\n", num_count); 
+    fprintf(f, "min_pore_radius=%lf\n", abs_lpes_min);
+    fprintf(f, "max_pore_radius=%lf\n", abs_lpes_max);
+    fprintf(f, "mean_pore_radius=%lf\n", pore_mean);    
+    fprintf(f, "stderr_pore_radius=%lf\n", pore_std);
+    fprintf(f, "phi_reff=%lf\n",1.0-float(num_count)/float(total_shots)); 
+    fprintf(f, "cells=1\n");
+    fprintf(f, "threads=1\n"); 
+    fprintf(f, "voro_cpu_time=%lf\n", voro_time);    
+    fprintf(f, "voro_real_time=%lf\n", voro_time);   
+    fprintf(f, "triangle_setup_cpu_time=%lf\n", triangle_time); 
+    fprintf(f, "triangle_setup_real_time=%lf\n", triangle_time);
+    fprintf(f, "MonteCarlo_cpu_time=%lf\n", mc_time); 
+    fprintf(f, "MonteCarlo_real_time=%lf\n", mc_time);
 
     fclose(f);
-    
 
 }
+
+void simulation_box::print_info_numbers_file() 
+{
+    std::string info_filename = "";
+    std::vector<std::string> results;
+
+    results = split_string_by_delimiter(out_filename, '.');
+
+    for (int i = 0; i < (results.size()-1); i++)
+        info_filename += results[i];
+
+    info_filename += "-INFO-numbers";   
+    info_filename += "."+results[(results.size()-1)];
+
+    FILE *f;
+    f = fopen(info_filename.c_str(), "w");
+
+    fprintf(f, "%d\n",num_particles);
+    fprintf(f, "%lf\n",ro);
+    fprintf(f, "%lf\n",rp);
+    fprintf(f, "%lf\n",rc);
+    fprintf(f, "%lf\n", L[0] * L[1] * L[2]);
+    fprintf(f, "%d\n", total_num_triangles);
+    fprintf(f, "%d\n", total_shots);
+    fprintf(f, "%d\n", num_count);               
+    fprintf(f, "%lf\n", abs_lpes_min);
+    fprintf(f, "%lf\n", abs_lpes_max);
+    fprintf(f, "%lf\n", pore_mean);
+    fprintf(f, "%lf\n", pore_std);
+    fprintf(f, "%lf\n", 1.0-float(num_count)/float(total_shots)); 
+    fprintf(f, "1\n");  // number of neighbor cells
+    fprintf(f, "1\n");  // number of threads used in parallel
+    fprintf(f, "%lf\n", voro_time); // voro cpu time 
+    fprintf(f, "%lf\n", voro_time); // voro real time
+    fprintf(f, "%lf\n", triangle_time); // triangle cpu time
+    fprintf(f, "%lf\n", triangle_time); // triangle real time
+    fprintf(f, "%lf\n", mc_time);   // MC cpu time
+    fprintf(f, "%lf\n", mc_time);   // MC real time
+    fclose(f);
+
+}
+
 
 bool simulation_box::check_probe_centre_viability()
 {
