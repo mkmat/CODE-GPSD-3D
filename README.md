@@ -73,7 +73,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-rc=** shell thickness  *r<sub>c</sub>*. If not specified, *r<sub>c</sub>=0* is used.
 
-**-q=** positive quality value (optionally). If not specified, *q=10* is used. The number of random shots is *q* times the number of material spheres.
+**-q=** positive quality value (optionally). If not specified, *q=10.0* is used. The number of random shots is *q* times the number of material spheres.
 
 **-o=** name of the resulting file containing a list of pore radii. If not specified, the list is saved in a .gpsd-file.
 
