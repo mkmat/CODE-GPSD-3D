@@ -164,23 +164,25 @@ As we did not suppress stdout via -quiet, it should produce the following within
         [GPSD-3D]                                 reff = rc+rp       0.0000
         [GPSD-3D]                                 rs = ro+reff       1.0000
         [GPSD-3D]                       max triangle extension       2.8398
+        [INFO]                  note: vertices inside material
         [GPSD-3D]                    creating neighbor list ..
         [GPSD-3D]                               neighborlist_M            4             4             4
         [GPSD-3D]                            neighborlist_size       6.0000        6.0000        6.0000
         [GPSD-3D]                           triangles per cell     931.5938
         [GPSD-3D]                      starting Monte Carlo ..
-        [GPSD-3D]                    volume fraction phi(reff)       0.3767
-        [GPSD-3D]                                    V(0|reff)    8617.1904
-        [GPSD-3D]                              min pore radius       0.0179
-        [GPSD-3D]                             mean pore radius       1.5525 +/-    0.0033
+        [GPSD-3D]                            volume V=V(0,-ro)   13824.0000
+        [GPSD-3D]                    volume fraction phi(reff)       0.3638
+        [GPSD-3D]                                    V(0|reff)    8794.8288
+        [GPSD-3D]                              min pore radius       0.0122
+        [GPSD-3D]                             mean pore radius       1.5452 +/     0.0033
         [GPSD-3D]                              max pore radius       2.8465
         [GPSD-3D]             created a list {r} of pore radii
         [GPSD-3D]                    shots (use -q to enlarge)        20000
-        [GPSD-3D]       cpu+real time spent in overhead [secs]       0.0002        0.0000
-        [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.1144        0.2500
-        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0005        0.0000
-        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      16.4258        1.6250
-        [GPSD-3D]         cpu+real time per 10000 shots [secs]       8.2129        0.8125
+        [GPSD-3D]       cpu+real time spent in overhead [secs]       0.0003        0.0000
+        [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.0799        0.2500
+        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0004        0.0000
+        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      14.3359        1.3750
+        [GPSD-3D]         cpu+real time per 10000 shots [secs]       7.1680        0.6875
         [GPSD-3D] completed
         [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
@@ -254,7 +256,6 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 |8 | 10000 | 0.1 | 0 | 0 | 11 | 72 | 110000 | 307609 | 3.21 | 4.83 | 1.5 s | 6.88 s | 
 |9 | 100000 | 0.1 | 0 | 0 | 2 | 72 | 200000 | 4057056 | 0.38 | 0.4 | 17.75 s | 83.3 s | 
 
-
 ## Benchmarks (c++ version)
 
 | no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
@@ -262,6 +263,31 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 |1 | 320 | 0.1 | 0 | 0 | 313 | 1 | 100160 | 2106252336 | 1.36 | 1.65 | 0 s | 157.93 s | 
 |2 | 1080 | 0.1 | 0 | 0 | 93 | 1 | 100440 | -385795024 | 31.29 | 0 | 0 s | 937.34 s | 
 |3 | 64 | 0.1 | 0 | 0 | 1563 | 1 | 100032 | -139113424 | 1.37 | 1.38 | 0 s | 42.57 s | 
+
+## Quick benchmarks (fortran90 version)
+
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+|1 | 320 | 0.1 | 0 | 0 | 3 | 30 | 960 | 9389 | 1.36 | 1.67 | 0.13 s | 0.08 s | 
+|2 | 1080 | 0.1 | 0 | 0 | 1 | 30 | 1000 | 40338 | 31.23 | 31.3 | 0.25 s | 0.26 s | 
+|3 | 64 | 0.1 | 0 | 0 | 15 | 30 | 960 | 2488 | 1.37 | 1.38 | 0 s | 0.04 s | 
+|4 | 100000 | 0.1 | 0 | 0 | 0 | 30 | 1000 | 4058940 | 2.45 | 3.86 | 21.75 s | 22.19 s | 
+|5 | 139218 | 0.1 | 0 | 0 | 0 | 30 | 1000 | 3917190 | 1.39 | 2.14 | 22.13 s | 22.77 s | 
+|6 | 3200 | 0.1 | 0 | 0 | 0 | 30 | 1000 | 39504 | 1.31 | 1.31 | 0.88 s | 1.04 s | 
+|6 | 200 | 0.1 | 0 | 0 | 5 | 30 | 1000 | 8028 | 1.6 | 2.03 | 0 s | 0.06 s | 
+|6 | 3200 | 1 | 0 | 0 | 0 | 30 | 1000 | 39504 | 0.32 | 0.41 | 1 s | 1.03 s | 
+|6 | 3200 | 1 | 0.1 | 0 | 0 | 30 | 1000 | 39504 | 0.37 | 0.41 | 1 s | 1.01 s | 
+|6 | 3200 | 1 | 0.1 | 0.1 | 0 | 30 | 1000 | 39504 | 0.29 | 0.31 | 0.88 s | 1.01 s | 
+|7 | 2000 | 0.1 | 0 | 0 | 1 | 30 | 1000 | 59622 | 2.57 | 3.75 | 0.25 s | 0.36 s | 
+|8 | 10000 | 0.1 | 0 | 0 | 0 | 30 | 1000 | 307609 | 3.21 | 4.83 | 1.5 s | 1.64 s | 
+|9 | 100000 | 0.1 | 0 | 0 | 0 | 30 | 1000 | 4057056 | 0.4 | 0.4 | 15 s | 15.87 s | 
+|10 | 3200 | 1 | 0 | 0 | 0 | 3 | 1000 | 39504 | 0.33 | 0.41 | 1 s | 1.13 s | 
+
+## Quick benchmarks (c++ version)
+
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
 
 ## About <a name="about">
 
