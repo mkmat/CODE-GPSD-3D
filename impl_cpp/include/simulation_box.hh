@@ -90,7 +90,7 @@ private:
 
     std::string out_filename;
     std::string str_delimiter;   
-    char mydelimiter = ',';     
+    char mydelimiter = ' ';     
 
     coords lpes_centre;
     coords probe_centre;
@@ -208,13 +208,18 @@ simulation_box::simulation_box(int argc, char *argv[])
         if (results[0] == "-info")
             info = true;
 
-        if (results[0] == "-d")                     
+        if (results[0] == "-d") {                
             str_delimiter = results[1];             
-            mydelimiter = str_delimiter[1];         
+            mydelimiter = str_delimiter[0];
+
+            //for (int i = 0; i < str_delimiter.size(); i++)
+                //std::cout<<str_delimiter[i]<<std::endl;
+
+        }
         
     }
 
-    std::cout << "delimiter [" << mydelimiter << "]\n";
+    //std::cout << "delimiter [" << mydelimiter << "]\n";
 
     if (!filename_b)   
         std::cout<<"configuration file name -in=<filename> is missing"<<std::endl;
@@ -224,7 +229,7 @@ simulation_box::simulation_box(int argc, char *argv[])
         if (myfile.is_open()) {
             std::string str;
             std::getline (myfile,str);
-            results = split_string_by_delimiter(str, mydelimiter); 
+            results = split_string_by_delimiter(str, mydelimiter);
             xlo = std::stod(results[0]);
             xhi = std::stod(results[1]);
             ylo = std::stod(results[2]);
@@ -267,16 +272,19 @@ simulation_box::simulation_box(int argc, char *argv[])
 
     num_shots = q * num_particles; 
 
+    //std::cout<<"putting particles in voro++"<<std::endl;
 
     start = std::chrono::high_resolution_clock::now();
 
-    voro::container con(xlo,xhi,ylo,yhi,zlo,zhi,1,1,1,true,true,true,num_particles);
+    voro::container con(xlo,xhi,ylo,yhi,zlo,zhi,10,10,10,true,true,true,(2*num_particles)/1000);
 
     for (int i = 0; i < num_particles; i++){
         con.put(i, all_coords[i].x, all_coords[i].y, all_coords[i].z);
     }
 
     end = std::chrono::high_resolution_clock::now();
+
+    //std::cout<<"finished particles in voro++"<<std::endl;
 
     voro_time  = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
     voro_time *= 1e-9; 
@@ -316,6 +324,8 @@ simulation_box::simulation_box(int argc, char *argv[])
 
         cl.pos(temp_x,temp_y,temp_z);
         id=cl.pid();
+
+        //std::cout<<"id = "<<id<<std::endl;
 
         temp_particle.clear_faces();
         temp_particle.set_particle_coord(temp_x, temp_y, temp_z);
@@ -477,9 +487,9 @@ int simulation_box::return_position_in_grid(int *pos)
 
 void simulation_box::get_position_in_grid(coords cx)
 {
-    position_in_grid[0] = (int)(cx.x * inv_deltax[0]);
-    position_in_grid[1] = (int)(cx.y * inv_deltax[1]);
-    position_in_grid[2] = (int)(cx.z * inv_deltax[2]);
+    position_in_grid[0] = (int)((cx.x-xlo) * inv_deltax[0]);
+    position_in_grid[1] = (int)((cx.y-ylo) * inv_deltax[1]);
+    position_in_grid[2] = (int)((cx.z-zlo) * inv_deltax[2]);
 }
 
 void simulation_box::calculate_gpsd()
@@ -505,6 +515,8 @@ void simulation_box::calculate_gpsd()
 
 
     while (total_shots < num_shots){ 
+
+        std::cout<<"shots = "<<total_shots<<std::endl;
 
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
         condition = check_probe_centre_viability();

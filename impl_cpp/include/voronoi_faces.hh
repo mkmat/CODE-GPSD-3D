@@ -15,6 +15,7 @@ public:
     double return_max_radius_for_face(coords p, coords vx, double rsc, coords &lpes_c, std::string &sol_type, double current_particle_max);
     void set_new_coordinate_system(coords p);
     void print_n_coords();
+    void get_longest_triangle_edge();
 
 private:
     std::vector<triangle> face_triangles;
@@ -111,10 +112,6 @@ void voronoi_faces::set_new_coordinate_system(coords p)
     n_q.normalize();
 
     material_projection = (n_f * geometrical_centre) * n_f;
-
-    //std::cout<<"dots = "<<face_triangles[0].vA * n_f<<"\t"<<face_triangles[0].vB * n_f<<"\t"<<face_triangles[0].vC * n_f<<std::endl;
-    //std::cout<<"norms = "<<n_f*n_f<<"\t"<<n_p*n_p<<"\t"<<n_q*n_q<<std::endl; 
-    //std::cout<<"dots  = "<<n_f*n_p<<"\t"<<n_p*n_q<<"\t"<<n_q*n_f<<std::endl; 
 }
 
 double voronoi_faces::return_max_radius_for_face(coords p, coords vx, double rs, coords &lpes_c, std::string &sol_type, double current_particle_max)
@@ -139,15 +136,14 @@ void voronoi_faces::set_normal(double nx, double ny, double nz)
 {
     n_f.set_coords(nx, ny, nz);
     n_f.normalize();
-
-    //n_f.print_coords();
-    //test_n.print_coords();
 }
 
 void voronoi_faces::print_n_coords()
 {
     n_f.print_coords();
 }
+
+void voronoi
 
 }
 
