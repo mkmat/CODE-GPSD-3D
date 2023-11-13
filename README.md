@@ -81,7 +81,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-d=** delimiter (single character) present in the configuration and box-files, e.g. -d="\ " for a blank, default is -d=","
 
-**-more**: tell the code to add, besides pore radius, the corresponding pore center coordinate to the output file. This file then has 7 columns: point p, pore center coordinate, pore radius
+**-more**: tell the code to add, besides pore radius *r*, the corresponding probe particle center **p** and pore center coordinate **c** to the output file. This file then has 8 columns: line number, **p**, **c**, *r*
 
 **-info**: triggers storing runtime information (cpu times etc) in a separate [info](#info) file.
 
