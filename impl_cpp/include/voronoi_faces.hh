@@ -15,7 +15,7 @@ public:
     double return_max_radius_for_face(coords p, coords vx, double rsc, coords &lpes_c, std::string &sol_type, double current_particle_max);
     void set_new_coordinate_system(coords p);
     void print_n_coords();
-    void get_longest_triangle_edge();
+    double get_longest_triangle_edge();
 
 private:
     std::vector<triangle> face_triangles;
@@ -143,7 +143,19 @@ void voronoi_faces::print_n_coords()
     n_f.print_coords();
 }
 
-void voronoi
+double voronoi_faces::get_longest_triangle_edge()
+{
+    double face_edge_max = 0.;
+    double temp_triangle_max = 0.;
+
+    for (int i = 0; i < num_triangles; i++){
+        temp_triangle_max = face_triangles[i].get_longest_edge();
+        face_edge_max     = (face_edge_max * (face_edge_max > temp_triangle_max)) + (temp_triangle_max * (face_edge_max < temp_triangle_max));
+    }
+
+    return face_edge_max;
+
+}
 
 }
 

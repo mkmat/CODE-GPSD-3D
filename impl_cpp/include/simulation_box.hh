@@ -43,6 +43,7 @@ private:
     double r_max;
     double r_max_squared;
     int    *nx;
+    int    *nx_alt;
     double xlo;
     double xhi;
     double ylo;
@@ -54,7 +55,11 @@ private:
     int    *L_eff;
     double *delta_x;
     double *inv_deltax;
-    int    *position_in_grid;    
+    int    *position_in_grid;   
+    int    *L_eff_alt;
+    double *delta_x_alt;
+    double *inv_deltax_alt;
+    int    *position_in_grid_alt;   
     double periodic_distance_sq;
     double x_periodic;
     double y_periodic;
@@ -290,7 +295,7 @@ simulation_box::simulation_box(int argc, char *argv[])
     voro_time *= 1e-9; 
 
     all_particles.resize(num_particles);
-    voro::voronoicell c;
+    voro::voronoicell_neighbor c;
     std::vector<int> neigh,f_vert;
     std::vector<double> v;
 
@@ -314,6 +319,7 @@ simulation_box::simulation_box(int argc, char *argv[])
     std::vector<coords> temp_face_vertex_coords;
     int v_idx;
     std::vector<double> face_normals;
+    std::vector<int> neighs;
     coords temp_r_max;
 
     r_max = 0.;
@@ -334,6 +340,9 @@ simulation_box::simulation_box(int argc, char *argv[])
         //c.vertices(temp_x, temp_y, temp_z, v);
         c.vertices(v);
         c.normals(face_normals);
+        c.neighbors(neighs);
+
+        //std::cout<<"size = "<<neighs.size()<<"\t"<<face_normals.size()/3<<std::endl;
 
         all_vertices.clear();
         num_vertices = v.size()/3;
@@ -357,7 +366,9 @@ simulation_box::simulation_box(int argc, char *argv[])
                 temp_face_vertex_coords.push_back(all_vertices[v_idx]);
             }
 
-            temp_particle.set_voronoi_faces(temp_face_vertex_coords, face_normals[3*f_count], face_normals[3*f_count+1], face_normals[3*f_count+2]);
+            if (id > neighs[f_count])
+                temp_particle.set_voronoi_faces(temp_face_vertex_coords, face_normals[3*f_count], face_normals[3*f_count+1], face_normals[3*f_count+2]);
+
             f_sum   += 1;
             f_count += 1;
         }
@@ -380,7 +391,17 @@ simulation_box::simulation_box(int argc, char *argv[])
     triangle_time *= 1e-9;     
 
 
-    r_max      = 2. * std::sqrt(r_max);
+    r_max      = std::sqrt(r_max);
+
+    double max_edge_length = 0.;
+    double temp_edge_max   = 0.;
+
+    for (int i = 0; i < num_particles; i++){
+        temp_edge_max = all_particles[i].get_longest_face_edge();
+        max_edge_length = (max_edge_length * (max_edge_length > temp_edge_max)) + (temp_edge_max * (temp_edge_max > max_edge_length));
+    }
+
+    r_max = r_max + std::sqrt(max_edge_length);
 
     L = (double*)malloc(sizeof(double) * dim);
     L[0] = xhi - xlo;
@@ -457,6 +478,35 @@ simulation_box::simulation_box(int argc, char *argv[])
 
     }
 
+    delta_x_alt    = (double*)malloc(sizeof(double) * dim);
+    inv_deltax_alt = (double*)malloc(sizeof(double) * dim);
+    nx_alt         = (int*)malloc(sizeof(int) * dim);
+
+    for (int axis = 0; axis < dim; axis++){
+        delta_x_alt[axis]        = r_coated;
+        inv_deltax_alt[axis]     = 1./r_coated;
+        nx_alt[axis]             = (int)(L[axis] * inv_deltax_alt[axis]);
+        delta_x_alt[axis]        = L[axis]/(1. * nx_alt[axis]);
+        inv_deltax_alt[axis]     = 1./delta_x_alt[axis];
+    }
+
+    L_eff_alt = (int*)malloc(sizeof(int)*dim);
+
+    for (int axis = 0; axis < dim; axis++)
+        L_eff_alt[axis] = 1;
+
+    for (int axis = 0; axis < dim; axis++)
+    {
+        for (int itr = axis+1; itr < dim; itr++)
+            L_eff_alt[axis] *= nx_alt[itr];
+    }
+
+    int L_total_alt = 1;
+
+    for (int axis = 0; axis < dim; axis++)
+        L_total_alt *= nx_alt[axis];
+
+
     free(neigh_position_in_grid);
     
 }
@@ -516,7 +566,7 @@ void simulation_box::calculate_gpsd()
 
     while (total_shots < num_shots){ 
 
-        std::cout<<"shots = "<<total_shots<<std::endl;
+        //std::cout<<"shots = "<<total_shots<<std::endl;
 
         probe_centre.set_coords(xlo+L[0]*dis(generator), ylo+L[1]*dis(generator), zlo+L[2]*dis(generator));
         condition = check_probe_centre_viability();
@@ -525,7 +575,7 @@ void simulation_box::calculate_gpsd()
 
             lpes_max = 0.;
 
-            for (int i = 0; i < num_particles; i++){
+            /*for (int i = 0; i < num_particles; i++){
 
                 probe_centre_image = get_probe_centre_image(probe_centre, all_particles[i].position);
                 particle_max = all_particles[i].return_max_lpes_radius(probe_centre_image, rs, lpes_c, sol_type, lpes_max);
@@ -534,7 +584,18 @@ void simulation_box::calculate_gpsd()
                     lpes_max = particle_max;
                 }
 
-            }
+            }*/
+
+            for (int i = 0; i < temp_neighbour_list.size(); i++){
+
+                probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list[i]].position);
+                particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c, sol_type, lpes_max);
+
+                if (particle_max > lpes_max){
+                    lpes_max = particle_max;
+                }
+
+            }            
 
             if (more_b)
                 fprintf(f, "%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", num_count, probe_centre.x, probe_centre.y, probe_centre.z, lpes_c.x, lpes_c.y, lpes_c.z, lpes_max);

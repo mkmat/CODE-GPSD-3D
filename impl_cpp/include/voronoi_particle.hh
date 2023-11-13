@@ -20,6 +20,7 @@ public:
     coords rel_position;
     double return_max_lpes_radius(coords p, double rs, coords &lpes_c, std::string &sol_type, double current_box_max);
     void print_normal();
+    double get_longest_face_edge();
 
 private:
     std::vector<voronoi_faces> all_faces;
@@ -86,6 +87,20 @@ void voronoi_particle::print_normal()
 {
     for (int i = 0; i < num_faces; i++)
         all_faces[i].print_n_coords();
+}
+
+double voronoi_particle::get_longest_face_edge()
+{
+    double particle_edge_max = 0.;
+    double temp_face_max = 0.;
+
+    for (int i = 0; i < num_faces; i++){
+        temp_face_max = all_faces[i].get_longest_triangle_edge();
+        particle_edge_max = (particle_edge_max * (particle_edge_max > temp_face_max)) + (temp_face_max * (temp_face_max > particle_edge_max)); 
+    }
+
+    return particle_edge_max;
+
 }
 
 

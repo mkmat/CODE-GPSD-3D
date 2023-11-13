@@ -244,13 +244,13 @@ double triangle::get_longest_edge()
     double temp_distance;
 
     temp_distance = vA.return_distance_sq(vB);
-    edge_max      = edge_max * (edge_max > temp_distance) + temp_distance * (temp_distance > edge_max);
+    edge_max      = (edge_max * (edge_max > temp_distance)) + (temp_distance * (temp_distance > edge_max));
 
     temp_distance = vB.return_distance_sq(vC);
-    edge_max      = edge_max * (edge_max > temp_distance) + temp_distance * (temp_distance > edge_max);
+    edge_max      = (edge_max * (edge_max > temp_distance)) + (temp_distance * (temp_distance > edge_max));
 
     temp_distance = vC.return_distance_sq(vA);
-    edge_max      = edge_max * (edge_max > temp_distance) + temp_distance * (temp_distance > edge_max);
+    edge_max      = (edge_max * (edge_max > temp_distance)) + (temp_distance * (temp_distance > edge_max));
 
     return edge_max;
 
