@@ -23,6 +23,8 @@ public:
     void test_setup(int n);
     int  return_position_in_grid(int *pos); 
     void get_position_in_grid(coords cx);
+    int  return_position_in_grid_alt(int *pos);
+    void get_position_in_grid_alt(coords cx);
     void calculate_gpsd();
     void print_info_file();
     void print_info_numbers_file();     
@@ -36,6 +38,7 @@ private:
     double rp;
     double rs;
     double r_coated;
+    double r_coated_sq;
     const int dim = 3;
     int    num_shots;
     int    num_count = 0;  
@@ -87,10 +90,12 @@ private:
     std::vector<coords> all_coords;
     std::vector<int> neighbour_ids;
     std::vector<std::vector<int>> grid;
+    std::vector<std::vector<int>> grid_alt;
     std::vector<int> neighbour_list;
     std::mt19937 generator;
     std::uniform_real_distribution<double> dis;
-    std::vector<int> temp_neighbour_list; 
+    std::vector<int> temp_neighbour_list;
+    std::vector<int> temp_neighbour_list_alt;
 
 
     std::string out_filename;
@@ -253,8 +258,9 @@ simulation_box::simulation_box(int argc, char *argv[])
         }; 
     };
 
-    rs = ro + rc + rp;
-    r_coated = ro + rc;
+    rs          = ro + rc + rp;
+    r_coated    = ro + rc;
+    r_coated_sq = r_coated * r_coated; 
 
     if (!outfilename_b)
         out_filename = "results.gpsd";
@@ -415,7 +421,7 @@ simulation_box::simulation_box(int argc, char *argv[])
 
     delta_x    = (double*)malloc(sizeof(double) * dim);
     inv_deltax = (double*)malloc(sizeof(double) * dim);
-    nx         = (int*)malloc(sizeof(int) * dim);
+    nx         = (int*)malloc(sizeof(int) * dim); 
 
     for (int axis = 0; axis < dim; axis++){
         delta_x[axis]    = r_max;
@@ -475,12 +481,12 @@ simulation_box::simulation_box(int argc, char *argv[])
             }
         }
 
-
     }
 
-    delta_x_alt    = (double*)malloc(sizeof(double) * dim);
-    inv_deltax_alt = (double*)malloc(sizeof(double) * dim);
-    nx_alt         = (int*)malloc(sizeof(int) * dim);
+    delta_x_alt          = (double*)malloc(sizeof(double) * dim);
+    inv_deltax_alt       = (double*)malloc(sizeof(double) * dim);
+    nx_alt               = (int*)malloc(sizeof(int) * dim);
+    position_in_grid_alt = (int*)malloc(sizeof(int) * dim);
 
     for (int axis = 0; axis < dim; axis++){
         delta_x_alt[axis]        = r_coated;
@@ -505,6 +511,34 @@ simulation_box::simulation_box(int argc, char *argv[])
 
     for (int axis = 0; axis < dim; axis++)
         L_total_alt *= nx_alt[axis];
+
+    grid_alt.resize(L_total_alt);
+
+    for (int i = 0; i < num_particles; i++){
+
+        cx = all_particles[i].position;
+        get_position_in_grid_alt(cx);
+
+        for (int ii = -1; ii <= 1; ii++){
+            for (int jj = -1; jj <= 1; jj++){
+                for (int kk = -1; kk <= 1; kk++){
+
+                    neigh_position_in_grid[0] = position_in_grid_alt[0] + ii;
+                    neigh_position_in_grid[1] = position_in_grid_alt[1] + jj;
+                    neigh_position_in_grid[2] = position_in_grid_alt[2] + kk;
+
+                    for (int axis = 0; axis < dim; axis++){
+                        temp_index = neigh_position_in_grid[axis];
+                        neigh_position_in_grid[axis] += nx_alt[axis] * ((temp_index < 0) - (temp_index >= nx_alt[axis]));
+                    } 
+
+                    grid_alt[return_position_in_grid_alt(neigh_position_in_grid)].push_back(i);
+
+                }
+            }
+        }
+
+    }    
 
 
     free(neigh_position_in_grid);
@@ -540,6 +574,23 @@ void simulation_box::get_position_in_grid(coords cx)
     position_in_grid[0] = (int)((cx.x-xlo) * inv_deltax[0]);
     position_in_grid[1] = (int)((cx.y-ylo) * inv_deltax[1]);
     position_in_grid[2] = (int)((cx.z-zlo) * inv_deltax[2]);
+}
+
+int simulation_box::return_position_in_grid_alt(int *pos)
+{
+    int counter = 0;
+
+    for (int axis = 0; axis < dim; axis++)
+        counter += pos[axis] * L_eff_alt[axis];
+
+    return counter;
+}
+
+void simulation_box::get_position_in_grid_alt(coords cx)
+{
+    position_in_grid_alt[0] = (int)((cx.x-xlo) * inv_deltax_alt[0]);
+    position_in_grid_alt[1] = (int)((cx.y-ylo) * inv_deltax_alt[1]);
+    position_in_grid_alt[2] = (int)((cx.z-zlo) * inv_deltax_alt[2]);    
 }
 
 void simulation_box::calculate_gpsd()
@@ -718,15 +769,20 @@ void simulation_box::print_info_numbers_file()
 
 bool simulation_box::check_probe_centre_viability()
 {
-    temp_neighbour_list.clear();
-    get_position_in_grid(probe_centre);
-    temp_neighbour_list = grid[return_position_in_grid(position_in_grid)];
 
-    for (int i = 0; i < temp_neighbour_list.size(); i++){
-        probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list[i]].position);
-        if (probe_centre_image.return_norm() <= r_coated)
+    temp_neighbour_list_alt.clear();
+    get_position_in_grid_alt(probe_centre);
+    temp_neighbour_list_alt = grid_alt[return_position_in_grid_alt(position_in_grid_alt)];
+
+    for (int i = 0; i < temp_neighbour_list_alt.size(); i++){
+        probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list_alt[i]].position);
+        if (probe_centre_image.return_norm_sq() <= r_coated_sq)
             return false;
     }
+
+    temp_neighbour_list.clear();
+    get_position_in_grid(probe_centre);
+    temp_neighbour_list = grid[return_position_in_grid(position_in_grid)];    
 
     return true;
 }
