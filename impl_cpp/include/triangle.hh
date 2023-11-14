@@ -11,12 +11,12 @@ public:
 
     void set_vertices(std::vector<coords> vertices);
     void print_triangle();
-    void get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p, coords &lpes_c, coords mp, coords n_f, coords n_p, coords n_q,
-     std::string &sol_type, double current_face_r_max);
-    void transform_all_coordinates(coords p, coords mp, coords n_f, coords n_p, coords n_q);
+    inline void get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p, coords &lpes_c, coords mp, coords n_f, coords n_p, coords n_q,
+                            std::string &sol_type, double &current_face_r_max);
+    inline void transform_all_coordinates(coords p, coords mp, coords n_f, coords n_p, coords n_q);
     coords transform_one_coordinate(coords cx, coords n_f, coords n_p, coords n_q);
-    double return_max_distance_for_triangle(coords p, coords vx, double rs, coords &lpes_c, coords mp, coords n_f, coords n_p, coords n_q,
-     std::string &sol_type, double current_face_r_max);
+    inline void return_max_distance_for_triangle(coords p, coords vx, double rs, coords &lpes_c, coords mp, coords n_f, coords n_p, coords n_q,
+                                            std::string &sol_type, double &current_face_r_max);
     coords get_original_coords(coords cx, coords mp, coords n_f, coords n_p, coords n_q);
     double get_longest_edge(); 
     
@@ -74,20 +74,25 @@ void triangle::print_triangle()
     vC.print_coords();
 }
 
-void triangle::get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p, coords &lpes_c, coords mp, coords n_f, coords n_p, coords n_q,
- std::string &sol_type, double current_face_r_max)
+inline void triangle::get_candidate_rmax(coords p, coords vx, double rs, coords candidate_p, coords &lpes_c, coords mp, coords n_f, coords n_p, coords n_q,
+ std::string &sol_type, double &current_face_r_max)
 {
     R1 = vx.return_distance(candidate_p)-rs;
     R2 = p.return_distance(candidate_p);
     //condition = 1.*(R1 > r_max)*(R1 >= R2);
     //r_max  = R1*condition + r_max*(1. - condition);
     
-    if ((R1 >= R2) && (R1 > current_face_r_max)){
+    /*if ((R1 >= R2) && (R1 > current_face_r_max)){
         r_max  = R1;
         lpes_c = 1.* candidate_p;
         sol_type = "vertex";
-    }
+    }*/
     //std::cout<<"R1 = "<<R1<<"\t R2 = "<<R2<<"\t condition = "<<condition<<std::endl;
+
+    condition = 1. * (R1 >= R2) * (R1 > current_face_r_max);
+
+    current_face_r_max += (R1-current_face_r_max) * condition;
+    lpes_c              = (condition * candidate_p) + ((1.-condition) * lpes_c);
 }
 
 coords triangle::get_original_coords(coords cx, coords mp, coords n_f, coords n_p, coords n_q)
@@ -95,16 +100,16 @@ coords triangle::get_original_coords(coords cx, coords mp, coords n_f, coords n_
     return (mp + ((cx.x*n_f) + (cx.y*n_p) + (cx.z*n_q)));
 }
 
-double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs, coords &lpes_c, coords mp, coords n_f,
- coords n_p, coords n_q, std::string &sol_type, double current_face_r_max)
+inline void triangle::return_max_distance_for_triangle(coords p, coords vx, double rs, coords &lpes_c, coords mp, coords n_f,
+ coords n_p, coords n_q, std::string &sol_type, double &current_face_r_max)
 {
-    r_max = current_face_r_max;
+    //r_max = current_face_r_max;
 
     get_candidate_rmax(p, vx, rs, vA, lpes_c, mp, n_f, n_q, n_q, sol_type, current_face_r_max);
     get_candidate_rmax(p, vx, rs, vB, lpes_c, mp, n_f, n_q, n_q, sol_type, current_face_r_max);
     get_candidate_rmax(p, vx, rs, vC, lpes_c, mp, n_f, n_q, n_q, sol_type, current_face_r_max);
 
-    current_face_r_max = r_max;
+    //current_face_r_max = r_max;
 
     inv_C = 1./vC_modified.z; 
 
@@ -133,12 +138,17 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             R1 = X_modified.return_distance(analytical_r_max)-rs;
             R2 = P_modified.return_distance(analytical_r_max);
             
-            if (R1 > current_face_r_max){
+            /*if (R1 > current_face_r_max){
                 r_max  = R1;
                 current_face_r_max = r_max;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
                 sol_type = "interior_minus";
-            }
+            }*/
+
+            condition           = 1. * (R1 > current_face_r_max);
+            current_face_r_max += (condition * (R1 - current_face_r_max));
+            lpes_c              = (condition * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q)) + ((1. - condition) * lpes_c);
+
         }
 
         t_plus = (numerator + discriminant)*denominator;
@@ -149,12 +159,17 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             R1 = X_modified.return_distance(analytical_r_max)-rs;
             R2 = P_modified.return_distance(analytical_r_max);
 
-            if (R1 > current_face_r_max){
+            /*if (R1 > current_face_r_max){
                 r_max = R1;
                 current_face_r_max = r_max;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
                 sol_type = "interior_plus";
-            }
+            }*/
+
+            condition           = 1. * (R1 > current_face_r_max);
+            current_face_r_max += (condition * (R1 - current_face_r_max));
+            lpes_c              = (condition * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q)) + ((1. - condition) * lpes_c);
+
         }
     }
 
@@ -180,12 +195,17 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             R1 = X_modified.return_distance(analytical_r_max)-rs;
             R2 = P_modified.return_distance(analytical_r_max);
             
-            if ((R1 > current_face_r_max)){
+            /*if ((R1 > current_face_r_max)){
                 r_max = R1;
                 current_face_r_max = r_max;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
                 sol_type = "edge_minus";
-            }
+            }*/
+
+            condition           = 1. * (R1 > current_face_r_max);
+            current_face_r_max += (condition * (R1 - current_face_r_max));
+            lpes_c              = (condition * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q)) + ((1. - condition) * lpes_c);
+
         }
 
         t_plus = (numerator + discriminant)*denominator;
@@ -196,17 +216,21 @@ double triangle::return_max_distance_for_triangle(coords p, coords vx, double rs
             R1 = X_modified.return_distance(analytical_r_max)-rs;
             R2 = P_modified.return_distance(analytical_r_max);
 
-            if ((R1 > current_face_r_max)){
+            /*if ((R1 > current_face_r_max)){
                 r_max = R1;
                 current_face_r_max = r_max;
                 lpes_c = 1. * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q);
                 sol_type = "edge_plus";
-            }
+            }*/
+
+            condition           = 1. * (R1 > current_face_r_max);
+            current_face_r_max += (condition * (R1 - current_face_r_max));
+            lpes_c              = (condition * get_original_coords(analytical_r_max, mp, n_f, n_p, n_q)) + ((1. - condition) * lpes_c);            
 
         }
     }
 
-    return r_max;
+    //return r_max;
 
 
 }
@@ -216,7 +240,7 @@ coords triangle::transform_one_coordinate(coords cx, coords n_f, coords n_p, coo
     return coords(cx*n_f, cx*n_p, cx*n_q);
 }
 
-void triangle::transform_all_coordinates(coords p, coords mp, coords n_f, coords n_p, coords n_q)
+inline void triangle::transform_all_coordinates(coords p, coords mp, coords n_f, coords n_p, coords n_q)
 {
     vA_modified    = transform_one_coordinate(vA, n_f, n_p, n_q);
     vB_modified    = transform_one_coordinate(vB, n_f, n_p, n_q);

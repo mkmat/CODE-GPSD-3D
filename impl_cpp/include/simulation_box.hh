@@ -598,11 +598,6 @@ void simulation_box::calculate_gpsd()
     bool condition;
     double particle_max;
     double lpes_max;
-    FILE *f;
-    f = fopen(out_filename.c_str(), "w");
-
-    if (more_b)
-        fprintf(f, "id,px,py,pz,cx,cy,cz,r\n");
 
     std::string sol_type;
 
@@ -611,8 +606,10 @@ void simulation_box::calculate_gpsd()
     pore_std     = 0.;
     abs_lpes_max = 0.;
     abs_lpes_min = L[0]*L[0]+L[1]*L[1]+L[2]*L[2];
-
     start = std::chrono::high_resolution_clock::now();
+    
+    double temp_lpes_max;
+    std::string to_print_to_file = "";
 
 
     while (total_shots < num_shots){ 
@@ -624,7 +621,9 @@ void simulation_box::calculate_gpsd()
 
         if(condition){
 
-            lpes_max = 0.;
+            lpes_max      = 0.;
+            temp_lpes_max = 0.;
+            lpes_c.set_coords(0.,0.,0.);
 
             /*for (int i = 0; i < num_particles; i++){
 
@@ -640,18 +639,29 @@ void simulation_box::calculate_gpsd()
             for (int i = 0; i < temp_neighbour_list.size(); i++){
 
                 probe_centre_image = get_probe_centre_image(probe_centre, all_particles[temp_neighbour_list[i]].position);
-                particle_max = all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c, sol_type, lpes_max);
+                all_particles[temp_neighbour_list[i]].return_max_lpes_radius(probe_centre_image, rs, lpes_c, sol_type, lpes_max);
 
-                if (particle_max > lpes_max){
+                /*if (particle_max > lpes_max){
                     lpes_max = particle_max;
+                }*/
+
+                if (lpes_max > temp_lpes_max){
+                    temp_lpes_max = lpes_max;
+                    lpes_c        = lpes_c+all_particles[temp_neighbour_list[i]].position;
                 }
 
-            }            
+            }
 
-            if (more_b)
+            /*if (more_b)
                 fprintf(f, "%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", num_count, probe_centre.x, probe_centre.y, probe_centre.z, lpes_c.x, lpes_c.y, lpes_c.z, lpes_max);
             else
-                fprintf(f, "%lf\n", lpes_max); 
+                fprintf(f, "%lf\n", lpes_max); */
+
+            if (more_b)
+                to_print_to_file += std::to_string(num_count) + "," + std::to_string(probe_centre.x) + "," + std::to_string(probe_centre.y) + "," + std::to_string(probe_centre.z)
+                + "," + std::to_string(lpes_c.x) + "," + std::to_string(lpes_c.y) + "," + std::to_string(lpes_c.z) + "," + std::to_string(lpes_max) + "\n";
+            else
+                to_print_to_file += std::to_string(lpes_max) + "\n";
 
             num_count++;
             pore_mean += lpes_max;
@@ -666,7 +676,21 @@ void simulation_box::calculate_gpsd()
 
     }
 
-    fclose(f);
+    /*FILE *f;
+    f = fopen(out_filename.c_str(), "w");
+
+    if (more_b)
+        fprintf(f, "id,px,py,pz,cx,cy,cz,r\n");
+
+    fprintf(f, to_print_to_file);
+
+    fclose(f);*/
+
+    std::ofstream f;
+    f.open(out_filename);
+    f << "id,px,py,pz,cx,cy,cz,r\n";
+    f << to_print_to_file;
+    f.close();
 
     end      = std::chrono::high_resolution_clock::now();
     mc_time  = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
