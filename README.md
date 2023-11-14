@@ -240,7 +240,7 @@ For the case of polydisperse systems, the GPSD-3D script contains two lines that
 
 Benchmark configurations are available as .benchmark-#-config and .benchmark-#-box files. 
 
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 |1 | 320 | 0.1 | 0 | 0 | 312 | 30 | 99840 | 9389 | 1.36 | 1.67 | 0 s | 0.92 s | 
 |2 | 1080 | 0.1 | 0 | 0 | 92 | 30 | 99360 | 40338 | 31.28 | 31.3 | 0.25 s | 0.73 s | 
@@ -259,12 +259,12 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 
 ## Benchmarks (c++ version)
 
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 
 ## QUICK Benchmarks (nlin version) 
 
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 |1 | 320 | 0.1 | 0 | 0 | 3 | 1 | 960 | 0 | 1.24 | 1.67 | 0 s | 2.83 s | 
 |2 | 1080 | 0.1 | 0 | 0 | 1 | 1 | 1000 | 0 | 30.85 | 31.3 | 0 s | 8.38 s | 
@@ -279,7 +279,7 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 
 ## QUICK Benchmarks (fortran90 version) 
 
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | *S* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 |1 | 320 | 0.1 | 0 | 0 | 3 | 30 | 960 | 9389 | 1.37 | 1.67 | 0 s | 0.33 s | 
 |2 | 1080 | 0.1 | 0 | 0 | 1 | 30 | 1000 | 40338 | 31.27 | 31.3 | 0.13 s | 0.52 s | 
