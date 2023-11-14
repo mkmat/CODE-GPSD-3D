@@ -19,6 +19,7 @@ public:
 
     friend std::vector<std::string> split_string_by_delimiter(const std::string& s, char delimiter);    
     simulation_box(int argc, char *argv[]);
+    ~simulation_box();
     void print_coords();
     void test_setup(int n);
     int  return_position_in_grid(int *pos); 
@@ -545,7 +546,23 @@ simulation_box::simulation_box(int argc, char *argv[])
     
 }
 
+simulation_box::~simulation_box()
+{
 
+    free(nx);
+    free(nx_alt);
+    free(L);
+    free(inv_L);
+    free(L_eff);
+    free(delta_x);
+    free(inv_deltax);
+    free(position_in_grid);   
+    free(L_eff_alt);
+    free(delta_x_alt);
+    free(inv_deltax_alt);
+    free(position_in_grid_alt);   
+
+}
 
 void simulation_box::print_coords()
 {
