@@ -705,7 +705,8 @@ void simulation_box::calculate_gpsd()
 
     std::ofstream f;
     f.open(out_filename);
-    f << "id,px,py,pz,cx,cy,cz,r\n";
+    if (more_b)
+        f << "id,px,py,pz,cx,cy,cz,r\n";
     f << to_print_to_file;
     f.close();
 
