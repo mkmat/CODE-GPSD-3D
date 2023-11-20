@@ -329,7 +329,7 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 |7 | 2000 | 0.1 | 0 | 0 | 1 | 1 | 1000 | -1 | 2.59 | 3.44 | 0 s | 19.65 s | 19650.33 &mu;s | 
 |8 | 10000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | -1 | 3.19 | 4.83 | 0 s | 39.16 s | 39160.01 &mu;s | 
 |9 | 100000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | -1 | 0.4 | 0 | 0 s | 43.04 s | 43044.3 &mu;s | 
-|10 | 200 | 0.1 | 0 | 0 | 500 | 30 | 100000 | -1 | --- | --- | --- | --- | crashed | 
+|10 | 200 | 0.1 | 0 | 0 | --- | 1 | 1000 | -1 | --- | --- | --- | --- | crashed | 
 
 ## FEW SHOTS single processor Benchmarks (nlin version) 
 
