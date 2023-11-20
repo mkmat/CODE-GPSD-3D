@@ -27,7 +27,6 @@ private:
     double particle_r_max;
     double face_r_max;
     int    num_faces;
-    double condition;
 
 };
 

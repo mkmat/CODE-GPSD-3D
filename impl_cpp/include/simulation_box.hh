@@ -254,7 +254,7 @@ simulation_box::simulation_box(int argc, char *argv[])
         };
     } else { 
         if (!xlo_b || !xhi_b || !ylo_b || !yhi_b || !zlo_b || !zhi_b) { 
-            std::cout<<"one of the necessary arguments is missing"<<std::endl;
+            std::cout<<"one of the box size arguments is missing"<<std::endl;
             exit(EXIT_FAILURE);
         }; 
     };
@@ -275,20 +275,41 @@ simulation_box::simulation_box(int argc, char *argv[])
     generator.seed(1729);
 
     while(getline(parser,str)){
-        results = split_string_by_delimiter(str, mydelimiter); 
-        temp_c.set_coords(stod(results[1]), stod(results[2]), stod(results[3]));
+        results = split_string_by_delimiter(str, mydelimiter);
+
+        if (results.size() == 4)
+            temp_c.set_coords(stod(results[1]), stod(results[2]), stod(results[3]));
+
+        else if (results.size() == 3)
+            temp_c.set_coords(stod(results[0]), stod(results[1]), stod(results[2]));
+
+        else{
+            std::cout<<"the configuration file is not in the correct format"<<std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+
         num_particles++;
         all_coords.push_back(temp_c);
     }
     parser.close();
-
     num_shots = q * num_particles; 
 
-    //std::cout<<"putting particles in voro++"<<std::endl;
+    L = (double*)malloc(sizeof(double) * dim);
+    L[0] = xhi - xlo;
+    L[1] = yhi - ylo;
+    L[2] = zhi - zlo;    
 
     start = std::chrono::high_resolution_clock::now();
 
-    voro::container con(xlo,xhi,ylo,yhi,zlo,zhi,10,10,10,true,true,true,(2*num_particles)/1000);
+    double volume = L[0] * L[1] * L[2];
+    double g      = std::pow((1.* volume)/(1. * num_particles), 0.333);
+
+    int voro_x    = (L[0]/g) + 1;
+    int voro_y    = (L[1]/g) + 1;
+    int voro_z    = (L[2]/g) + 1;
+
+    voro::container con(xlo,xhi,ylo,yhi,zlo,zhi,voro_x,voro_y,voro_z,true,true,true,num_particles);
 
     for (int i = 0; i < num_particles; i++){
         con.put(i, all_coords[i].x, all_coords[i].y, all_coords[i].z);
@@ -409,11 +430,6 @@ simulation_box::simulation_box(int argc, char *argv[])
     }
 
     r_max = r_max + std::sqrt(max_edge_length);
-
-    L = (double*)malloc(sizeof(double) * dim);
-    L[0] = xhi - xlo;
-    L[1] = yhi - ylo;
-    L[2] = zhi - zlo;
 
     inv_L = (double*)malloc(sizeof(double) * dim);
 
