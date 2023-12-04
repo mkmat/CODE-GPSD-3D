@@ -32,7 +32,7 @@ and a new file GPSD-3D (a perl script). Ideally, it finishes with saying
     Copy GPSD-3D (just this single file) to a directory where you'll need it or where it can be found.
     Then call (i) GPSD-3D or (ii) ./GPSD-3D or (iii) perl GPSD-3D to start GPSD-3D (includes documentation)
 
-But, if you have voro++ not yet installed, or no fortran compiler, you will end up with an error message that provides you with a download link. In this case you need to do the installation, and call the installation script INSTALL.pl again. 
+But, if you have voro++ not yet installed, or no fortran compiler, you will end up with an error message that provides you with a download link. In this case you need to do the installation, and call the installation script INSTALL.pl again. Furthermore, if you'd like to have GPSD-3D offering the -nlin option, the INSTALL.pl will ask you to install NLopt. You may choose to install GPSD-3D without the -nlin option. 
 
 ## Configuration and box file formats <a name=format>
 
