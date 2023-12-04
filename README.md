@@ -107,7 +107,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-c++** enforce using the c++ version (default: voronoi fortran version)
 
-**-nlin** enforce using the constrained nonlinear optimization
+**-nlin** enforce using the constrained nonlinear optimization [if installed]
 
 **-kmpr=..** specify, if known, the maximum pore radius to speed up the -nlin algorithm
 
