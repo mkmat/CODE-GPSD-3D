@@ -127,7 +127,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 4. Each GPSD-3D call runs in a unique temporary directory, upon successful completion the temporary directory is removed.
 5. The maximum number of threads used by OpenMP is reported during the installation and also if GPSD-3D is called without arguments. For very large systems with, say, more than 1000000 spheres, running at the maximum number of threats must not be an advantage and you should check the speed also using a single processor, using -np=1
 6. Negative values *r<sub>p</sub>* and *r<sub>c</sub>* are allowed as long as *r<sub>p</sub>*+*r<sub>c</sub>*+*r<sub>o</sub>* is positive. A [negative coating thickness](#about) effectively reduces the material sphere radius.
-
+7. Windows-users: Your perl may not accept arguments on the command line. If so, see [windows-user](#windows)
 
 ## Output
 
@@ -341,7 +341,15 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 | no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 
-## About <a name="about">
+## Windows-users<a name="windows"></a>
+
+To our surprize, we successfully installed voro++ and GPSD-3D under windows 10 using /mingw64/bin/gfortran and /mingw64/bin/g++. You need to have perl installed. After successful installation, we were faced with the problem that our perl under windows did not accept command line arguments. To circumvent this problem, add the full GPSD-3D command to a file, say, windows.pl and execute this file from the command line via: 
+
+        perl ./windows.pl
+
+An example windows.pl file comes with the GPSD-3D distribution. 
+
+## About <a name="about"></a>
 
 Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
 
