@@ -143,7 +143,7 @@ This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub
 
         px py pz cx cy cz r
 
-where *px*,*py*,*pz* are the coordinates of the shot into the void space that gave rise to the center coordinates *cx*, *cy*, *cz* of the pore of radius *r*.
+where *px*,*py*,*pz* are the coordinates of the shot into the void space that gave rise to the center coordinates *cx*, *cy*, *cz* of the pore with radius *r*.
 
 ## Test configurations and test runs
 
