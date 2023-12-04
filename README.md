@@ -55,11 +55,25 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-rp=<value>] 
           [-rc=<value>] 
           [-q=<integer>] 
-          [-o=<filename>]
-          [-np=<integer>]
-          [-d=<delimiter>]
+          [-TPSD] 
+
           [-more]
           [-info]
+          [-np=<integer>]
+          [-d=<delimiter>]
+
+          [-grid]
+          [-griddelta=..]
+          [-gridmax=..]
+
+          [-c++]
+
+          [-nlin]
+          [-kmpr=..]
+          
+          [-o=<filename>]
+          [-list]
+          
           [-quiet]
           [-clean]
 
@@ -75,15 +89,31 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-q=** positive quality value (optionally). If not specified, *q=10.0* is used. The number of random shots is *q* times the number of material spheres.
 
-**-o=** name of the resulting file containing a list of pore radii. If not specified, the list is saved in a .gpsd-file.
+**-TPSD** calculate the TPSDs in addition create a *.tpsd file. 
+
+**-more**: tell the code to add, besides pore radius *r*, the corresponding probe particle center **p** and pore center coordinate **c** to the output file. This file then has 8 columns: line number, **p**, **c**, *r*
+
+**-info**: triggers storing runtime information (cpu times etc) in a separate [info](#info) file.
 
 **-np=** number of threads np to be used. If not specified, *n<sub>p</sub>* is set to the available number of threads.
 
 **-d=** delimiter (single character) present in the configuration and box-files, e.g. -d="\ " for a blank, default is -d=","
 
-**-more**: tell the code to add, besides pore radius *r*, the corresponding probe particle center **p** and pore center coordinate **c** to the output file. This file then has 8 columns: line number, **p**, **c**, *r*
+**-grid** enforce using the grid-based method
 
-**-info**: triggers storing runtime information (cpu times etc) in a separate [info](#info) file.
+**-griddelta=..** minimum grid spacing (in units of effective particle radius ro+rc) (default: 0.005)
+
+**-gridmax=..** maximum number of grid voxels (default: 1000000)
+
+**-c++** enforce using the c++ version (default: voronoi fortran version)
+
+**-nlin** enforce using the constrained nonlinear optimization
+
+**-kmpr=..** specify, if known, the maximum pore radius to speed up the -nlin algorithm
+
+**-o=** name of the resulting file containing a list of pore radii. If not specified, the list is saved in a .gpsd-file.
+
+**-list** use a list of p vectors (stored in p.txt, format: id px py pz) instead of randomly shooting
 
 **-quiet**: prevents GPSD-3D to create stdout.
 
@@ -109,84 +139,88 @@ GPSD-3D returns a list of pore radii *r* in a file, either in configfilename.gps
         0.685289
         ...
 
-This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>* can be used to effectively modify the stored particle radii, without changing the configuration file. If you call GPSD-3D with the -more option, the same file will contain four columns (no header)
+This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>* can be used to effectively modify the stored particle radii, without changing the configuration file. If you call GPSD-3D with the -more option, the same file will contain seven columns (no header)
 
-        r        x    y    z
-        0.658312 1.31 2.13 1.99
-        0.274754 2.30 1.01 4.02
-        1.070546 ...
-        0.685289 ...
-        ...
+        px py pz cx cy cz r
 
-where *x*,*y*,*z* are the center coordinates of the pore with radius *r*.
+where *px*,*py*,*pz* are the coordinates of the shot into the void space that gave rise to the center coordinates *cx*, *cy*, *cz* of the pore of radius *r*.
 
 ## Test configurations and test runs
 
 A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call, using 10 of the available threads, 20000 Monte Carlo trials (*q=10*), for a probe sphere with zero radius, and *N=2000* materials spheres of radius *r*<sub>o</sub>=1.0 is 
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -fortran
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 
 
 As we did not suppress stdout via -quiet, it should produce the following within a few seconds:
 
-       _______________________________________________________________________________________________________________________________
+      
+            _______________________________________________________________________________________________________________________________
+            
+            This is GPSD-3D version 1.0
+            written Nov 2023 by Martin Kroger, ETH Zurich, www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
+            
+            Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
+            Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
+            
+            GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
+            GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
+            _______________________________________________________________________________________________________________________________
+            
+            
+            [INFO] using configuration file .benchmark-7-config
+            [INFO] using box file .benchmark-7-box
+            [PREPARING] scanning .benchmark-7-box
+            [PREPARING] recognized format (B)
+            [INFO] monodisperse: 1
+            [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
+            [INFO] using ro=1, rc=0, rp=0
+            [INFO] created files in .tmp-GPSD-3D-733750 including .parameters.
+            [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
+            [GPSD-3D] using voronoi (fortran) algorithm[GPSD-3D] Using 20000 shots on 10 threads
+            [GPSD-3D] Please stand by ..
+            [GPSD-3D]                               reading box ..
+            [GPSD-3D]                                          box      24.0000       24.0000       24.0000
+            [VORO++]                                             N         2000
+            [VORO++]                                  max vertices           53
+            [VORO++]                                     max faces           26
+            [VORO++]                             max face-vertices           12
+            [GPSD-3D]                                    triangles        59622
+            [GPSD-3D]                      parallel processes (np)           10
+            [GPSD-3D]                         material spheres (N)         2000
+            [GPSD-3D]                              UpperPoreRadius       2.8465
+            [GPSD-3D]                                           ro       1.0000
+            [GPSD-3D]                                           rc       0.0000
+            [GPSD-3D]                                           rp       0.0000
+            [GPSD-3D]                                 reff = rc+rp       0.0000
+            [GPSD-3D]                                 rs = ro+reff       1.0000
+            [GPSD-3D]                       max triangle extension       2.8398
+            [INFO]                  note: vertices inside material
+            [GPSD-3D]                  creating T-neighbor list ..
+            [GPSD-3D]                              Tneighborlist_M            4             4             4
+            [GPSD-3D]                           Tneighborlist_size       6.0000        6.0000        6.0000
+            [GPSD-3D]                           triangles per cell     931.5938
+            [GPSD-3D]                  creating X-neighbor list ..
+            [GPSD-3D]                              Xneighborlist_M           24            24            24
+            [GPSD-3D]                           Xneighborlist_size       1.0000        1.0000        1.0000
+            [GPSD-3D]                           particles per cell       0.1447
+            [GPSD-3D]                      starting Monte Carlo ..
+            [GPSD-3D]                            volume V=V(0,-ro)   13824.0000
+            [GPSD-3D]                    volume fraction phi(reff)       0.3667
+            [GPSD-3D]                                    V(0|reff)    8754.7392
+            [GPSD-3D]                              min pore radius       0.0147
+            [GPSD-3D]                             mean pore radius       1.5456 +/     0.0033
+            [GPSD-3D]                              max pore radius       2.8465
+            [GPSD-3D]                    pore radius {r} list size        12666
+            [GPSD-3D]                    shots (use -q to enlarge)        20000
+            [GPSD-3D]       cpu+real time spent in overhead [secs]       0.0003        0.0000
+            [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.0770        0.2500
+            [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0004        0.0000
+            [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]       7.3443        0.7500
+            [GPSD-3D]         cpu+real time per 10000 shots [secs]       3.6722        0.3750
+            [GPSD-3D] completed GPSD
+            [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
-        This is GPSD-3D version 1.0 written by Martin Kroger 2023, ETH Zurich, https://www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
-
-        Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
-        Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
-
-        GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
-        GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
-        _______________________________________________________________________________________________________________________________
-
-        [INFO] using configuration file .benchmark-7-config
-        [INFO] using box file .benchmark-7-box
-        [PREPARING] scanning .benchmark-7-box
-        [PREPARING] recognized format (B)
-        [INFO] monodisperse: 1
-        [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-49303 including .parameters.
-        [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
-        [GPSD-3D] Using 20000 shots on 10 threads
-        [GPSD-3D] Please stand by ..
-        [GPSD-3D]                               reading box ..
-        [GPSD-3D]                                          box      24.0000       24.0000       24.0000
-        [VORO++]                                  max vertices           53
-        [VORO++]                                     max faces           26
-        [VORO++]                             max face-vertices           12
-        [GPSD-3D]                                    triangles        59622
-        [GPSD-3D]                      parallel processes (np)           10
-        [GPSD-3D]                         material spheres (N)         2000
-        [GPSD-3D]                              UpperPoreRadius       2.8465
-        [GPSD-3D]                                           ro       1.0000
-        [GPSD-3D]                                           rc       0.0000
-        [GPSD-3D]                                           rp       0.0000
-        [GPSD-3D]                                 reff = rc+rp       0.0000
-        [GPSD-3D]                                 rs = ro+reff       1.0000
-        [GPSD-3D]                       max triangle extension       2.8398
-        [INFO]                  note: vertices inside material
-        [GPSD-3D]                    creating neighbor list ..
-        [GPSD-3D]                               neighborlist_M            4             4             4
-        [GPSD-3D]                            neighborlist_size       6.0000        6.0000        6.0000
-        [GPSD-3D]                           triangles per cell     931.5938
-        [GPSD-3D]                      starting Monte Carlo ..
-        [GPSD-3D]                            volume V=V(0,-ro)   13824.0000
-        [GPSD-3D]                    volume fraction phi(reff)       0.3638
-        [GPSD-3D]                                    V(0|reff)    8794.8288
-        [GPSD-3D]                              min pore radius       0.0122
-        [GPSD-3D]                             mean pore radius       1.5452 +/     0.0033
-        [GPSD-3D]                              max pore radius       2.8465
-        [GPSD-3D]             created a list {r} of pore radii
-        [GPSD-3D]                    shots (use -q to enlarge)        20000
-        [GPSD-3D]       cpu+real time spent in overhead [secs]       0.0003        0.0000
-        [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.0799        0.2500
-        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0004        0.0000
-        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      14.3359        1.3750
-        [GPSD-3D]         cpu+real time per 10000 shots [secs]       7.1680        0.6875
-        [GPSD-3D] completed
-        [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
-
-and the following file (a list of roughly 20000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
+and the following file (a list of roughly 13000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
         .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
@@ -196,7 +230,7 @@ With such list of values at hand, creating the normalized histogram (the pore ra
 
 If you repeat the above command, now using the -info option
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info -fortran
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info
 
 a second file will have been generated (all entries in this file are described in brackets)
 
@@ -229,12 +263,22 @@ a second file will have been generated (all entries in this file are described i
 
 A text-free version of the .info-file is available in the .inf-file. 
 
-## Polydisperse systems: Grid-based <a name="hardcoded">
+## Polydisperse systems
 
-For the case of polydisperse systems, the GPSD-3D script contains two lines that may be edited by users to increase or reduce the resolution further. The default setting is:  
+While GPSD-3D can handle polydisperse conifigurations, we do not recommend using it, as the Voronoi-based method cannot be used directly; GPSD-3D falls back using the costrained nonlinear optimization or grid-based method. While the constrained nonlinear optimization is slow and must not produce absolutely correct results, the grid-based method is memory-consuming and slow as well. A future release of GPSD-3D will be able to handle polydisperse systems quickly. 
 
-        $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
-        $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
+### Constrained nonlinear optimization
+
+For the case of polydisperse systems, by default the GPSD-3D script employs a constrained nonlinear solver. There is one option that may be used to speed up the solver if an upper limit for the pore radius is already known
+
+        -kmpr=5.3              # USER-defined upper limit of the pore radius (here: 5.3)
+
+### Grid-based <a name="hardcoded">
+
+For the case of polydisperse systems, a grid-based solver is used if the -grid option is given. There are two options, that may be used to increase or reduce the resolution further. The default setting is:  
+
+        -griddelta=0.005       # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
+        -gridmax=1000000       # USER-defined upper limit for the number of voxels 
 
 ## Benchmarks (fortran90 version) 
 
