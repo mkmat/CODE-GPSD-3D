@@ -32,7 +32,7 @@ and a new file GPSD-3D (a perl script). Ideally, it finishes with saying
     Copy GPSD-3D (just this single file) to a directory where you'll need it or where it can be found.
     Then call (i) GPSD-3D or (ii) ./GPSD-3D or (iii) perl GPSD-3D to start GPSD-3D (includes documentation)
 
-But, if you have voro++ not yet installed, or no fortran compiler, you will end up with an error message that provides you with a download link. In this case you need to do the installation, and call the installation script INSTALL.pl again. 
+But, if you have voro++ not yet installed, or no fortran compiler, you will end up with an error message that provides you with a download link. In this case you need to do the installation, and call the installation script INSTALL.pl again. Furthermore, if you'd like to have GPSD-3D offering the -nlin option, the INSTALL.pl will ask you to install NLopt. You may choose to install GPSD-3D without the -nlin option. 
 
 ## Configuration and box file formats <a name=format>
 
@@ -55,11 +55,25 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-rp=<value>] 
           [-rc=<value>] 
           [-q=<integer>] 
-          [-o=<filename>]
-          [-np=<integer>]
-          [-d=<delimiter>]
+          [-TPSD] 
+
           [-more]
           [-info]
+          [-np=<integer>]
+          [-d=<delimiter>]
+
+          [-grid]
+          [-griddelta=..]
+          [-gridmax=..]
+
+          [-c++]
+
+          [-nlin]
+          [-kmpr=..]
+          
+          [-o=<filename>]
+          [-list]
+          
           [-quiet]
           [-clean]
 
@@ -75,15 +89,31 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-q=** positive quality value (optionally). If not specified, *q=10.0* is used. The number of random shots is *q* times the number of material spheres.
 
-**-o=** name of the resulting file containing a list of pore radii. If not specified, the list is saved in a .gpsd-file.
+**-TPSD** calculate the TPSDs in addition create a *.tpsd file. 
+
+**-more**: tell the code to add, besides pore radius *r*, the corresponding probe particle center **p** and pore center coordinate **c** to the output file. This file then has 8 columns: line number, **p**, **c**, *r*
+
+**-info**: triggers storing runtime information (cpu times etc) in a separate [info](#info) file.
 
 **-np=** number of threads np to be used. If not specified, *n<sub>p</sub>* is set to the available number of threads.
 
 **-d=** delimiter (single character) present in the configuration and box-files, e.g. -d="\ " for a blank, default is -d=","
 
-**-more**: tell the code to add, besides pore radius *r*, the corresponding probe particle center **p** and pore center coordinate **c** to the output file. This file then has 8 columns: line number, **p**, **c**, *r*
+**-grid** enforce using the grid-based method
 
-**-info**: triggers storing runtime information (cpu times etc) in a separate [info](#info) file.
+**-griddelta=..** minimum grid spacing (in units of effective particle radius ro+rc) (default: 0.005)
+
+**-gridmax=..** maximum number of grid voxels (default: 1000000)
+
+**-c++** enforce using the c++ version (default: voronoi fortran version)
+
+**-nlin** enforce using the constrained nonlinear optimization [if installed]
+
+**-kmpr=..** specify, if known, the maximum pore radius to speed up the -nlin algorithm
+
+**-o=** name of the resulting file containing a list of pore radii. If not specified, the list is saved in a .gpsd-file.
+
+**-list** use a list of p vectors (stored in p.txt, format: id px py pz) instead of randomly shooting
 
 **-quiet**: prevents GPSD-3D to create stdout.
 
@@ -97,7 +127,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 4. Each GPSD-3D call runs in a unique temporary directory, upon successful completion the temporary directory is removed.
 5. The maximum number of threads used by OpenMP is reported during the installation and also if GPSD-3D is called without arguments. For very large systems with, say, more than 1000000 spheres, running at the maximum number of threats must not be an advantage and you should check the speed also using a single processor, using -np=1
 6. Negative values *r<sub>p</sub>* and *r<sub>c</sub>* are allowed as long as *r<sub>p</sub>*+*r<sub>c</sub>*+*r<sub>o</sub>* is positive. A [negative coating thickness](#about) effectively reduces the material sphere radius.
-
+7. Windows-users: Your perl may not accept arguments on the command line. If so, see [windows-user](#windows)
 
 ## Output
 
@@ -109,84 +139,88 @@ GPSD-3D returns a list of pore radii *r* in a file, either in configfilename.gps
         0.685289
         ...
 
-This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>* can be used to effectively modify the stored particle radii, without changing the configuration file. If you call GPSD-3D with the -more option, the same file will contain four columns (no header)
+This list of *r* values (for the chosen values *r<sub>p</sub>* and *r<sub>c</sub>*) gives rise to a distribution of pore radii, so called generalized geometric pore radius distribution *P(r;r<sub>p</sub>|r<sub>c</sub>)*. The bare radius of the particles *r<sub>o</sub>* is usually not mentioned here, as it belongs to the system. For monodisperse systems only the sum or *r<sub>o</sub>+r<sub>c</sub>* matters. For polydisperse systems each spherical particle has its own radius according to the configuration file, and *r<sub>c</sub>* can be used to effectively modify the stored particle radii, without changing the configuration file. If you call GPSD-3D with the -more option, the same file will contain seven columns (no header)
 
-        r        x    y    z
-        0.658312 1.31 2.13 1.99
-        0.274754 2.30 1.01 4.02
-        1.070546 ...
-        0.685289 ...
-        ...
+        px py pz cx cy cz r
 
-where *x*,*y*,*z* are the center coordinates of the pore with radius *r*.
+where *px*,*py*,*pz* are the coordinates of the shot into the void space that gave rise to the center coordinates *cx*, *cy*, *cz* of the pore with radius *r*.
 
 ## Test configurations and test runs
 
 A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call, using 10 of the available threads, 20000 Monte Carlo trials (*q=10*), for a probe sphere with zero radius, and *N=2000* materials spheres of radius *r*<sub>o</sub>=1.0 is 
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -fortran
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 
 
 As we did not suppress stdout via -quiet, it should produce the following within a few seconds:
 
-       _______________________________________________________________________________________________________________________________
+      
+            _______________________________________________________________________________________________________________________________
+            
+            This is GPSD-3D version 1.0
+            written Nov 2023 by Martin Kroger, ETH Zurich, www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
+            
+            Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
+            Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
+            
+            GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
+            GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
+            _______________________________________________________________________________________________________________________________
+            
+            
+            [INFO] using configuration file .benchmark-7-config
+            [INFO] using box file .benchmark-7-box
+            [PREPARING] scanning .benchmark-7-box
+            [PREPARING] recognized format (B)
+            [INFO] monodisperse: 1
+            [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
+            [INFO] using ro=1, rc=0, rp=0
+            [INFO] created files in .tmp-GPSD-3D-733750 including .parameters.
+            [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
+            [GPSD-3D] using voronoi (fortran) algorithm[GPSD-3D] Using 20000 shots on 10 threads
+            [GPSD-3D] Please stand by ..
+            [GPSD-3D]                               reading box ..
+            [GPSD-3D]                                          box      24.0000       24.0000       24.0000
+            [VORO++]                                             N         2000
+            [VORO++]                                  max vertices           53
+            [VORO++]                                     max faces           26
+            [VORO++]                             max face-vertices           12
+            [GPSD-3D]                                    triangles        59622
+            [GPSD-3D]                      parallel processes (np)           10
+            [GPSD-3D]                         material spheres (N)         2000
+            [GPSD-3D]                              UpperPoreRadius       2.8465
+            [GPSD-3D]                                           ro       1.0000
+            [GPSD-3D]                                           rc       0.0000
+            [GPSD-3D]                                           rp       0.0000
+            [GPSD-3D]                                 reff = rc+rp       0.0000
+            [GPSD-3D]                                 rs = ro+reff       1.0000
+            [GPSD-3D]                       max triangle extension       2.8398
+            [INFO]                  note: vertices inside material
+            [GPSD-3D]                  creating T-neighbor list ..
+            [GPSD-3D]                              Tneighborlist_M            4             4             4
+            [GPSD-3D]                           Tneighborlist_size       6.0000        6.0000        6.0000
+            [GPSD-3D]                           triangles per cell     931.5938
+            [GPSD-3D]                  creating X-neighbor list ..
+            [GPSD-3D]                              Xneighborlist_M           24            24            24
+            [GPSD-3D]                           Xneighborlist_size       1.0000        1.0000        1.0000
+            [GPSD-3D]                           particles per cell       0.1447
+            [GPSD-3D]                      starting Monte Carlo ..
+            [GPSD-3D]                            volume V=V(0,-ro)   13824.0000
+            [GPSD-3D]                    volume fraction phi(reff)       0.3667
+            [GPSD-3D]                                    V(0|reff)    8754.7392
+            [GPSD-3D]                              min pore radius       0.0147
+            [GPSD-3D]                             mean pore radius       1.5456 +/     0.0033
+            [GPSD-3D]                              max pore radius       2.8465
+            [GPSD-3D]                    pore radius {r} list size        12666
+            [GPSD-3D]                    shots (use -q to enlarge)        20000
+            [GPSD-3D]       cpu+real time spent in overhead [secs]       0.0003        0.0000
+            [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.0770        0.2500
+            [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0004        0.0000
+            [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]       7.3443        0.7500
+            [GPSD-3D]         cpu+real time per 10000 shots [secs]       3.6722        0.3750
+            [GPSD-3D] completed GPSD
+            [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
-        This is GPSD-3D version 1.0 written by Martin Kroger 2023, ETH Zurich, https://www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
-
-        Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
-        Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
-
-        GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
-        GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
-        _______________________________________________________________________________________________________________________________
-
-        [INFO] using configuration file .benchmark-7-config
-        [INFO] using box file .benchmark-7-box
-        [PREPARING] scanning .benchmark-7-box
-        [PREPARING] recognized format (B)
-        [INFO] monodisperse: 1
-        [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
-        [INFO] created files in .tmp-GPSD-3D-49303 including .parameters.
-        [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
-        [GPSD-3D] Using 20000 shots on 10 threads
-        [GPSD-3D] Please stand by ..
-        [GPSD-3D]                               reading box ..
-        [GPSD-3D]                                          box      24.0000       24.0000       24.0000
-        [VORO++]                                  max vertices           53
-        [VORO++]                                     max faces           26
-        [VORO++]                             max face-vertices           12
-        [GPSD-3D]                                    triangles        59622
-        [GPSD-3D]                      parallel processes (np)           10
-        [GPSD-3D]                         material spheres (N)         2000
-        [GPSD-3D]                              UpperPoreRadius       2.8465
-        [GPSD-3D]                                           ro       1.0000
-        [GPSD-3D]                                           rc       0.0000
-        [GPSD-3D]                                           rp       0.0000
-        [GPSD-3D]                                 reff = rc+rp       0.0000
-        [GPSD-3D]                                 rs = ro+reff       1.0000
-        [GPSD-3D]                       max triangle extension       2.8398
-        [INFO]                  note: vertices inside material
-        [GPSD-3D]                    creating neighbor list ..
-        [GPSD-3D]                               neighborlist_M            4             4             4
-        [GPSD-3D]                            neighborlist_size       6.0000        6.0000        6.0000
-        [GPSD-3D]                           triangles per cell     931.5938
-        [GPSD-3D]                      starting Monte Carlo ..
-        [GPSD-3D]                            volume V=V(0,-ro)   13824.0000
-        [GPSD-3D]                    volume fraction phi(reff)       0.3638
-        [GPSD-3D]                                    V(0|reff)    8794.8288
-        [GPSD-3D]                              min pore radius       0.0122
-        [GPSD-3D]                             mean pore radius       1.5452 +/     0.0033
-        [GPSD-3D]                              max pore radius       2.8465
-        [GPSD-3D]             created a list {r} of pore radii
-        [GPSD-3D]                    shots (use -q to enlarge)        20000
-        [GPSD-3D]       cpu+real time spent in overhead [secs]       0.0003        0.0000
-        [GPSD-3D]      cpu+real time spent in read_voro [secs]       0.0799        0.2500
-        [GPSD-3D]cpu+real time spent in setup_triangles [secs]       0.0004        0.0000
-        [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]      14.3359        1.3750
-        [GPSD-3D]         cpu+real time per 10000 shots [secs]       7.1680        0.6875
-        [GPSD-3D] completed
-        [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
-
-and the following file (a list of roughly 20000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
+and the following file (a list of roughly 13000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
         .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
@@ -196,7 +230,7 @@ With such list of values at hand, creating the normalized histogram (the pore ra
 
 If you repeat the above command, now using the -info option
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info -fortran
+        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info
 
 a second file will have been generated (all entries in this file are described in brackets)
 
@@ -229,124 +263,93 @@ a second file will have been generated (all entries in this file are described i
 
 A text-free version of the .info-file is available in the .inf-file. 
 
-## Polydisperse systems: Grid-based <a name="hardcoded">
+## Polydisperse systems
 
-For the case of polydisperse systems, the GPSD-3D script contains two lines that may be edited by users to increase or reduce the resolution further. The default setting is:  
+While GPSD-3D can handle polydisperse conifigurations, we do not recommend using it, as the Voronoi-based method cannot be used directly; GPSD-3D falls back using the costrained nonlinear optimization or grid-based method. While the constrained nonlinear optimization is slow and must not produce absolutely correct results, the grid-based method is memory-consuming and slow as well. A future release of GPSD-3D will be able to handle polydisperse systems quickly. 
 
-        $min_delta_grid     = 0.005;      # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
-        $maxvoxels_grid     = 1000000;    # USER-defined upper limit for number of voxels 
+### Constrained nonlinear optimization
 
-## Benchmarks (fortran90 version) 
+For the case of polydisperse systems, by default the GPSD-3D script employs a constrained nonlinear solver. There is one option that may be used to speed up the solver if an upper limit for the pore radius is already known
+
+        -kmpr=5.3              # USER-defined upper limit of the pore radius (here: 5.3)
+
+### Grid-based <a name="hardcoded">
+
+For the case of polydisperse systems, a grid-based solver is used if the -grid option is given. There are two options, that may be used to increase or reduce the resolution further. The default setting is:  
+
+        -griddelta=0.005       # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
+        -gridmax=1000000       # USER-defined upper limit for the number of voxels 
+
+## Benchmarks (100000 shots, using -np=30) 
 
 Benchmark configurations are available as .benchmark-#-config and .benchmark-#-box files. 
 
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-|1 | 320 | 0.1 | 0 | 0 | 312 | 30 | 99840 | 9389 | 1.36 | 1.67 | 0.13 s | 1.13 s | 11.31 &mu;s | 
-|2 | 1080 | 0.1 | 0 | 0 | 92 | 30 | 99360 | 40338 | 31.28 | 31.3 | 0.13 s | 0.98 s | 9.85 &mu;s | 
-|3 | 64 | 0.1 | 0 | 0 | 1562 | 30 | 99968 | 2488 | 1.37 | 1.38 | 0.13 s | 0.66 s | 6.56 &mu;s | 
-|4 | 100000 | 0.1 | 0 | 0 | 1 | 30 | 100000 | 4058940 | 2.47 | 3.86 | 14.63 s | 22.19 s | 221.94 &mu;s | 
-|5 | 139218 | 0.1 | 0 | 0 | 1 | 30 | 100000 | 3917190 | 1.38 | 2.14 | 17 s | 21.94 s | 219.38 &mu;s | 
-|6 | 3200 | 0.1 | 0 | 0 | 31 | 30 | 99200 | 39504 | 1.31 | 1.31 | 1 s | 3.23 s | 32.56 &mu;s | 
-|6 | 3200 | 1 | 0 | 0 | 31 | 30 | 99200 | 39504 | 0.34 | 0.41 | 1.13 s | 1.58 s | 15.97 &mu;s | 
-|6 | 3200 | 1 | 0.1 | 0 | 31 | 30 | 99200 | 39504 | 0.37 | 0.41 | 1 s | 1.64 s | 16.56 &mu;s | 
-|6 | 3200 | 1 | 0.1 | 0.1 | 31 | 30 | 99200 | 39504 | 0.29 | 0.31 | 1 s | 1.48 s | 14.93 &mu;s | 
-|6 | 3200 | 1 | 0 | 0 | 31 | 3 | 99200 | 39504 | 0.34 | 0.41 | 1 s | 3.56 s | 35.9 &mu;s | 
-|7 | 2000 | 0.1 | 0 | 0 | 50 | 30 | 100000 | 59622 | 2.57 | 3.75 | 0.25 s | 5.08 s | 50.78 &mu;s | 
-|8 | 10000 | 0.1 | 0 | 0 | 10 | 30 | 100000 | 307609 | 3.21 | 4.83 | 1.25 s | 9.08 s | 90.84 &mu;s | 
-|9 | 100000 | 0.1 | 0 | 0 | 1 | 30 | 100000 | 4057056 | 0.38 | 0.4 | 14.13 s | 17.35 s | 173.5 &mu;s | 
-|10 | 200 | 0.1 | 0 | 0 | 500 | 30 | 100000 | 8028 | 1.61 | 2.03 | 0 s | 0.83 s | 8.3 &mu;s | 
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+|1 | 320 | 0.1 | 0 | 0 | 312 | 30  | 9389 | 1.36 | 1.67 | 0 s | 0.85 s | 8.5 &mu;s | 
+|2 | 1080 | 0.1 | 0 | 0 | 92 | 30  | 40338 | 31.28 | 31.3 | 0.13 s | 0.69 s | 7.0 &mu;s | 
+|3 | 64 | 0.1 | 0 | 0 | 1562 | 30  | 2488 | 1.37 | 1.38 | 0 s | 0.42 s | 4.2 &mu;s | 
+|4 | 100000 | 0.1 | 0 | 0 | 1 | 30  | 4058940 | 2.47 | 3.86 | 14.25 s | 20.92 s | 209.3 &mu;s | 
+|5 | 139218 | 0.1 | 0 | 0 | 1 | 30  | 3917190 | 1.38 | 2.14 | 16.63 s | 20.39 s | 203.9 &mu;s | 
+|6 | 3200 | 0.1 | 0 | 0 | 31 | 30  | 39504 | 1.31 | 1.31 | 1 s | 2.74 s | 27.6 &mu;s | 
+|6 | 3200 | 1 | 0 | 0 | 31 | 30  | 39504 | 0.34 | 0.41 | 1 s | 1.31 s | 13.3 &mu;s | 
+|6 | 3200 | 1 | 0.1 | 0 | 31 | 30  | 39504 | 0.37 | 0.41 | 1 s | 1.37 s | 13.8 &mu;s | 
+|6 | 3200 | 1 | 0.1 | 0.1 | 31 | 30  | 39504 | 0.29 | 0.31 | 1 s | 1.21 s | 12.2 &mu;s | 
+|7 | 2000 | 0.1 | 0 | 0 | 50 | 30  | 59622 | 2.58 | 3.75 | 0.25 s | 4.46 s | 44.6 &mu;s | 
+|8 | 10000 | 0.1 | 0 | 0 | 10 | 30  | 307609 | 3.21 | 4.83 | 1.13 s | 8.2 s | 82.0 &mu;s | 
+|9 | 100000 | 0.1 | 0 | 0 | 1 | 30  | 4057056 | 0.38 | 0.4 | 13.88 s | 16.73 s | 167.3 &mu;s | 
+|10 | 200 | 0.1 | 0 | 0 | 500 | 30  | 8028 | 1.61 | 2.03 | 0.13 s | 0.58 s | 5.8 &mu;s | 
+|11 | 64 | 0.1 | 0 | 0 | 1562 | 30  | 768 | 1.63 | 1.63 | 0 s | 0.41 s | 4.1 &mu;s | 
+|12 | 192 | 0.1 | 0 | 0 | 520 | 30  | 5880 | 3.64 | 3.91 | 0 s | 0.47 s | 4.7 &mu;s | 
+
+
+## Benchmarks (100000 shots, using -np=1) 
+
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+|1 | 320 | 0.1 | 0 | 0 | 312 | 1  | 9389 | 1.36 | 1.67 | 0 s | 21.41 s | 214.5 &mu;s | 
+|2 | 1080 | 0.1 | 0 | 0 | 92 | 1  | 40338 | 31.28 | 31.3 | 0.25 s | 12.18 s | 122.6 &mu;s | 
+|3 | 64 | 0.1 | 0 | 0 | 1562 | 1  | 2488 | 1.37 | 1.38 | 0 s | 6.3 s | 63.0 &mu;s | 
+|4 | 100000 | 0.1 | 0 | 0 | 1 | 1  | 4058940 | 2.47 | 3.86 | 14.25 s | 120.87 s | 1208.7 &mu;s | 
+|5 | 139218 | 0.1 | 0 | 0 | 1 | 1  | 3917190 | 1.38 | 2.14 | 16.5 s | 74.7 s | 747.0 &mu;s | 
+|6 | 3200 | 0.1 | 0 | 0 | 31 | 1  | 39504 | 1.31 | 1.31 | 1 s | 49.85 s | 502.5 &mu;s | 
+|6 | 3200 | 1 | 0 | 0 | 31 | 1  | 39504 | 0.34 | 0.41 | 1 s | 7.52 s | 75.8 &mu;s | 
+|6 | 3200 | 1 | 0.1 | 0 | 31 | 1  | 39504 | 0.37 | 0.41 | 1 s | 9.38 s | 94.6 &mu;s | 
+|6 | 3200 | 1 | 0.1 | 0.1 | 31 | 1  | 39504 | 0.29 | 0.31 | 1 s | 4.97 s | 50.1 &mu;s | 
+|7 | 2000 | 0.1 | 0 | 0 | 50 | 1  | 59622 | 2.58 | 3.75 | 0.25 s | 122.89 s | 1228.9 &mu;s | 
+|8 | 10000 | 0.1 | 0 | 0 | 10 | 1  | 307609 | 3.21 | 4.83 | 1.13 s | 164.99 s | 1649.9 &mu;s | 
+|9 | 100000 | 0.1 | 0 | 0 | 1 | 1  | 4057056 | 0.39 | 0.4 | 13.88 s | 64.3 s | 643.0 &mu;s | 
+|10 | 200 | 0.1 | 0 | 0 | 500 | 1  | 8028 | 1.61 | 2.03 | 0.13 s | 13.08 s | 130.8 &mu;s | 
+|11 | 64 | 0.1 | 0 | 0 | 1562 | 1  | 768 | 1.63 | 1.63 | 0.13 s | 0.5 s | 5.0 &mu;s | 
+|12 | 192 | 0.1 | 0 | 0 | 520 | 1  | 5880 | 3.64 | 3.91 | 0.13 s | 6.35 s | 63.7 &mu;s | 
+
 
 
 ## Benchmarks (c++ version)
 
 | no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |  time/shot |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-|1 | 320 | 0.1 | 0 | 0 | 312 | 1 | 99840 | -1 | 1.36 | 0 | 0 s | 288.44 s | 2889.03 &mu;s | 
-|2 | 1080 | 0.1 | 0 | 0 | 92 | 1 | 99360 | -1 | 31.29 | 31.3 | 0 s | 9441.82 s | 95026.32 &mu;s | 
-|3 | 64 | 0.1 | 0 | 0 | 1562 | 1 | 99968 | -1 | 1.37 | 1.38 | 0 s | 146.93 s | 1469.81 &mu;s | 
-|4 | 100000 | 0.1 | 0 | 0 | 1 | 1 | 100000 | -1 | 2.47 | 3.66 | 0 s | 963.47 s | 9634.66 &mu;s | 
-|5 | 139218 | 0.1 | 0 | 0 | 1 | 1 | 100000 | -1 | 1.38 | 2.08 | 0.01 s | 484.15 s | 4841.45 &mu;s | 
-|6 | 3200 | 0.1 | 0 | 0 | 31 | 1 | 99200 | -1 | 1.31 | 1.31 | 0 s | 2514.03 s | 25343.04 &mu;s | 
-|6 | 3200 | 1 | 0 | 0 | 31 | 1 | 99200 | -1 | 0.34 | 0.41 | 0 s | 540.02 s | 5443.77 &mu;s | 
-|6 | 3200 | 1 | 0.1 | 0 | 31 | 1 | 99200 | -1 | 0.14 | 0.31 | 0 s | 539.67 s | 5440.21 &mu;s | 
-|6 | 3200 | 1 | 0.1 | 0.1 | 31 | 1 | 99200 | -1 | 0.08 | 0.21 | 0 s | 282.03 s | 2843.03 &mu;s | 
-|6 | 3200 | 1 | 0 | 0 | 31 | 1 | 99200 | -1 | 0.34 | 0.41 | 0 s | 540.49 s | 5448.48 &mu;s | 
-|7 | 2000 | 0.1 | 0 | 0 | 50 | 1 | 100000 | -1 | 2.58 | 3.65 | 0 s | 1912.21 s | 19122.1 &mu;s | 
-|8 | 10000 | 0.1 | 0 | 0 | 10 | 1 | 100000 | -1 | 3.22 | 4.8 | 0 s | 3627.17 s | 36271.69 &mu;s | 
-|9 | 100000 | 0.1 | 0 | 0 | 1 | 1 | 100000 | -1 | 0.38 | 0.4 | 0 s | 4905.32 s | 49053.22 &mu;s | 
-|10 | 200 | 0.1 | 0 | 0 | 500 | 30 | 100000 | -1 | --- | --- | --- | --- | crashed | 
+
 
 ## Benchmarks (nlin version) 
 
 | no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-|1 | 320 | 0.1 | 0 | 0 | 312 | 1 | 99840 | 0 | 1.24 | 1.67 | 0 s | 1624.64 s | 16272.41 &mu;s | 
-|2 | 1080 | 0.1 | 0 | 0 | 92 | 1 | 99360 | 0 | 30.82 | 31.3 | 0 s | 955.19 s | 9613.41 &mu;s | 
-|3 | 64 | 0.1 | 0 | 0 | 1562 | 1 | 99968 | 0 | 1.36 | 1.38 | 0 s | 96.23 s | 962.62 &mu;s | 
-|4 | 100000 | 0.1 | 0 | 0 | 1 | 1 | 100000 | 0 | 2.26 | 3.86 | 0 s | 1053.45 s | 10534.46 &mu;s | 
-|5 | 139218 | 0.1 | 0 | 0 | 1 | 1 | 100000 | 0 | 1.26 | 2.14 | 0 s | 1818.53 s | 18185.35 &mu;s | 
-|6 | 3200 | 0.1 | 0 | 0 | 31 | 1 | 99200 | 0 | 1.31 | 1.31 | 0 s | 2646.88 s | 26682.26 &mu;s | 
-|6 | 3200 | 1 | 0 | 0 | 31 | 1 | 99200 | 0 | 0.34 | 0.41 | 0 s | 2201.02 s | 22187.72 &mu;s | 
-|7 | 2000 | 0.1 | 0 | 0 | 50 | 1 | 100000 | 0 | 2.36 | 3.75 | 0 s | 3259.57 s | 32595.74 &mu;s | 
-|8 | 10000 | 0.1 | 0 | 0 | 10 | 1 | 100000 | 0 | 2.96 | 4.83 | 0 s | 3896.62 s | 38966.25 &mu;s | 
-|9 | 100000 | 0.1 | 0 | 0 | 1 | 1 | 100000 | -1 | --- | --- | --- | --- | crashed | 
-|10 | 200 | 0.1 | 0 | 0 | 500 | 1 | 100000 | 0 | 1.46 | 2.03 | 0 s | 894.89 s | 8948.91 &mu;s | 
 
-
-## FEW SHOTS single processor Benchmarks (fortran90 version) 
+## Benchmarks (grid version) 
 
 | no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-|1 | 320 | 0.1 | 0 | 0 | 3 | 1 | 960 | 9389 | 1.35 | 1.67 | 0 s | 0.51 s | 534.34 &mu;s | 
-|2 | 1080 | 0.1 | 0 | 0 | 1 | 1 | 1000 | 40338 | 31.27 | 31.3 | 0.25 s | 0.57 s | 574.41 &mu;s | 
-|3 | 64 | 0.1 | 0 | 0 | 15 | 1 | 960 | 2488 | 1.37 | 1.38 | 0 s | 0.33 s | 344.23 &mu;s | 
-|4 | 100000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 4058940 | 2.47 | 3.86 | 14.63 s | 16.34 s | 16339.69 &mu;s | 
-|5 | 139218 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 3917190 | 1.38 | 2.14 | 17 s | 18.43 s | 18429.47 &mu;s | 
-|6 | 3200 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 39504 | 1.31 | 1.31 | 1 s | 1.8 s | 1795.71 &mu;s | 
-|6 | 3200 | 1 | 0 | 0 | 0 | 1 | 1000 | 39504 | 0.34 | 0.41 | 1 s | 1.39 s | 1389.76 &mu;s | 
-|6 | 3200 | 1 | 0.1 | 0 | 0 | 1 | 1000 | 39504 | 0.36 | 0.41 | 1.13 s | 1.4 s | 1400.5 &mu;s | 
-|6 | 3200 | 1 | 0.1 | 0.1 | 0 | 1 | 1000 | 39504 | 0.29 | 0.31 | 1 s | 1.35 s | 1349.7 &mu;s | 
-|7 | 2000 | 0.1 | 0 | 0 | 1 | 1 | 1000 | 59622 | 2.56 | 3.75 | 0.25 s | 1.78 s | 1780.73 &mu;s | 
-|8 | 10000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 307609 | 3.22 | 4.83 | 1.25 s | 3.15 s | 3154.72 &mu;s | 
-|9 | 100000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 4057056 | 0.38 | 0.4 | 14.13 s | 15.3 s | 15295.63 &mu;s | 
-|10 | 200 | 0.1 | 0 | 0 | 5 | 1 | 1000 | 8028 | 1.61 | 2.03 | 0 s | 0.43 s | 426.67 &mu;s | 
 
+## Windows-users<a name="windows"></a>
 
-## FEW SHOTS single processor Benchmarks (c++ version) 
+To our surprize, we successfully installed voro++ and GPSD-3D under windows 10 using /mingw64/bin/gfortran and /mingw64/bin/g++. You need to have perl installed. After successful installation, we were faced with the problem that our perl under windows did not accept command line arguments. To circumvent this problem, add the full GPSD-3D command to a file, say, windows.pl and execute this file from the command line via: 
 
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-|1 | 320 | 0.1 | 0 | 0 | 3 | 1 | 960 | -1 | 1.36 | 1.67 | 0 s | 3.04 s | 3168.13 &mu;s | 
-|2 | 1080 | 0.1 | 0 | 0 | 1 | 1 | 1000 | -1 | 31.25 | 31.3 | 0 s | 103.56 s | 103563.81 &mu;s | 
-|3 | 64 | 0.1 | 0 | 0 | 15 | 1 | 960 | -1 | 1.37 | 1.38 | 0 s | 1.66 s | 1727.05 &mu;s | 
-|4 | 100000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | -1 | 2.48 | 3.35 | 0 s | 23.38 s | 23382.25 &mu;s | 
-|5 | 139218 | 0.1 | 0 | 0 | 0 | 1 | 1000 | -1 | 1.39 | 2 | 0.01 s | 17.19 s | 17194.35 &mu;s | 
-|6 | 3200 | 0.1 | 0 | 0 | 0 | 1 | 1000 | -1 | 1.31 | 1.31 | 0 s | 26.18 s | 26184.98 &mu;s | 
-|6 | 3200 | 1 | 0 | 0 | 0 | 1 | 1000 | -1 | 0.35 | 0.41 | 0 s | 5.38 s | 5380.14 &mu;s | 
-|6 | 3200 | 1 | 0.1 | 0 | 0 | 1 | 1000 | -1 | 0.15 | 0.31 | 0 s | 5.38 s | 5375.15 &mu;s | 
-|6 | 3200 | 1 | 0.1 | 0.1 | 0 | 1 | 1000 | -1 | 0.1 | 0.21 | 0 s | 3.2 s | 3195.95 &mu;s |
-|7 | 2000 | 0.1 | 0 | 0 | 1 | 1 | 1000 | -1 | 2.59 | 3.44 | 0 s | 19.65 s | 19650.33 &mu;s | 
-|8 | 10000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | -1 | 3.19 | 4.83 | 0 s | 39.16 s | 39160.01 &mu;s | 
-|9 | 100000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | -1 | 0.4 | 0 | 0 s | 43.04 s | 43044.3 &mu;s | 
-|10 | 200 | 0.1 | 0 | 0 | --- | 1 | 1000 | -1 | --- | --- | --- | --- | crashed | 
+        perl ./windows.pl
 
-## FEW SHOTS single processor Benchmarks (nlin version) 
+An example windows.pl file comes with the GPSD-3D distribution. 
 
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-|1 | 320 | 0.1 | 0 | 0 | 3 | 1 | 960 | 0 | 1.23 | 1.67 | 0 s | 5.07 s | 5280.63 &mu;s | 
-|2 | 1080 | 0.1 | 0 | 0 | 1 | 1 | 1000 | 0 | 30.83 | 31.3 | 0 s | 8.36 s | 8361.14 &mu;s | 
-|3 | 64 | 0.1 | 0 | 0 | 15 | 1 | 960 | 0 | 1.36 | 1.38 | 0 s | 0.58 s | 605.69 &mu;s | 
-|4 | 100000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 0 | 2.26 | 3.44 | 0 s | 4.25 s | 4251.54 &mu;s | 
-|5 | 139218 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 0 | 1.26 | 2.14 | 0 s | 6.1 s | 6096.2 &mu;s | 
-|6 | 3200 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 0 | 1.31 | 1.31 | 0 s | 18.99 s | 18986.37 &mu;s |
-|6 | 3200 | 1 | 0 | 0 | 0 | 1 | 1000 | 0 | 0.35 | 0.41 | 0 s | 20.61 s | 20612.61 &mu;s | 
-|7 | 2000 | 0.1 | 0 | 0 | 1 | 1 | 1000 | 0 | 2.38 | 3.75 | 0 s | 12.11 s | 12113.66 &mu;s | 
-|8 | 10000 | 0.1 | 0 | 0 | 0 | 1 | 1000 | 0 | 3.02 | 4.82 | 0 s | 19.09 s | 19090.51 &mu;s | 
-|10 | 200 | 0.1 | 0 | 0 | 5 | 1 | 1000 | 0 | 1.46 | 2.03 | 0 s | 2.78 s | 2780.57 &mu;s | 
-
-## About <a name="about">
+## About <a name="about"></a>
 
 Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
 
