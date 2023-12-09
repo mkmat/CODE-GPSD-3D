@@ -42,7 +42,7 @@ The input required by GPSD-3D are (i) coordinates: the center positions of *N* m
 2. id x y z (monodisperse system, requires specifying -ro on the command line)        
 3. id x y z radius  (polydisperse system, monodisperse if all radii are equal)
 4. samarth-type configuration file (do not specify box dimensions in that case, requires specifying -ro on the command line)
-5. lammps-users can call GPSD-3D from within their script as shown [here](#lammps)
+5. lammps.dump file. Use dump mydump all custom N lammps.dump id x y z to save your dump-file. lammps-users can call GPSD-3D from within their script as shown [here](#lammps)
 
 The six values for the box can be either saved in a txt-file (single line, six values xlo xhi ylo yhi zlo zhi separated by blank or commata), or passed over on the command line. The delimiting character can be specified using the -d option.  
 
