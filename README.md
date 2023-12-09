@@ -291,11 +291,13 @@ There are several ways to use GPSD-3D with lammps.
 
 Call GPSD-3D directly from within your lammps script. GPSD-3D uses by default the box dimensions provided by lammps, no need to specify them in your GPSD-3D call.
 
-        dump           GPSDdump all custom 1000 lammps.dump id x y z
-        run            1000
+        dump           GPSDdump all custom 10000 lammps.dump id x y z
+        run            10000
         shell          perl ./GPSD-3D -in=lammps.dump -rp=.. -ro=.. -rc=.. -q=.. -info
 
-The above example creates a single lammps.gpsd file after 1000 time steps. You have still the freedom to change box dimensions on the command line via -xlo=.. -xhi=.. etc. Because the -info option has been given, a lammps.info and lammps.inf file are created as well.
+The above example creates a single lammps.gpsd file at the end of your run, after 10000 time steps. You have still the freedom to change box dimensions on the command line via -xlo=.. -xhi=.. etc. Because the -info option has been given, a lammps.info and lammps.inf file are created as well.
+
+### Version 2
 
 If you want to calculate the PSD in regular intervals during a lammps simulation, create a lammps loop. 
 
@@ -313,7 +315,7 @@ If you want to calculate the PSD in regular intervals during a lammps simulation
 
 where SELF should be replaced by the file name of your lammps script, if you running lammps in parallel. In the above example, the GPSD is calculated 15 times, each 1000 steps, and the resulting pore radii are saved in result1.gpsd, result2.gpsd, ..., result15.gpsd. If you prefer to not save all pore radii, but instead accumulate a histogram, you can replace result${a} by result, write a script that reads the result.gpsd file, calculates and accumulates the histogram, and saves it. Using the -info option, result1.info etc. files are also generated. 
 
-### Version 2 (not recommended)
+### Version 3 (not recommended)
 
 Store a xyz-formatted file using lammps-commands
 
