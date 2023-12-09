@@ -3,7 +3,7 @@ Generalized geometric pore size distribution (G-PSD) for periodic systems compos
 
 <img src="images/schematic-GPSD3D-github.png" width="100%">  
 
-For monodisperse systems GPSD-3D uses the advanced (grid-free) voronoi-based algorithm. For polydisperse systems, it uses a basic grid-based algorithm, whose resolution is limited by the amount of available memory. The settings of the grid-based algorithm are hard-coded in the file GPSD-3D, and can be modified there (see [below](#hardcoded) for details).  
+For monodisperse systems GPSD-3D uses the advanced (grid-free) voronoi-based algorithm. For polydisperse systems, it uses a constrained nonlinear optimization strategy or alternatively a grid-based algorithm, whose resolution is limited by the amount of available memory. See [below](#polydisperse) for details for polydisperse systems. Lammps-users can call GPSD-3D directly from within their lammps script as shown [here](#lammps).
 
 ## Installation
 
@@ -42,6 +42,7 @@ The input required by GPSD-3D are (i) coordinates: the center positions of *N* m
 2. id x y z (monodisperse system, requires specifying -ro on the command line)        
 3. id x y z radius  (polydisperse system, monodisperse if all radii are equal)
 4. samarth-type configuration file (do not specify box dimensions in that case, requires specifying -ro on the command line)
+5. lammps-users can call GPSD-3D from within their script as shown [here](#lammps)
 
 The six values for the box can be either saved in a txt-file (single line, six values xlo xhi ylo yhi zlo zhi separated by blank or commata), or passed over on the command line. The delimiting character can be specified using the -d option.  
 
@@ -263,7 +264,7 @@ a second file will have been generated (all entries in this file are described i
 
 A text-free version of the .info-file is available in the .inf-file. 
 
-## Polydisperse systems
+## Polydisperse systems<a name="polydisperse">
 
 While GPSD-3D can handle polydisperse conifigurations, we do not recommend using it, as the Voronoi-based method cannot be used directly; GPSD-3D falls back using the costrained nonlinear optimization or grid-based method. While the constrained nonlinear optimization is slow and must not produce absolutely correct results, the grid-based method is memory-consuming and slow as well. A future release of GPSD-3D will be able to handle polydisperse systems quickly. 
 
@@ -271,14 +272,59 @@ While GPSD-3D can handle polydisperse conifigurations, we do not recommend using
 
 For the case of polydisperse systems, by default the GPSD-3D script employs a constrained nonlinear solver. There is one option that may be used to speed up the solver if an upper limit for the pore radius is already known
 
+        -nlin
         -kmpr=5.3              # USER-defined upper limit of the pore radius (here: 5.3)
 
 ### Grid-based <a name="hardcoded">
 
 For the case of polydisperse systems, a grid-based solver is used if the -grid option is given. There are two options, that may be used to increase or reduce the resolution further. The default setting is:  
 
+        -grid 
         -griddelta=0.005       # USER-defined minimum grid spacing (in units of the effective particle radius ro+rc)
         -gridmax=1000000       # USER-defined upper limit for the number of voxels 
+
+## lammps-users<a name="lammps">
+
+There are several ways to use GPSD-3D with lammps. 
+
+### Version 1
+
+Call GPSD-3D directly from within your lammps script. GPSD-3D uses by default the box dimensions provided by lammps, no need to specify them in your GPSD-3D call.
+
+        dump           GPSDdump all custom 1000 lammps.dump id x y z
+        run            1000
+        shell          perl ./GPSD-3D -in=lammps.dump -rp=.. -ro=.. -rc=.. -q=.. -info
+
+The above example creates a single lammps.gpsd file after 1000 time steps. You have still the freedom to change box dimensions on the command line via -xlo=.. -xhi=.. etc. Because the -info option has been given, a lammps.info and lammps.inf file are created as well.
+
+If you want to calculate the PSD in regular intervals during a lammps simulation, create a lammps loop. 
+
+        label         loop 
+        variable      a loop 15
+        dump          GPSDdump all custom 1000 lammps.dump id x y z
+        run           1000
+        shell         perl ./GPSD-3D -in=lammps.dump -rp=.. -ro=.. -rc=.. -q=.. -info -o=result${a} 
+        # here you may call your own script that analyses result.gpsd or result.info 
+        undump        GPSDdump
+        next          a
+        jump          SELF loop      
+        label         break
+        variable      a delete
+
+where SELF should be replaced by the file name of your lammps script, if you running lammps in parallel. In the above example, the GPSD is calculated 15 times, each 1000 steps, and the resulting pore radii are saved in result1.gpsd, result2.gpsd, ..., result15.gpsd. If you prefer to not save all pore radii, but instead accumulate a histogram, you can replace result${a} by result, write a script that reads the result.gpsd file, calculates and accumulates the histogram, and saves it. Using the -info option, result1.info etc. files are also generated. 
+
+### Version 2 (not recommended)
+
+Store a xyz-formatted file using lammps-commands
+
+        dump           GPSDdump all xyz 1000 lammps.xyz
+        dump_modify    GPSDdump header no
+
+Then call GPSD-3D from the command line, after lammps finished. Because the xyz-formmated lammps file does not contain box sizes, you have the freedom to specify them manually. 
+
+        perl ./GPSD-3D -in=lammps.xyz -xlo=... -xhi=... -ylo=... -yhi=... -zlo=... -zhi=... -rp=... -ro=... -q=...
+
+Be aware that the lammps-formatted xyz-file may contain scaled coordinates, so that you have to specify ro, rp, and rc also in scaled form.
 
 ## Benchmarks (100000 shots, using -np=30) 
 
