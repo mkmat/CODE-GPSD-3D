@@ -36,7 +36,7 @@ But, if you have voro++ not yet installed, or no fortran compiler, you will end 
 
 ## Configuration and box file formats <a name=format>
 
-The input required by GPSD-3D are (i) coordinates: the center positions of *N* monodisperse or polydisperse spheres, that are located inside a rectangular, periodic box, whose corners are specified by (ii) box geometry: 6 values: xlo,xhi,ylo,yhi,zlo,zhi. We offer various file formats, where each of the *N* lines contains the coordinates, and eventually also the radius of a single sphere
+The input required by GPSD-3D are (i) coordinates: the center positions of *N* monodisperse or polydisperse spheres, that are located inside a rectangular, periodic box, whose corners are specified by (ii) box geometry: 6 values: xlo,xhi,ylo,yhi,zlo,zhi. We offer various file formats, where each of the *N* lines contains the coordinates, and eventually also the radii of the individual spheres
 
 1. x y z (monodisperse system, requires specifying -ro on the command line)
 2. id x y z (monodisperse system, requires specifying -ro on the command line)        
