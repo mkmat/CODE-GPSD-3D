@@ -11,7 +11,7 @@ Create a new directory named GPSD-3D. Download GPSD-3D.tar.gz to the new directo
 
     gunzip GPSD-3D.tar.gz; tar -x GPSD-3D.tar; 
 
-This will create the following files: GPSD-3D.f90, and GPSD-3D-grid.f90, voro-parser.cpp, get-max-threads.f90, INSTALL.pl, TEMPLATE.pl, MESSAGE.txt. Then switch to the new directory and call the installation script via
+This will create a number of files including: GPSD-3D.f90, and GPSD-3D-grid.f90, voro-parser.cpp, get-max-threads.f90, INSTALL.pl, TEMPLATE.pl, MESSAGE.txt. Then switch to the new directory and call the installation script via
 
     perl ./INSTALL.pl
 
