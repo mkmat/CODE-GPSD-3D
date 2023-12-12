@@ -3,7 +3,7 @@ Generalized geometric pore size distribution (G-PSD) for periodic systems compos
 
 <img src="images/schematic-GPSD3D-github.png" width="100%">  
 
-For monodisperse systems GPSD-3D uses the advanced (grid-free) voronoi-based algorithm. For polydisperse systems, it uses a constrained nonlinear optimization strategy or alternatively a grid-based algorithm, whose resolution is limited by the amount of available memory. See [below](#polydisperse) for details for polydisperse systems. Lammps-users can call GPSD-3D directly from within their lammps script as shown [here](#lammps).
+For monodisperse systems GPSD-3D uses a semi-analytic, fully accurate (grid- and approximation-free) voronoi-based algorithm. For polydisperse systems, on the other hand, it uses a constrained nonlinear optimization strategy or alternatively a grid-based algorithm, whose resolution is limited by the amount of available memory. See [below](#polydisperse) for details for polydisperse systems. Lammps-users can call GPSD-3D directly from within their lammps script as shown [here](#lammps). The GPSD-3D was tested under linux, mac-OS, and windows environments. 
 
 ## Installation
 
