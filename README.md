@@ -43,6 +43,7 @@ The input required by GPSD-3D are (i) coordinates: the center positions of *N* m
 3. id x y z radius  (polydisperse system, monodisperse if all radii are equal)
 4. samarth-type configuration file (do not specify box dimensions in that case, requires specifying -ro on the command line)
 5. lammps.dump file. Use dump mydump all custom N lammps.dump id x y z to save your dump-file. lammps-users can call GPSD-3D from within their script as shown [here](#lammps)
+6. lammps.dump trajectory file. Use -dumpstep=.. to select a snapshot from your trajectory file. 
 
 The six values for the box can be either saved in a txt-file (single line, six values xlo xhi ylo yhi zlo zhi separated by blank or commata), or passed over on the command line. The delimiting character can be specified using the -d option.  
 
@@ -53,8 +54,8 @@ The six values for the box can be either saved in a txt-file (single line, six v
           -in=<filename>
           -box=<filename> OR -xlo=.. -xhi=.. ylo=.. -yhi=.. -zlo=.. -zhi=..
           [-ro=<positive value>] 
-          [-rp=<value>] 
-          [-rc=<value>] 
+          [-rp=<positive value>] 
+          [-rc=<positive value>] 
           [-q=<integer>] 
           [-TPSD] 
 
@@ -64,31 +65,32 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-d=<delimiter>]
 
           [-grid]
-          [-griddelta=..]
-          [-gridmax=..]
+          [-griddelta=<positive value>]
+          [-gridmax=<large integer>]
 
           [-c++]
 
           [-nlin]
-          [-kmpr=..]
+          [-kmpr=<value>]
           
           [-o=<filename>]
           [-list]
+          [-dumpstep=<integer>]
           
           [-quiet]
           [-clean]
 
-**-in=**    name of the file containing the material sphere [coordinates](#format) (for polydisperse systems also the sphere radii).
+**-in=..**    name of the file containing the material sphere [coordinates](#format) (for polydisperse systems also the sphere radii).
 
-**-box=**   name of the file containing the box [geometry](#format) (alternatively, the box size can be passed over on the command line using -xlo= .. -zhi=..).
+**-box=..**   name of the file containing the box [geometry](#format) (alternatively, the box size can be passed over on the command line using -xlo= .. -zhi=..).
 
-**-ro=** material circle radius *r<sub>o</sub>* (required, if the particle radii are not contained in the input file). If *r<sub>o</sub>* is specified, existing radii in the input file are ignored).
+**-ro=..** material circle radius *r<sub>o</sub>* (required, if the particle radii are not contained in the input file). If *r<sub>o</sub>* is specified, existing radii in the input file are ignored).
 
-**-rp=** probe particle radius *r<sub>p</sub>*. If not specified, *r<sub>p</sub>=0* is used.
+**-rp=..** probe particle radius *r<sub>p</sub>*. If not specified, *r<sub>p</sub>=0* is used.
 
-**-rc=** shell thickness  *r<sub>c</sub>*. If not specified, *r<sub>c</sub>=0* is used.
+**-rc=..** shell thickness  *r<sub>c</sub>*. If not specified, *r<sub>c</sub>=0* is used.
 
-**-q=** positive quality value (optionally). If not specified, *q=10.0* is used. The number of random shots is *q* times the number of material spheres.
+**-q=..** positive quality value (optionally). If not specified, *q=10.0* is used. The number of random shots is *q* times the number of material spheres.
 
 **-TPSD** calculate the TPSDs in addition create a *.tpsd file. 
 
@@ -96,9 +98,9 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-info**: triggers storing runtime information (cpu times etc) in a separate [info](#info) file.
 
-**-np=** number of threads np to be used. If not specified, *n<sub>p</sub>* is set to the available number of threads.
+**-np=..** number of threads np to be used. If not specified, *n<sub>p</sub>* is set to the available number of threads.
 
-**-d=** delimiter (single character) present in the configuration and box-files, e.g. -d="\ " for a blank, default is -d=","
+**-d=..** delimiter (single character) present in the configuration and box-files, e.g. -d="\ " for a blank, default is -d=","
 
 **-grid** enforce using the grid-based method
 
@@ -106,7 +108,7 @@ The six values for the box can be either saved in a txt-file (single line, six v
 
 **-gridmax=..** maximum number of grid voxels (default: 1000000)
 
-**-c++** enforce using the c++ version (default: voronoi fortran version)
+**-c++** enforce using the c++ version [if installed]
 
 **-nlin** enforce using the constrained nonlinear optimization [if installed]
 
@@ -115,6 +117,8 @@ The six values for the box can be either saved in a txt-file (single line, six v
 **-o=** name of the resulting file containing a list of pore radii. If not specified, the list is saved in a .gpsd-file.
 
 **-list** use a list of p vectors (stored in p.txt, format: id px py pz) instead of randomly shooting
+
+**-dumpstep=..** select a timestep of your lammps dump-trajectory file. 
 
 **-quiet**: prevents GPSD-3D to create stdout.
 
