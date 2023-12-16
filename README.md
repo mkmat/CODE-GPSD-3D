@@ -68,8 +68,6 @@ The six values for the box can be either saved in a txt-file (single line, six v
           [-griddelta=<positive value>]
           [-gridmax=<large integer>]
 
-          [-c++]
-
           [-nlin]
           [-kmpr=<value>]
           
@@ -107,8 +105,6 @@ The six values for the box can be either saved in a txt-file (single line, six v
 **-griddelta=..** minimum grid spacing (in units of effective particle radius ro+rc) (default: 0.005)
 
 **-gridmax=..** maximum number of grid voxels (default: 1000000)
-
-**-c++** enforce using the c++ version [if installed]
 
 **-nlin** enforce using the constrained nonlinear optimization [if installed]
 
