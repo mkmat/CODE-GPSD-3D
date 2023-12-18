@@ -17,13 +17,13 @@ This will create a number of files including: GPSD-3D.f90, and GPSD-3D-grid.f90,
 
 This will produce some message on your screen like 
 
-      
-    This is GPSD-3D version 1.0 written by Martin Kroger 2023, ETH Zurich, https://www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
-
-    Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
-    Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
-
+    This is GPSD-3D version 1.0
+    written Nov 2023 by Martin Kroger, ETH Zurich, www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
+    
+    Related publication (GPSD-3D): Comput. Phys. Commun. (2024) submitted 18 Dec 2023. Updated reference at github:
     GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
+    
+    Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
     GPSD-2D Code available from: https://github.com/mkmat/CODE-GPSD-2D
 
 and a new file GPSD-3D (a perl script). Ideally, it finishes with saying 
