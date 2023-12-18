@@ -397,7 +397,7 @@ An example windows.pl file comes with the GPSD-3D distribution.
 
 ## About <a name="about"></a>
 
-Related publication (GPSD-3D): Comput. Phys. Commun. (2023) submitted
+Related publication (GPSD-3D): Comput. Phys. Commun. (2024) submitted Dec 2023
 
 Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
 
