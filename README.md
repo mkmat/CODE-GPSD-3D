@@ -373,16 +373,14 @@ Benchmark configurations are available as .benchmark-#-config and .benchmark-#-b
 
 
 
-## Benchmarks (c++ version)
+## Benchmarks (nlin version)
 
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total |  time/shot |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | $\langle r\rangle$ | *r<sub>max</sub>* | total |  time/shot |
+|---|---|---|---|---|---|---|---|---|---|---|
+|1 | 320 | 0.1 | 0 | 0 | 312 | 1 | 1.24 | 1.67 | 2365.13 s | 23689.2 &mu;s | 
+|2 | 1080 | 0.1 | 0 | 0 | 92 | 1 | 30.81 | 31.3 | 958.53 s | 9647.1 &mu;s | 
+|3 | 64 | 0.1 | 0 | 0 | 1562 | 1 | 1.36 | 1.38 | 149.09 s | 1491.4 &mu;s | 
 
-
-## Benchmarks (nlin version) 
-
-| no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | shots | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 
 ## Benchmarks (grid version) 
 
