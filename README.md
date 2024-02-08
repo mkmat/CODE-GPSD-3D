@@ -5,9 +5,9 @@ Generalized geometric pore size distribution (G-PSD) for periodic systems compos
 
 For monodisperse systems GPSD-3D uses a semi-analytic, fully accurate (grid- and approximation-free) voronoi-based algorithm. For polydisperse systems, on the other hand, it uses a constrained nonlinear optimization strategy or alternatively a grid-based algorithm, whose resolution is limited by the amount of available memory. See [below](#polydisperse) for details for polydisperse systems. Lammps-users can call GPSD-3D directly from within their lammps script as shown [here](#lammps). The GPSD-3D was tested under linux, mac-OS, and windows environments. 
 
-## Installation
+## Download
 
-Create a new directory named GPSD-3D. Download GPSD-3D.tar.gz to the new directory GPSD-3D and unpack it via 
+Either clone the current repository or download the GPSD-3D.tar.gz file. If you have chosen to download the tar.gz-file, create a new directory named GPSD-3D. Move GPSD-3D.tar.gz to the new directory GPSD-3D and unpack it via 
 
     gunzip GPSD-3D.tar.gz; tar -x GPSD-3D.tar; 
 
@@ -15,7 +15,11 @@ or alternatively, depending on the syntax requirements of your installed gzip an
 
     gzip -d GPSD-3D.tar.gz; tar -xfv GPSD-3D.tar; 
 
-This will create a number of files including: GPSD-3D.f90, and GPSD-3D-grid.f90, voro-parser.cpp, get-max-threads.f90, INSTALL.pl, TEMPLATE.pl, MESSAGE.txt. Then switch to the new directory and call the installation script via
+This will create a number of files including: GPSD-3D.f90, and GPSD-3D-grid.f90, voro-parser.cpp, get-max-threads.f90, INSTALL.pl, TEMPLATE.pl, MESSAGE.txt. 
+
+## Installation
+
+Switch to the new directory carrying the GPSD-3D sources and call the installation script via
 
     perl ./INSTALL.pl
 
