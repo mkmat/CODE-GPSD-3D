@@ -65,7 +65,7 @@ ________________________________________________________________________________
 Documentation is available from the related publication and the above-mentioned github repository:
 https://github.com/mkmat/CODE-GPSD-3D
 
-After installation, help is available via: perl ./ GPSD-3D
+After installation, help is available via: perl ./GPSD-3D
 
 _______________________________________________________________________________________________________________________________
 
