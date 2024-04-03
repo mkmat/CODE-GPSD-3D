@@ -2,6 +2,17 @@ module shared
 
 ! 1 dec 2023 mk@mat.ethz.ch employing the libnlopt.so library
 
+! routines available in this code: 
+
+! subroutine f(R1, ndim, c, grad, need_gradient, f_data) defines the nonlinear optimization target
+! subroutine fc(val, ndim, c, grad, need_gradient, p) defines the nonlinear optimization problem
+! subroutines init_seed, finalize_seed handle the random number seed
+! subroutine check_result(p,c) is not in use
+! subroutine manage_cpu_and_real_clock(no,cpu_and_real_time) measures and reports cpu time
+
+! functions avaiable in this code:
+! function smallest_coated_surface_distance_allspheres_point(p) calculates smallest point-surface distances
+
    integer, parameter :: dim = 3
    integer  :: N
    real*8, dimension(:,:), allocatable :: x
@@ -253,6 +264,7 @@ end module shared
                endif
             enddo
          
+            ! calling the nonlinear optimizer
             call nlo_optimize(ires, opt, c, R)
          
             bad = .false.
@@ -394,7 +406,7 @@ end module shared
      real*8  :: c(ndim), grad(ndim)
      real*8  :: f_data,R1
      integer :: need_gradient
-         if (need_gradient.ne.0) stop 'BAD'
+         if (need_gradient.ne.0) stop 'ERROR. Nonlinear optimization failed. Contact the author.'
          R1 = smallest_coated_surface_distance_allspheres_point(c)-rp
      end
 
@@ -406,7 +418,7 @@ end module shared
      real*8  :: val, c(ndim), grad(ndim), p(dim)
      real*8  :: R1,R2
      real*8  :: pc(dim)
-      if (need_gradient.ne.0) stop 'BAD'
+      if (need_gradient.ne.0) stop 'ERROR. Nonlinear optimization failed. contact the author.'
       R1 = smallest_coated_surface_distance_allspheres_point(c)-rp
       pc = p-c
       pc = pc-box*anint(pc/box)
@@ -436,7 +448,7 @@ end module shared
     end
  
 
-    subroutine check_result(p,c)
+    subroutine check_result(p,c) ! not in use
     use shared
     implicit none
     real*8   :: p(dim),c(dim)
@@ -454,8 +466,8 @@ end module shared
              R1 = singleR1
           endif
        enddo
-       if (R1.lt.0.D0)        stop 'BUG A1'
-       if (R1-R2.lt.-1.D-6)   stop 'BUG A2'
+       if (R1.lt.0.D0)        stop 'R1 < 0 ERROR. Contact the author'
+       if (R1-R2.lt.-1.D-6)   stop 'R1 > R2 ERROR. Contact the author'
     return
     end
 
