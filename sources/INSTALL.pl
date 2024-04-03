@@ -223,7 +223,7 @@ foreach $p (@pack) { if (-s "$p") { } else { print "incomplete GPSD-3D package, 
 foreach $source (@sources) { if (-s "$source") { print "$i $found: $source\n"; } else { print "$notfound: missing source code $source\n"; $m2=1; }; };
 
 if ($cpp eq "true") {
-    $source = "$code.cpp"; if (-s "$source") { print "$i $found: $source\n"; } else { print "$notfound: missing source code $source\n"; $m2=1; };
+   $source = "$code.cpp"; if (-s "$source") { print "$i $found: $source\n"; } else { print "$notfound: missing source code $source\n"; $m2=1; };
 };
 
 # required local executables and check if they exist
@@ -275,7 +275,7 @@ foreach $exe (@exeutables) { if (-s "$exe") { print "$i $found: $exe\n"; } else 
 $maxnp = `./.maxnp.ex`+0; print "[INFO]    ",green("available threads: $maxnp"),"\n";
 
 # pack, if this was chosen
-if ($ARGV[0] eq "-pack") { print `tar -c -v -f GPSD-3D.tar @pack .bench*config .bench*box`; exit; }; 
+if ($ARGV[0] eq "-pack") { print `tar -c -v -f GPSD-3D.tar @pack benchmark`; exit; }; 
 
 open(S,">GPSD-3D"); 
 open(T,"<TEMPLATE.pl"); while (!eof(T)) { $line=<T>; 
