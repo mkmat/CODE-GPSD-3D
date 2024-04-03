@@ -90,14 +90,14 @@ Resulting files:
 
 Reproduce the example mentioned at our github site using a benchmark configuration available in your installation directory:
 
-perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 
+perl ./GPSD-3D -in=benchmark/benchmark-7-config -box=benchmark/benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 
 
 Examples using other existing benchmarks
 EOF
-$benchmarks = `ls -1 .bench*config | grep -c .`+0; 
+$benchmarks = `cd benchmark; ls -1 .bench*config | grep -c .`+0; 
 foreach $no (0 .. $benchmarks) { 
-   if (-s ".benchmark-$no-config") { 
-      PRINT("perl $0 -in=.benchmark-$no-config -box=.benchmark-$no-box -rp=0.0 -ro=1.0 -q=10 [-nlin -info -more -quiet]\n");
+   if (-s "benchmark/benchmark-$no-config") { 
+      PRINT("perl $0 -in=benchmark/benchmark-$no-config -box=benchmark/benchmark-$no-box -rp=0.0 -ro=1.0 -q=10 [-nlin -info -more -quiet]\n");
    };
 }; 
 if ($ERROR) { showerr; }; 
@@ -141,7 +141,7 @@ foreach $arg (@ARGV) { $arg=~s/=/==/; ($field,$value)=split(/==/,$arg);
     } elsif ($field eq "-ro")       { $ro=$value+0; $setro=1; 
     } elsif ($field eq "-rc")       { $rc=$value+0; 
     } elsif ($field eq "-q")        { $q=$value+0; if ($q eq 0) { PRINT("[INFO] q=0 means: no shots\n"); }; 
-    } elsif ($field eq "-clean")    { `rm -rf .tmp-GPSD-3D-*; rm -f .UpperPoreRadius .benchmark*.inf .benchmark*.info .benchmark*psd `; PRINT("[INFO] cleaned\n"); exit; 
+    } elsif ($field eq "-clean")    { `rm -rf .tmp-GPSD-3D-*; rm -f .UpperPoreRadius benchmark/benchmark*.inf benchmark/benchmark*.info benchmark/benchmark*psd `; PRINT("[INFO] cleaned\n"); exit; 
     } elsif ($field eq "-quiet")    { $quiet="true"; 
     } elsif ($field eq "-more")     { $more="true"; 
     } elsif ($field eq "-info")     { $info=1; 
