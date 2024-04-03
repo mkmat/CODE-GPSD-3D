@@ -156,9 +156,9 @@ where *px*,*py*,*pz* are the coordinates of the shot into the void space that ga
 
 ## Test configurations and test runs
 
-A number of configurations and corresponding box-files are available from the current respository. They are named .benchmark-x-config and .benchmark-x-box. A test call, using 10 of the available threads, 20000 Monte Carlo trials (*q=10*), for a probe sphere with zero radius, and *N=2000* materials spheres of radius *r*<sub>o</sub>=1.0 is 
+A number of configurations and corresponding box-files are available from the current respository. They are named benchmark/benchmark-x-config and benchmark/benchmark-x-box. A test call, using 10 of the available threads, 20000 Monte Carlo trials (*q=10*), for a probe sphere with zero radius, and *N=2000* materials spheres of radius *r*<sub>o</sub>=1.0 is 
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 
+        perl ./GPSD-3D -in=benchmark/benchmark-7-config -box=benchmark/benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 
 
 As we did not suppress stdout via -quiet, it should produce the following within a few seconds:
 
@@ -176,12 +176,12 @@ As we did not suppress stdout via -quiet, it should produce the following within
             _______________________________________________________________________________________________________________________________
             
             
-            [INFO] using configuration file .benchmark-7-config
-            [INFO] using box file .benchmark-7-box
-            [PREPARING] scanning .benchmark-7-box
+            [INFO] using configuration file benchmark/benchmark-7-config
+            [INFO] using box file benchmark/benchmark-7-box
+            [PREPARING] scanning benchmark/benchmark-7-box
             [PREPARING] recognized format (B)
             [INFO] monodisperse: 1
-            [INFO] .benchmark-7-config contains 2000 particle coordinates (4 columns)
+            [INFO] benchmark/benchmark-7-config contains 2000 particle coordinates (4 columns)
             [INFO] using ro=1, rc=0, rp=0
             [INFO] created files in .tmp-GPSD-3D-733750 including .parameters.
             [INFO] monodisperse system. The particle radius is taken as 1, shell thickness 0, test particle radius 0.
@@ -227,11 +227,11 @@ As we did not suppress stdout via -quiet, it should produce the following within
             [GPSD-3D]     cpu+real time spent in MonteCarlo [secs]       7.3443        0.7500
             [GPSD-3D]         cpu+real time per 10000 shots [secs]       3.6722        0.3750
             [GPSD-3D] completed GPSD
-            [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
+            [GPSD-3D] created: benchmark/benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
 and the following file (a list of roughly 13000 *r* values) should have been generated (if you do not see it, type: ls -lat): 
 
-        .benchmark-7-config-ro=1-rp=0-rc=0.gpsd
+        benchmark/benchmark-7-config-ro=1-rp=0-rc=0.gpsd
 
 With such list of values at hand, creating the normalized histogram (the pore radius distribution) is straightforward using any software that can bin the values, and visualize a graph. Some quantities derived from the list, such as minimum and maximum pore radius, as well as the mean pore radius including its standard error are mentioned in the above stdout. If you are not satisfied with the name of the resulting file, use the -o option. 
 
@@ -239,11 +239,11 @@ With such list of values at hand, creating the normalized histogram (the pore ra
 
 If you repeat the above command, now using the -info option
 
-        perl ./GPSD-3D -in=.benchmark-7-config -box=.benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info
+        perl ./GPSD-3D -in=benchmark/benchmark-7-config -box=benchmark/benchmark-7-box -rp=0.0 -ro=1.0 -q=10 -np=10 -info
 
 a second file will have been generated (all entries in this file are described in brackets)
 
-        [GPSD-3D] created: .benchmark-7-config-ro=1-rp=0-rc=0.info
+        [GPSD-3D] created: benchmark/benchmark-7-config-ro=1-rp=0-rc=0.info
 
         N=2000                             (number of material spheres)
         ro=1.00000                         (material sphere radius)
@@ -338,7 +338,7 @@ Be aware that the lammps-formatted xyz-file may contain scaled coordinates, so t
 
 ## Benchmarks (100000 shots, using -np=30) 
 
-Benchmark configurations are available as .benchmark-#-config and .benchmark-#-box files. 
+Benchmark configurations are available as benchmark/benchmark-#-config and benchmark/benchmark-#-box files. 
 
 | no | *N* | *r<sub>o</sub>* | *r<sub>p</sub>* | *r<sub>c</sub>* | *q* | *n<sub>p</sub>* | triangles | $\langle r\rangle$ | *r<sub>max</sub>* | voro++ | total | time/shot |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
