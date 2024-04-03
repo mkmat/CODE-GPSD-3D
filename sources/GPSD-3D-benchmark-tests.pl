@@ -29,14 +29,14 @@ $count=0;
 foreach $no (@nos) {
 foreach $irp (@irps) { $rp=$irp*0.1; 
    $count+=1;
-   $N=`grep -c . .benchmark-$no-config`+0; 
+   $N=`grep -c . benchmark/benchmark-$no-config`+0; 
    $q = $shots/$N; if ($q>1) { $q=int($shots/$N); }
-   $command = "perl ./GPSD-3D -in=.benchmark-$no-config -box=.benchmark-$no-box -rp=$rp -ro=$ro -q=$q -o=tmp -info"; 
+   $command = "perl ./GPSD-3D -in=benchmark/benchmark-$no-config -box=benchmark/benchmark-$no-box -rp=$rp -ro=$ro -q=$q -o=tmp -info"; 
    print "[CHECKING $count/$noirps] $command; "; 
    `$command`; 
    $line=`grep "mean_pore_radius" tmp.info`; $line=strip($line); @tmp=split(/=/,$line); $mean=$tmp[1]; 
    $line=`grep "stderr_pore_radius" tmp.info`; $line=strip($line); @tmp=split(/=/,$line); $stderr=$tmp[1];
-   # print "[.benchmark-$no-config] <r> = $mean +/- $stderr\n"; 
+   # print "[benchmark-$no-config] <r> = $mean +/- $stderr\n"; 
    if (abs(1-$target[$irp][$no]/$mean-$target) < 0.01) {
       print green("PASSED")," <r> = $mean +/- $stderr\n";
    } else {
@@ -52,14 +52,14 @@ if ($cpp eq "true") {
  foreach $no (@nos) {
  foreach $irp (@irps) { $rp=$irp*0.1;
    $count+=1;
-   $N=`grep -c . .benchmark-$no-config`+0;
+   $N=`grep -c . benchmark/benchmark-$no-config`+0;
    $q = $shots/$N; if ($q>1) { $q=int($shots/$N); }
-   $command = "perl ./GPSD-3D -in=.benchmark-$no-config -box=.benchmark-$no-box -rp=$rp -ro=$ro -q=$q -o=tmp -info -c++";
+   $command = "perl ./GPSD-3D -in=benchmark/benchmark-$no-config -box=benchmark/benchmark-$no-box -rp=$rp -ro=$ro -q=$q -o=tmp -info -c++";
    print "[CHECK++  $count/$noirps] $command; ";
    `$command`;
    $line=`grep "mean_pore_radius" tmp.info`; $line=strip($line); @tmp=split(/=/,$line); $mean=$tmp[1];
    $line=`grep "stderr_pore_radius" tmp.info`; $line=strip($line); @tmp=split(/=/,$line); $stderr=$tmp[1];
-   # print "[.benchmark-$no-config] <r> = $mean +/- $stderr\n";
+   # print "[benchmark-$no-config] <r> = $mean +/- $stderr\n";
    if (abs(1-$target[$irp][$no]/$mean-$target) < 0.01) {
       print green("PASSED")," <r> = $mean +/- $stderr\n";
    } else {
