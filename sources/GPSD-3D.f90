@@ -83,12 +83,6 @@ implicit none
     return
     end
     
-!    function dot(vec1,vec2)
-!    real*8 :: dot,vec1(3),vec2(3)
-!        dot = vec1(1)*vec2(1)+vec1(2)*vec2(2)+vec1(3)*vec2(3)
-!    return
-!    end
-
     function distance_fold(vec)
     real*8  :: distance_fold(3),vec(3)
         distance_fold  = vec-anint(vec/box)*box
