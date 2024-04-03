@@ -4,6 +4,26 @@ implicit none
 ! (c) 27 sep 2023 mk@mat.ethz.ch
 ! grid-based GPSD 
 
+! routines offered by this code: 
+
+! subroutine read_parameters  ! reads simulation parameters
+! subroutine read_config      ! reads the configuration files
+! subroutine allocate_grids   ! allocates memory
+! subroutine print_something  ! returns some numbers to stdout
+! subroutine init_seed        ! initialize seed
+! subroutine finalize_seed    ! finalize seed
+! subroutine make_radial_list ! creates a list of voxel contained in a sphere
+! recursive subroutine quicksort(left,right) ! sort routine
+! subroutine exchange(i,j)    ! exchanges entries i and  j
+! subroutine fill_grid        ! fills the voxel grid using material sphere data
+! subroutine manage_cpu_and_real_clock(no)
+! subroutine create_maps      ! prevents mod in other places
+! subroutine create_ID2_bottleneck ! creates the Euclidean distance map
+! subroutine lookup_ID2       ! looks up the Euclidean distance map
+! subroutine get_jp           ! creates a counter that walks spiral-wise around a voxel
+! subroutine create_info      ! summarizes the results and creates files
+
+
     integer     :: stdout
     integer     :: maxGradius
     integer     :: N,M(3),i,j,k,bin(3),i1,i2,i3,j1,j2,j3
