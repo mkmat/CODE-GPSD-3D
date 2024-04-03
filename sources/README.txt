@@ -3,7 +3,7 @@ ________________________________________________________________________________
 This is GPSD-3D version 1.0
 written Nov 2023 by Martin Kroger, ETH Zurich, www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
 
-Related publication (GPSD-3D): Comput. Phys. Commun. (2024) to appear
+Related publication (GPSD-3D): Comput. Phys. Commun. (2024) to appear.
 Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
 
 GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
@@ -31,30 +31,30 @@ GPSD-3D-benchmark-tests.pl
 hard-code-software-location.pl
 windows.pl
 software-locations-example.txt
-.benchmark-10-config
-.benchmark-11-config
-.benchmark-12-config
-.benchmark-1-config
-.benchmark-2-config
-.benchmark-3-config
-.benchmark-4-config
-.benchmark-5-config
-.benchmark-6-config
-.benchmark-7-config
-.benchmark-8-config
-.benchmark-9-config
-.benchmark-10-box
-.benchmark-11-box
-.benchmark-12-box
-.benchmark-1-box
-.benchmark-2-box
-.benchmark-3-box
-.benchmark-4-box
-.benchmark-5-box
-.benchmark-6-box
-.benchmark-7-box
-.benchmark-8-box
-.benchmark-9-box
+benchmark/benchmark-10-config
+benchmark/benchmark-11-config
+benchmark/benchmark-12-config
+benchmark/benchmark-1-config
+benchmark/benchmark-2-config
+benchmark/benchmark-3-config
+benchmark/benchmark-4-config
+benchmark/benchmark-5-config
+benchmark/benchmark-6-config
+benchmark/benchmark-7-config
+benchmark/benchmark-8-config
+benchmark/benchmark-9-config
+benchmark/benchmark-10-box
+benchmark/benchmark-11-box
+benchmark/benchmark-12-box
+benchmark/benchmark-1-box
+benchmark/benchmark-2-box
+benchmark/benchmark-3-box
+benchmark/benchmark-4-box
+benchmark/benchmark-5-box
+benchmark/benchmark-6-box
+benchmark/benchmark-7-box
+benchmark/benchmark-8-box
+benchmark/benchmark-9-box
 README.txt
 
 _______________________________________________________________________________________________________________________________
