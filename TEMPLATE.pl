@@ -206,6 +206,9 @@ if (-s $config) {
                if      ($fields[$ifield] eq "x")  { $fx=$ifield-2;
                } elsif ($fields[$ifield] eq "y")  { $fy=$ifield-2;
                } elsif ($fields[$ifield] eq "z")  { $fz=$ifield-2;
+               } elsif ($fields[$ifield] eq "xu") { $fx=$ifield-2;
+               } elsif ($fields[$ifield] eq "yu") { $fy=$ifield-2;
+               } elsif ($fields[$ifield] eq "zu") { $fz=$ifield-2;
                }; 
             };
             if (!$fx) { $ERROR="Your lammps dump-file has no x column"; USAGE; }; 
