@@ -7,7 +7,11 @@ For monodisperse systems GPSD-3D uses a semi-analytic, fully accurate (grid- and
 
 ## Download
 
-Either clone the current repository or download the GPSD-3D.tar.gz file. If you have chosen to download the tar.gz-file, create a new directory named GPSD-3D. Move GPSD-3D.tar.gz to the new directory GPSD-3D and unpack it via 
+Either clone the current repository via 
+
+    git clone https://github.com/mkmat/CODE-GPSD-3D
+
+or download the GPSD-3D.tar.gz file. If you have chosen to download the tar.gz-file, create a new directory named GPSD-3D. Move GPSD-3D.tar.gz to the new directory GPSD-3D and unpack it via 
 
     gunzip GPSD-3D.tar.gz; tar -x GPSD-3D.tar; 
 
