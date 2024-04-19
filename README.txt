@@ -3,7 +3,7 @@ ________________________________________________________________________________
 This is GPSD-3D version 1.0
 written Nov 2023 by Martin Kroger, ETH Zurich, www.complexfluids.ethz.ch, Email: mk@mat.ethz.ch
 
-Related publication (GPSD-3D): Comput. Phys. Commun. (2024) in press (see Github link below).
+Related publication (GPSD-3D): Comput. Phys. Commun. (2024) in press. Link: https://doi.org/10.1016/j.cpc.2024.109212
 Related publication (GPSD-2D): Phys. Rev. E 107 (2023) 015307. Link: http://doi.org/DOI:10.1103/PhysRevE.107.015307
 
 GPSD-3D Code available from: https://github.com/mkmat/CODE-GPSD-3D
