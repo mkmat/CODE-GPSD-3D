@@ -962,7 +962,7 @@ use shared
     write(2,401) 'ro=',ro
     write(2,401) 'rp=',rp
     write(2,401) 'rc=',rc
-    write(2,401) 'V=',volume
+    write(2,402) 'V=',volume
     write(2,400) 'triangles=',triangles
     write(2,400) 'shots=',shots
     write(2,400) 'radii=',count_r
@@ -1011,5 +1011,6 @@ use shared
 
 400 format(A,I12)
 401 format(A,F12.5)
+402 format(A,F12.1)
 stop
 end
