@@ -45,7 +45,7 @@ print<<EOF;
               (F) lammps.dump trajectory file (no need to specify a -boxfile in that case, choose time step via the -dumpstep=.. option)
 -box=..     : name of a file that contains the box bounds: xlo xhi ylo yhi zlo zhi on a single line
               Alternatively, box bounds can be entered on the command line via -xlo=.. -xhi=.. -ylo=.. -yhi=.. -zlo=.. -zhi=..
--ro=..      : particle radius (required for formats A and B) (if set and if system is monodisperse, overwrites radius in file format C. For polydisperse systems see note 6) 
+-ro=..      : particle radius (if set and if system is monodisperse, overwrites radius in file format C. For polydisperse systems see note 6) 
 -rp=..      : probe particle radius (default: rp=0)
 -rc=..      : particle coating thickness (default: rc=0) (only taken into account if file format C is used, ro=radius+rc is used)
 -q=..       : A positive number (default: 10), determines the quality. The number of shots is q times the number of material spheres
